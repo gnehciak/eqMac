@@ -1,0 +1,134 @@
+@import "../../styles/colors";
+
+:host {
+  display: block;
+  width: 100%;
+  filter: grayscale(80%);
+}
+
+:host.enabled {
+  filter: none;
+}
+
+.container {
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  transform: translateX(-2px);
+}
+
+.right {
+  width: 20px;
+  display: inline-flex;
+  flex-direction: column;
+  text-align: center;
+  position: absolute;
+  right: 0px;
+  top: calc(50% - 16px/2);
+}
+
+.item {
+  margin: 4px;
+  display: inline-flex;
+  flex-direction: row;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  .icon {
+    margin-right: 10px;
+    display: inline-block;
+  }
+}
+
+.panel {
+  position: fixed;
+  z-index: 4;
+  border-radius: 4px;
+  background-color: $text-dark;
+  // Same chrome ring as eqm-container + the select-box drop shadow
+  box-shadow: 0 0 0 1px #000,
+              0 0 0 2px rgb(70, 74, 77),
+              0px 8px 77px 2px rgba(0, 0, 0, 0.56);
+}
+
+.down {
+  transform-origin: top center;
+}
+
+.up {
+  transform-origin: bottom center;
+}
+
+.search {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px 4px;
+
+  eqm-input-field {
+    width: 100%;
+  }
+}
+
+.viewport {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.spacer {
+  position: relative;
+  width: 100%;
+}
+
+.window {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  will-change: transform;
+}
+
+.row {
+  border-color: transparent;
+  padding: 2px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+
+  border-width: 1px;
+  border-style: solid;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  box-sizing: content-box;
+  cursor: pointer;
+
+  .icon {
+    margin-right: 10px;
+    display: inline-block;
+  }
+
+  &.selected {
+    border-color: $accent !important;
+  }
+
+  &:hover {
+    border-color: darken($color: $accent, $amount: 20);
+  }
+}
+
+.no-results {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}

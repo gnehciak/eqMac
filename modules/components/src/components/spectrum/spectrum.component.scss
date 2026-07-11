@@ -1,0 +1,13 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  // The spectrum is meant to underlay eqm-eq-graph — never steal its mouse events
+  pointer-events: none;
+}
+
+.spectrum-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

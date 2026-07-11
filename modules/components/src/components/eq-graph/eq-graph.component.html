@@ -1,0 +1,70 @@
+<svg
+  class="eq-graph"
+  [attr.viewBox]="viewBox"
+  preserveAspectRatio="none"
+  (mousedown)="onBackgroundMouseDown($event)"
+  (dblclick)="onBackgroundDoubleClick($event)">
+
+  <g *ngIf="showGrid" class="grid">
+    <line *ngFor="let line of freqGridLines; trackBy: trackByIndex"
+      [attr.x1]="line.position" [attr.x2]="line.position"
+      [attr.y1]="0" [attr.y2]="height"
+      [attr.stroke]="colors.light"
+      [attr.opacity]="line.emphasized ? 0.25 : 0.08"
+      stroke-width="1"></line>
+    <line *ngFor="let line of gainGridLines; trackBy: trackByIndex"
+      [attr.x1]="0" [attr.x2]="width"
+      [attr.y1]="line.position" [attr.y2]="line.position"
+      [attr.stroke]="colors.light"
+      [attr.opacity]="line.emphasized ? 0.25 : 0.08"
+      stroke-width="1"></line>
+  </g>
+
+  <g *ngIf="showLabels" class="labels">
+    <text *ngFor="let line of freqGridLines; trackBy: trackByIndex"
+      [attr.x]="line.position + 2" [attr.y]="height - 3"
+      [attr.fill]="colors.light"
+      opacity="0.4"
+      font-size="8">{{ line.label }}</text>
+    <text *ngFor="let line of gainGridLines; trackBy: trackByIndex"
+      [attr.x]="2" [attr.y]="line.position - 2"
+      [attr.fill]="colors.light"
+      opacity="0.4"
+      font-size="8">{{ line.label }}</text>
+  </g>
+
+  <path *ngFor="let curve of bandCurves; trackBy: trackByBandId"
+    class="band-curve"
+    [attr.d]="curve.path"
+    fill="none"
+    [attr.stroke]="curve.color"
+    [attr.opacity]="curve.enabled ? (curve.selected ? 0.8 : 0.35) : 0.12"
+    stroke-width="1"></path>
+
+  <path *ngFor="let composite of composites; trackBy: trackByIndex"
+    class="composite-curve"
+    [attr.d]="composite.path"
+    fill="none"
+    [attr.stroke]="composite.color"
+    stroke-width="2"></path>
+
+  <g *ngFor="let handle of handles; trackBy: trackByHandle"
+    class="handle"
+    (mousedown)="onHandleMouseDown($event, handle.band)"
+    (dblclick)="onHandleDoubleClick($event, handle.band)"
+    (contextmenu)="onHandleContext($event, handle.band)"
+    (mouseenter)="onHandleMouseEnter(handle.band)"
+    (mouseleave)="onHandleMouseLeave()">
+    <circle
+      [attr.cx]="handle.x" [attr.cy]="handle.y"
+      [attr.r]="handleRadius + 4"
+      fill="transparent"></circle>
+    <circle
+      [attr.cx]="handle.x" [attr.cy]="handle.y"
+      [attr.r]="handleRadius"
+      [attr.fill]="handle.color"
+      [attr.fill-opacity]="handle.band.enabled ? 0.9 : 0.3"
+      [attr.stroke]="handle.selected ? colors.light : colors.dark"
+      [attr.stroke-width]="handle.selected ? 1.5 : 1"></circle>
+  </g>
+</svg>

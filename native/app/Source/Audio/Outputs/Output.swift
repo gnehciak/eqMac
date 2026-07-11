@@ -142,10 +142,15 @@ class Output {
     let inputBuffer = inputDevice.bufferFrameSize(direction: .recording)
     let outputOffset = device.safetyOffset(direction: .playback)
     let outputBuffer = device.bufferFrameSize(direction: .playback)
-    safetyOffset = Double(inputOffset! + outputOffset! + inputBuffer + outputBuffer)// + pow(2, 12)
+    // Account for inherent latency of the effects chain + raw DSP kernels
+    // (lookahead limiters, delay lines...) - otherwise the read pointer runs
+    // ahead of the delayed audio and triggers CircularBufferError reset loops
+    let chainLatency = Double(Application.engine?.chainLatencyFrames ?? 0)
+    safetyOffset = Double(inputOffset! + outputOffset! + inputBuffer + outputBuffer) + chainLatency// + pow(2, 12)
     sampleOffset = Application.engine!.lastSampleTime - lastSampleTime
     Console.log("Last Input Time: ", Application.engine!.lastSampleTime)
     Console.log("Last Output Time: ", lastSampleTime)
+    Console.log("Chain Latency: ", chainLatency)
     Console.log("Safety Offset: ", safetyOffset)
     Console.log("Sample Offset: ", sampleOffset)
   }

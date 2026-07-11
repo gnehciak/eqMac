@@ -1,7 +1,116 @@
-$accent: #4f8d71; //#de5f00;
-$warning: #eb3f42;
-$gradient-start: rgb(90, 91, 95);
-$gradient-end: #2c2c2e;
-$text-light: #c9cdd0;
-$text-medium: rgb(30, 30, 30);
-$text-dark: rgb(22, 25, 28);
+// eqMac shared color variables
+// ----------------------------
+// The SCSS variable names are unchanged so every component stylesheet keeps
+// compiling as before, but each variable now resolves to a CSS custom
+// property (theme token) stamped on :root by the ThemeService. The var()
+// fallback is the original hardcoded value (Classic Dark theme), so
+// components render identically when no theme engine is present.
+// Token defaults / documentation: ./theme-tokens.scss
+
+// ---------------------------------------------------------------------------
+// CSS-variable-aware shims for Sass color functions.
+//
+// Some component stylesheets apply darken()/lighten()/rgba() to the variables
+// below. Those built-ins require literal colors and would fail on var(...)
+// values, so the user-defined functions here shadow them:
+//   - Given a var(--eqm-*) value they return a *derived theme token*
+//     (e.g. var(--eqm-accent-darken-20, #2a4c3d)) whose fallback is computed
+//     from the original palette, and whose live value is stamped per-theme
+//     by ThemeService.
+//   - Given a literal color they reproduce the built-in behavior exactly.
+//
+// NOTE: mirrored in ui/src/app/styles/_colors.scss — keep both in sync.
+// ---------------------------------------------------------------------------
+
+$-eqm-token-fallbacks: (
+  '--eqm-accent': #4f8d71,
+  '--eqm-accent-light': #4DAD82,
+  '--eqm-warning': #eb3f42,
+  '--eqm-caution': #FFD500,
+  '--eqm-gradient-start': #5a5b5f,
+  '--eqm-gradient-end': #2c2c2e,
+  '--eqm-icon-gradient-start': #05FF71,
+  '--eqm-icon-gradient-middle': #03F193,
+  '--eqm-icon-gradient-end': #04E2B5,
+  '--eqm-text-light': #c9cdd0,
+  '--eqm-text-medium': #1e1e1e,
+  '--eqm-text-dark': #16191c,
+  '--eqm-surface': #16191c
+);
+
+@function -eqm-is-css-var($value) {
+  @return type-of($value) == string and str-index($value, 'var(') == 1;
+}
+
+// Extracts the custom property name from 'var(--name)' / 'var(--name, fallback)'
+@function -eqm-var-name($value) {
+  $start: str-index($value, '--');
+  $rest: str-slice($value, $start);
+  $comma: str-index($rest, ',');
+  $paren: str-index($rest, ')');
+  $end: if($comma != null and ($paren == null or $comma < $paren), $comma, $paren);
+  @return str-slice($rest, 1, $end - 1);
+}
+
+// Built-in equivalents (the built-ins are shadowed below, so reimplement)
+@function -eqm-darken($color, $amount) {
+  @return hsl(hue($color), saturation($color), lightness($color) - $amount);
+}
+
+@function -eqm-lighten($color, $amount) {
+  @return hsl(hue($color), saturation($color), lightness($color) + $amount);
+}
+
+@function darken($color, $amount) {
+  @if -eqm-is-css-var($color) and unitless($amount) {
+    $name: -eqm-var-name($color);
+    $fallback: map-get($-eqm-token-fallbacks, $name);
+    $token: #{$name}-darken-#{round($amount)};
+    @if $fallback != null {
+      @return var(#{$token}, #{-eqm-darken($fallback, $amount)});
+    }
+    @return var(#{$token});
+  }
+  @return -eqm-darken($color, $amount);
+}
+
+@function lighten($color, $amount) {
+  @if -eqm-is-css-var($color) and unitless($amount) {
+    $name: -eqm-var-name($color);
+    $fallback: map-get($-eqm-token-fallbacks, $name);
+    $token: #{$name}-lighten-#{round($amount)};
+    @if $fallback != null {
+      @return var(#{$token}, #{-eqm-lighten($fallback, $amount)});
+    }
+    @return var(#{$token});
+  }
+  @return -eqm-lighten($color, $amount);
+}
+
+@function rgba($args...) {
+  @if length($args) == 2 and -eqm-is-css-var(nth($args, 1)) {
+    $color: nth($args, 1);
+    $alpha: nth($args, 2);
+    $name: -eqm-var-name($color);
+    $fallback: map-get($-eqm-token-fallbacks, $name);
+    $token: #{$name}-rgba-#{round($alpha * 100)};
+    @if $fallback != null {
+      @return var(#{$token}, #{rgb($fallback, $alpha)});
+    }
+    @return var(#{$token});
+  }
+  @return rgb($args...);
+}
+
+// ---------------------------------------------------------------------------
+// Theme variables (names unchanged — values now themeable)
+// ---------------------------------------------------------------------------
+
+$accent: var(--eqm-accent, #4f8d71); //#de5f00;
+$warning: var(--eqm-warning, #eb3f42);
+$gradient-start: var(--eqm-gradient-start, #5a5b5f);
+$gradient-end: var(--eqm-gradient-end, #2c2c2e);
+$text-light: var(--eqm-text-light, #c9cdd0);
+$text-medium: var(--eqm-text-medium, #1e1e1e);
+$text-dark: var(--eqm-text-dark, #16191c);
+$surface: var(--eqm-surface, #16191c);

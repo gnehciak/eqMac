@@ -117,9 +117,59 @@ class Networking {
     }
     return port
   }
-  
+
   static func release(socket: Int32) {
     Darwin.shutdown(socket, SHUT_RDWR)
     close(socket)
+  }
+
+  static let LOOPBACK_ADDRESSES = [
+    "localhost",
+    "127.0.0.1",
+    "::1",
+    "0:0:0:0:0:0:0:1"
+  ]
+
+  static func isLoopback (address: String) -> Bool {
+    let address = address.lowercased()
+    if LOOPBACK_ADDRESSES.contains(address) {
+      return true
+    }
+    // The whole 127.0.0.0/8 block is loopback (incl. IPv4-mapped IPv6)
+    if address.hasPrefix("127.") || address.hasPrefix("::ffff:127.") {
+      return true
+    }
+    return false
+  }
+
+  // IPv4 addresses of this machine on the local network(s),
+  // loopback excluded. Useful for displaying the remote control URL.
+  static func getLANAddresses () -> [String] {
+    var addresses: [String] = []
+    var ifaddrsPointer: UnsafeMutablePointer<ifaddrs>?
+    guard getifaddrs(&ifaddrsPointer) == 0, let firstAddress = ifaddrsPointer else {
+      return addresses
+    }
+    var pointer: UnsafeMutablePointer<ifaddrs>? = firstAddress
+    while let current = pointer {
+      defer { pointer = current.pointee.ifa_next }
+      guard let addr = current.pointee.ifa_addr else { continue }
+      guard addr.pointee.sa_family == sa_family_t(AF_INET) else { continue }
+      var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+      guard getnameinfo(
+        addr,
+        socklen_t(addr.pointee.sa_len),
+        &hostname,
+        socklen_t(hostname.count),
+        nil,
+        0,
+        NI_NUMERICHOST
+      ) == 0 else { continue }
+      let address = String(cString: hostname)
+      if isLoopback(address: address) { continue }
+      addresses.append(address)
+    }
+    freeifaddrs(firstAddress)
+    return addresses
   }
 }

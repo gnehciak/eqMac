@@ -1,4 +1,105 @@
-$accent: #4f8d71;
+// eqMac UI color variables
+// ------------------------
+// The SCSS variable names are unchanged so existing stylesheets keep
+// compiling as before, but each variable now resolves to a CSS custom
+// property (theme token) stamped on :root by the ThemeService. The var()
+// fallback is the original hardcoded value (Classic Dark theme).
+// Token defaults / documentation:
+//   modules/components/src/styles/theme-tokens.scss
+
+// ---------------------------------------------------------------------------
+// CSS-variable-aware shims for Sass color functions.
+// Mirrored from modules/components/src/styles/colors.scss — keep in sync.
+// They shadow darken()/lighten()/rgba() so stylesheets that apply them to the
+// theme variables (e.g. equalizers.component.scss) compile and resolve to
+// derived theme tokens; literal colors keep the exact built-in behavior.
+// ---------------------------------------------------------------------------
+
+$-eqm-token-fallbacks: (
+  '--eqm-accent': #4f8d71,
+  '--eqm-accent-light': #4DAD82,
+  '--eqm-warning': #eb3f42,
+  '--eqm-caution': #FFD500,
+  '--eqm-gradient-start': #5a5b5f,
+  '--eqm-gradient-end': #2c2c2e,
+  '--eqm-icon-gradient-start': #05FF71,
+  '--eqm-icon-gradient-middle': #03F193,
+  '--eqm-icon-gradient-end': #04E2B5,
+  '--eqm-text-light': #c9cdd0,
+  '--eqm-text-medium': #1e1e1e,
+  '--eqm-text-dark': #16191c,
+  '--eqm-surface': #16191c
+);
+
+@function -eqm-is-css-var($value) {
+  @return type-of($value) == string and str-index($value, 'var(') == 1;
+}
+
+// Extracts the custom property name from 'var(--name)' / 'var(--name, fallback)'
+@function -eqm-var-name($value) {
+  $start: str-index($value, '--');
+  $rest: str-slice($value, $start);
+  $comma: str-index($rest, ',');
+  $paren: str-index($rest, ')');
+  $end: if($comma != null and ($paren == null or $comma < $paren), $comma, $paren);
+  @return str-slice($rest, 1, $end - 1);
+}
+
+// Built-in equivalents (the built-ins are shadowed below, so reimplement)
+@function -eqm-darken($color, $amount) {
+  @return hsl(hue($color), saturation($color), lightness($color) - $amount);
+}
+
+@function -eqm-lighten($color, $amount) {
+  @return hsl(hue($color), saturation($color), lightness($color) + $amount);
+}
+
+@function darken($color, $amount) {
+  @if -eqm-is-css-var($color) and unitless($amount) {
+    $name: -eqm-var-name($color);
+    $fallback: map-get($-eqm-token-fallbacks, $name);
+    $token: #{$name}-darken-#{round($amount)};
+    @if $fallback != null {
+      @return var(#{$token}, #{-eqm-darken($fallback, $amount)});
+    }
+    @return var(#{$token});
+  }
+  @return -eqm-darken($color, $amount);
+}
+
+@function lighten($color, $amount) {
+  @if -eqm-is-css-var($color) and unitless($amount) {
+    $name: -eqm-var-name($color);
+    $fallback: map-get($-eqm-token-fallbacks, $name);
+    $token: #{$name}-lighten-#{round($amount)};
+    @if $fallback != null {
+      @return var(#{$token}, #{-eqm-lighten($fallback, $amount)});
+    }
+    @return var(#{$token});
+  }
+  @return -eqm-lighten($color, $amount);
+}
+
+@function rgba($args...) {
+  @if length($args) == 2 and -eqm-is-css-var(nth($args, 1)) {
+    $color: nth($args, 1);
+    $alpha: nth($args, 2);
+    $name: -eqm-var-name($color);
+    $fallback: map-get($-eqm-token-fallbacks, $name);
+    $token: #{$name}-rgba-#{round($alpha * 100)};
+    @if $fallback != null {
+      @return var(#{$token}, #{rgb($fallback, $alpha)});
+    }
+    @return var(#{$token});
+  }
+  @return rgb($args...);
+}
+
+// ---------------------------------------------------------------------------
+// Theme variables (names unchanged — values now themeable)
+// ---------------------------------------------------------------------------
+
+$accent: var(--eqm-accent, #4f8d71);
 ::ng-deep .accent {
   color: $accent !important;
 }
@@ -7,7 +108,7 @@ $accent: #4f8d71;
   background-color: $accent !important;
 }
 
-$accent-light: #4DAD82;
+$accent-light: var(--eqm-accent-light, #4DAD82);
 ::ng-deep .accent-light {
   color: $accent-light !important;
 }
@@ -16,7 +117,7 @@ $accent-light: #4DAD82;
   background-color: $accent-light !important;
 }
 
-$warning: #eb3f42;
+$warning: var(--eqm-warning, #eb3f42);
 ::ng-deep .warning {
   color: $warning !important;
 }
@@ -25,7 +126,7 @@ $warning: #eb3f42;
   background-color: $warning !important;
 }
 
-$gradient-start: #5a5b5f;
+$gradient-start: var(--eqm-gradient-start, #5a5b5f);
 ::ng-deep .gradient-start {
   color: $gradient-start !important;
 }
@@ -34,7 +135,7 @@ $gradient-start: #5a5b5f;
   background-color: $gradient-start !important;
 }
 
-$gradient-end: #2c2c2e;
+$gradient-end: var(--eqm-gradient-end, #2c2c2e);
 ::ng-deep .gradient-end {
   color: $gradient-end !important;
 }
@@ -43,7 +144,7 @@ $gradient-end: #2c2c2e;
   background-color: $gradient-end !important;
 }
 
-$icon-gradient-start: #05FF71;
+$icon-gradient-start: var(--eqm-icon-gradient-start, #05FF71);
 ::ng-deep .icon-gradient-start {
   color: $icon-gradient-start !important;
 }
@@ -52,7 +153,7 @@ $icon-gradient-start: #05FF71;
   background-color: $icon-gradient-start !important;
 }
 
-$icon-gradient-middle: #03F193;
+$icon-gradient-middle: var(--eqm-icon-gradient-middle, #03F193);
 ::ng-deep .icon-gradient-middle {
   color: $icon-gradient-middle !important;
 }
@@ -61,7 +162,7 @@ $icon-gradient-middle: #03F193;
   background-color: $icon-gradient-middle !important;
 }
 
-$icon-gradient-end: #04E2B5;
+$icon-gradient-end: var(--eqm-icon-gradient-end, #04E2B5);
 ::ng-deep .icon-gradient-end {
   color: $icon-gradient-end !important;
 }
@@ -70,7 +171,7 @@ $icon-gradient-end: #04E2B5;
   background-color: $icon-gradient-end !important;
 }
 
-$light: #c9cdd0;
+$light: var(--eqm-text-light, #c9cdd0);
 ::ng-deep .light {
   color: $light !important;
 }
@@ -79,7 +180,7 @@ $light: #c9cdd0;
   background-color: $light !important;
 }
 
-$dark: rgb(22, 25, 28);
+$dark: var(--eqm-text-dark, #16191c);
 ::ng-deep .dark {
   color: $dark !important;
 }

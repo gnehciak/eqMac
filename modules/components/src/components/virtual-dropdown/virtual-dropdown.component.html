@@ -1,0 +1,42 @@
+<eqm-container #container [enabled]="enabled" (click)="toggle($event)" class="container">
+  <div class="item">
+    <eqm-icon *ngIf="selectedItem && selectedItem.icon" [name]="selectedItem.icon" [rotate]="selectedItem.iconRotate || 0" class="icon" [color]="selectedItem.iconColor || colors.accent"></eqm-icon>
+    <eqm-label [color]="colors.accent"> {{(items.length ? (selectedItem ? selectedItem[labelParam] : placeholder) : noItemsPlaceholder)}} </eqm-label>
+  </div>
+
+  <div class="right">
+    <eqm-icon [name]="'triangle'" [height]="8" [width]="8" [color]="items.length ? colors.accent : colors.gradientStart" [rotate]="-90">
+    </eqm-icon>
+    <eqm-icon [name]="'triangle'" [height]="8" [width]="8" [color]="items.length ? colors.accent : colors.gradientStart" [rotate]="90">
+    </eqm-icon>
+  </div>
+</eqm-container>
+
+<div #panel
+  [class]="'panel' + (direction === 'down' ? ' down' : ' up')"
+  [hidden]="!shown"
+  [style.top.px]="yCoordinate"
+  (clickedOutside)="onClickedOutside()">
+
+  <div class="search" *ngIf="searchable" [style.height.px]="searchRowHeight">
+    <eqm-input-field [text]="searchText" (textChange)="onSearchChanged($event)" [placeholder]="searchPlaceholder" [fontSize]="12"></eqm-input-field>
+  </div>
+
+  <div #viewport class="viewport" [style.height.px]="filteredItems.length ? viewportHeight : 0" (scroll)="onScroll()">
+    <div class="spacer" [style.height.px]="totalHeight">
+      <div class="window" [style.transform]="'translateY(' + translateY + 'px)'">
+        <div *ngFor="let item of visibleItems; trackBy: trackByItem"
+          [class]="'row' + (item === selectedItem ? ' selected' : '')"
+          [style.height.px]="itemHeight - 6"
+          (click)="selectItem(item)">
+          <eqm-icon *ngIf="item.icon" [name]="item.icon" [rotate]="item.iconRotate || 0" class="icon"></eqm-icon>
+          <eqm-label>{{item[labelParam]}}</eqm-label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-results" *ngIf="filteredItems.length === 0" [style.height.px]="itemHeight">
+    <eqm-label>{{noItemsPlaceholder}}</eqm-label>
+  </div>
+</div>

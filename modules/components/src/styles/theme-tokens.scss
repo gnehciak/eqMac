@@ -1,0 +1,46 @@
+// eqMac theme tokens
+// ------------------
+// Single source of truth for the themeable color palette, expressed as CSS
+// custom properties. The values below are the "Classic Dark" skeuomorph theme
+// (the original hardcoded eqMac palette) and act as the default when no theme
+// has been applied yet.
+//
+// At runtime ui/src/app/services/theme.service.ts (ThemeService) re-stamps
+// these properties on document.documentElement to switch themes, and
+// ColorsService (./services/colors.service.ts) reads them back for
+// canvas / SVG widgets.
+//
+// This file is meant to be imported ONCE globally (ui/src/styles.scss).
+// Do NOT import it from component stylesheets — import ./colors instead,
+// whose SCSS variables resolve to var(--eqm-*) with these same values as
+// inline fallbacks (so components render correctly even before this file
+// or ThemeService has loaded).
+//
+// Derived tokens (-darken-*/-lighten-*/-rgba-*) exist because a few component
+// stylesheets apply Sass color functions (darken/lighten/rgba) to the theme
+// variables; the CSS-variable-aware function shims in ./colors and
+// ui/src/app/styles/_colors.scss redirect those calls to these tokens, and
+// ThemeService recomputes them for every theme.
+
+:root {
+  // Base palette
+  --eqm-accent: #4f8d71;
+  --eqm-accent-light: #4DAD82;
+  --eqm-warning: #eb3f42;
+  --eqm-caution: #FFD500;
+  --eqm-gradient-start: #5a5b5f;
+  --eqm-gradient-end: #2c2c2e;
+  --eqm-icon-gradient-start: #05FF71;
+  --eqm-icon-gradient-middle: #03F193;
+  --eqm-icon-gradient-end: #04E2B5;
+  --eqm-text-light: #c9cdd0;
+  --eqm-text-medium: #1e1e1e;
+  --eqm-text-dark: #16191c;
+  --eqm-surface: #16191c;
+
+  // Derived tokens (kept in sync with the base palette by ThemeService)
+  --eqm-accent-darken-20: #2a4c3d; // darken(#4f8d71, 20)
+  --eqm-accent-rgba-50: rgba(79, 141, 113, 0.5); // rgba(#4f8d71, .5)
+  --eqm-gradient-start-darken-6: #4b4c4f; // darken(#5a5b5f, 6)
+  --eqm-gradient-end-lighten-3: #333336; // lighten(#2c2c2e, 3)
+}
