@@ -1,0 +1,50 @@
+:host {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.audio-units {
+  height: 100%;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+
+.chain-list {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.unit-row {
+  box-sizing: border-box;
+
+  &.loading {
+    opacity: 0.5;
+  }
+
+  .unit-name {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .row-button {
+    flex-shrink: 0;
+    cursor: pointer;
+
+    &.disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+  }
+}
+
+.add-row {
+  flex-shrink: 0;
+}
+
+.placeholder {
+  height: 100%;
+}

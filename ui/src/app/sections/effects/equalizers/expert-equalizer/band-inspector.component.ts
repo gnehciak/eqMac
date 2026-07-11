@@ -1,0 +1,161 @@
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectorRef
+} from '@angular/core'
+import { FlatSliderValueChangedEvent } from '@eqmac/components'
+import {
+  ExpertEqualizerBand,
+  ExpertEqualizerBandChannel,
+  ExpertEqualizerFilterType
+} from './expert-equalizer.service'
+
+export interface ExpertEqualizerFilterTypeItem {
+  id: ExpertEqualizerFilterType
+  name: string
+}
+
+/**
+ * Per-selected-band parameter editor row rendered under the eq-graph:
+ * filter type dropdown, frequency / gain / Q sliders with value screens,
+ * L / R / Both channel toggle, enable checkbox, add + delete band buttons.
+ *
+ * Styles are inline (styles array) — this component deliberately ships
+ * without its own .scss file.
+ */
+@Component({
+  selector: 'eqm-expert-band-inspector',
+  templateUrl: './band-inspector.component.html',
+  styles: [ `
+    :host {
+      display: block;
+      width: 100%;
+      height: 64px;
+      padding: 4px 5px 2px 5px;
+      box-sizing: border-box;
+    }
+
+    .inspector-row {
+      height: 26px;
+    }
+
+    .type-dropdown {
+      width: 110px;
+      min-width: 110px;
+    }
+
+    .slider-group {
+      min-width: 0;
+    }
+
+    .slider-container {
+      min-width: 30px;
+    }
+
+    .param-label {
+      min-width: 24px;
+      text-align: right;
+    }
+
+    .screen {
+      min-width: 52px;
+      text-align: center;
+    }
+  ` ]
+})
+export class BandInspectorComponent {
+  @Input() band: ExpertEqualizerBand | null = null
+  @Input() enabled = true
+  @Input() canAddBand = true
+
+  /** Emitted after this component mutated the band object's parameters */
+  @Output() bandChange = new EventEmitter<ExpertEqualizerBand>()
+  @Output() bandRemove = new EventEmitter<ExpertEqualizerBand>()
+  @Output() addBand = new EventEmitter<void>()
+
+  readonly filterTypes: ExpertEqualizerFilterTypeItem[] = [
+    { id: 'peak', name: 'Peak' },
+    { id: 'lowPass', name: 'Low Pass' },
+    { id: 'highPass', name: 'High Pass' },
+    { id: 'lowShelf', name: 'Low Shelf' },
+    { id: 'highShelf', name: 'High Shelf' },
+    { id: 'bandPass', name: 'Band Pass' },
+    { id: 'notch', name: 'Notch' },
+    { id: 'allPass', name: 'All Pass' }
+  ]
+
+  constructor (
+    public change: ChangeDetectorRef
+  ) {}
+
+  get selectedFilterTypeItem (): ExpertEqualizerFilterTypeItem | null {
+    const band = this.band
+    if (!band) return null
+    return this.filterTypes.find(item => item.id === band.type) || null
+  }
+
+  get frequencyScreenValue () {
+    if (!this.band) return ''
+    const frequency = this.band.frequency
+    return frequency >= 1000 ? `${(frequency / 1000).toFixed(1)}kHz` : `${frequency.toFixed(0)}Hz`
+  }
+
+  get gainScreenValue () {
+    if (!this.band) return ''
+    const gain = this.band.gain
+    return `${gain > 0 ? '+' : ''}${gain.toFixed(1)}dB`
+  }
+
+  get qScreenValue () {
+    if (!this.band) return ''
+    return `Q ${this.band.q.toFixed(2)}`
+  }
+
+  selectFilterType (item: ExpertEqualizerFilterTypeItem) {
+    if (!this.band || !item) return
+    this.band.type = item.id
+    this.emitChange()
+  }
+
+  setFrequency (event: FlatSliderValueChangedEvent) {
+    if (!this.band) return
+    this.band.frequency = Math.round(event.value * 10) / 10
+    this.emitChange()
+  }
+
+  setGain (event: FlatSliderValueChangedEvent) {
+    if (!this.band) return
+    this.band.gain = Math.round(event.value * 10) / 10
+    this.emitChange()
+  }
+
+  setQ (event: FlatSliderValueChangedEvent) {
+    if (!this.band) return
+    this.band.q = Math.round(event.value * 100) / 100
+    this.emitChange()
+  }
+
+  setChannel (channel: ExpertEqualizerBandChannel) {
+    if (!this.band || this.band.channel === channel) return
+    this.band.channel = channel
+    this.emitChange()
+  }
+
+  setEnabled (enabled: boolean) {
+    if (!this.band) return
+    this.band.enabled = enabled
+    this.emitChange()
+  }
+
+  remove () {
+    if (!this.band) return
+    this.bandRemove.emit(this.band)
+  }
+
+  private emitChange () {
+    this.change.detectChanges()
+    this.bandChange.emit(this.band)
+  }
+}

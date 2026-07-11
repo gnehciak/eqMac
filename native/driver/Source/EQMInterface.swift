@@ -116,6 +116,16 @@ func EQM_AddDeviceClient (inDriver: AudioServerPlugInDriverRef, inDeviceObjectID
 
   EQMClients.add(EQMClient(from: inClientInfo.pointee))
 
+  // Let listeners (the eqMac app) know the client list has changed.
+  // Dispatched asynchronously because the HAL can be holding locks
+  // while invoking AddDeviceClient.
+  DispatchQueue.global(qos: .default).async {
+    EQMDriver.propertiesUpdated(
+      objectId: kObjectID_Device,
+      changedProperties: [ EQMDeviceCustom.addresses.clients ]
+    )
+  }
+
   return noErr
 }
 
@@ -131,6 +141,16 @@ func EQM_RemoveDeviceClient (inDriver: AudioServerPlugInDriverRef, inDeviceObjec
 
   if (client.isAppClient && !EQMClients.isAppClientPresent) {
     EQMDevice.shown = false
+  }
+
+  // Let listeners (the eqMac app) know the client list has changed.
+  // Dispatched asynchronously because the HAL can be holding locks
+  // while invoking RemoveDeviceClient.
+  DispatchQueue.global(qos: .default).async {
+    EQMDriver.propertiesUpdated(
+      objectId: kObjectID_Device,
+      changedProperties: [ EQMDeviceCustom.addresses.clients ]
+    )
   }
 
   return noErr

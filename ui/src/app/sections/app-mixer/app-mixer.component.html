@@ -1,0 +1,18 @@
+<div class="app-mixer" fxLayout="column" fxLayoutAlign="start stretch">
+  <div *ngIf="available && apps.length > 0" class="app-list">
+    <eqm-app-row
+      *ngFor="let mixerApp of apps; trackBy: trackApp"
+      [app]="mixerApp"
+      [enabled]="app.enabled"
+      [style.height.px]="rowHeight"
+    ></eqm-app-row>
+  </div>
+
+  <div *ngIf="synced && available && apps.length === 0" class="placeholder" fxLayout="row" fxLayoutAlign="center center">
+    <eqm-label [fontSize]="11">No apps are playing audio</eqm-label>
+  </div>
+
+  <div *ngIf="synced && !available" class="placeholder" fxLayout="row" fxLayoutAlign="center center">
+    <eqm-label [fontSize]="11">App Mixer requires a newer version of eqMac</eqm-label>
+  </div>
+</div>

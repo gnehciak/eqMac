@@ -2,8 +2,10 @@ import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, Host
 import { BasicEqualizerService, BasicEqualizerPreset, BasicEqualizerBand, BasicEqualizerPresetGains } from './basic-equalizer.service'
 import { EqualizerComponent } from '../equalizer.component'
 import { KnobValueChangedEvent } from '@eqmac/components'
+import { Options } from 'src/app/components/options/options.component'
 import { TransitionService } from '../../../../services/transitions.service'
 import { ApplicationService } from '../../../../services/app.service'
+import { ToastService } from '../../../../services/toast.service'
 import { UIService } from '../../../../services/ui.service'
 
 @Component({
@@ -51,14 +53,38 @@ export class BasicEqualizerComponent extends EqualizerComponent implements OnIni
 
   get selectedPreset () { return this._selectedPreset }
 
-  settings = []
+  settings: Options = [ [
+    {
+      type: 'button',
+      label: 'Import Presets',
+      action: async () => {
+        const log = await this.service.importPresets()
+        await this.syncPresets()
+        this.toast.show({
+          type: 'success',
+          message: log
+        })
+      }
+    }, {
+      type: 'button',
+      label: 'Export Presets',
+      action: async () => {
+        const log = await this.service.exportPresets()
+        this.toast.show({
+          type: 'success',
+          message: log
+        })
+      }
+    }
+  ] ]
 
   constructor (
     public service: BasicEqualizerService,
     public app: ApplicationService,
     public ui: UIService,
     public change: ChangeDetectorRef,
-    public transition: TransitionService
+    public transition: TransitionService,
+    public toast: ToastService
   ) {
     super()
   }

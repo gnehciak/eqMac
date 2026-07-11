@@ -1,0 +1,29 @@
+<eqm-loading *ngIf="!selectedPreset || !presets"></eqm-loading>
+<div *ngIf="selectedPreset && presets" fxLayout="column" class="w-100 h-100">
+
+  <div class="graph-area" fxFlex>
+    <eqm-spectrum class="spectrum" [frames]="service.spectrum"></eqm-spectrum>
+    <eqm-eq-graph class="graph"
+      [bands]="bands"
+      [enabled]="enabled"
+      [minGain]="-24" [maxGain]="24"
+      [minFrequency]="20" [maxFrequency]="20000"
+      [minQ]="0.1" [maxQ]="10"
+      [selectedBandId]="selectedBandId"
+      (bandChanged)="onBandChanged($event)"
+      (bandAdded)="onBandAdded($event)"
+      (bandRemoved)="onBandRemoved($event)"
+      (bandSelected)="onBandSelected($event)">
+    </eqm-eq-graph>
+  </div>
+
+  <eqm-expert-band-inspector
+    [band]="selectedBand"
+    [enabled]="enabled"
+    [canAddBand]="canAddBand"
+    (bandChange)="onInspectorBandChanged($event)"
+    (bandRemove)="onBandRemoved($event)"
+    (addBand)="addBand()">
+  </eqm-expert-band-inspector>
+
+</div>

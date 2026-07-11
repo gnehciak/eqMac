@@ -1,0 +1,31 @@
+<div class="app-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+  <img *ngIf="iconSrc" class="app-icon" [src]="iconSrc" [alt]="name" draggable="false" />
+  <eqm-icon *ngIf="!iconSrc" class="app-icon" name="cog" [size]="16"></eqm-icon>
+
+  <div class="app-name" [eqmTooltip]="name">{{ name }}</div>
+
+  <div fxFlex class="slider-container">
+    <eqm-flat-slider
+      [min]="0"
+      [max]="1"
+      [enabled]="enabled"
+      [value]="volume"
+      (userChangedValue)="setVolume($event.value)"
+      [stickToMiddle]="false"
+      [showMiddleNotch]="false"
+      [doubleClickToAnimateToMiddle]="false"
+      [scrollOnlyWithOrientation]="true"
+      [thickness]="3"
+      [thumbRadius]="4"
+    ></eqm-flat-slider>
+  </div>
+
+  <eqm-icon
+    class="mute-button"
+    name="volume"
+    [size]="16"
+    [color]="muted ? colors.warning : colors.accent"
+    [eqmTooltip]="muted ? 'Unmute' : 'Mute'"
+    (click)="toggleMute()"
+  ></eqm-icon>
+</div>

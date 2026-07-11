@@ -1,12 +1,61 @@
-<div class="recorder" fxLayout="row" fxLayoutAlign="space-between center">
-    <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="center center">
-      <eqm-button type="circle" [hoverable]="false" height="25px" width="25px" (click)="toggleRecording()">
+<div class="recorder" fxLayout="column" fxLayoutAlign="space-evenly stretch">
+
+  <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
+    <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
+      <eqm-button
+        type="circle"
+        [hoverable]="false"
+        [height]="25"
+        [width]="25"
+        [enabled]="available"
+        (pressed)="toggleRecording()"
+        [eqmTooltip]="available ? (recording ? 'Stop recording' : 'Start recording') : ('Recording\nOnly available after v' + minNativeVersion)"
+        eqmTooltipPositionSide="bottom"
+      >
         <div [class]="'record-button ' + (recording ? 'stop-recording' : 'start-recording')"></div>
       </eqm-button>
-      <eqm-label>Record{{recording ? 'ing' : ''}}</eqm-label>
-      <eqm-label *ngIf="recording">{{utils.getTimestampFromDurationAndProgress(duration)}}</eqm-label>
+      <eqm-label>Record{{ recording ? 'ing' : '' }}</eqm-label>
+      <eqm-label *ngIf="recording">{{ utils.getTimestampFromDurationAndProgress(seconds) }}</eqm-label>
     </div>
-    <eqm-button type="narrow">
-      <eqm-label>Export File</eqm-label>
-    </eqm-button>
+
+    <eqm-icon
+      *ngIf="lastRecordingPath && !recording"
+      class="clickable"
+      name="show"
+      [size]="18"
+      [color]="colors.accent"
+      (click)="revealLastRecording()"
+      eqmTooltip="Show the last recording in Finder"
+      eqmTooltipPositionSide="left"
+    ></eqm-icon>
   </div>
+
+  <div class="destination" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+    <eqm-icon
+      class="clickable"
+      name="open"
+      [size]="16"
+      (click)="selectDestination()"
+      eqmTooltip="Change the recordings folder"
+      eqmTooltipPositionSide="top"
+    ></eqm-icon>
+    <div
+      class="destination-path clickable"
+      (click)="selectDestination()"
+      [eqmTooltip]="destination ? destination.path : ''"
+      eqmTooltipPositionSide="top"
+    >
+      <eqm-label [fontSize]="10">Saving to: {{ destinationFolderName }}</eqm-label>
+    </div>
+    <eqm-icon
+      *ngIf="destination && !destination.isDefault"
+      class="clickable"
+      name="reset"
+      [size]="14"
+      (click)="resetDestination()"
+      eqmTooltip="Reset to the default recordings folder"
+      eqmTooltipPositionSide="top"
+    ></eqm-icon>
+  </div>
+
+</div>

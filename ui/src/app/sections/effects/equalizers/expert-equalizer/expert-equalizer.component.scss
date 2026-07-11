@@ -1,0 +1,35 @@
+:host {
+  display: block;
+}
+
+.graph-area {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+
+  .spectrum,
+  .graph {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  // The spectrum underlays the eq-graph (its pointer-events are disabled,
+  // so the graph above stays fully interactive)
+  .spectrum {
+    z-index: 0;
+    opacity: 0.55;
+  }
+
+  .graph {
+    z-index: 1;
+  }
+}
+
+eqm-expert-band-inspector {
+  display: block;
+  width: 100%;
+}

@@ -1,0 +1,63 @@
+<div fxLayout="column" fxLayoutGap="6px">
+  <eqm-label class="title">Global Hotkeys</eqm-label>
+
+  <ng-container *ngIf="loaded">
+    <eqm-label *ngIf="!available">
+      Global Hotkeys require eqMac version {{ minNativeVersion }} or newer. Please update eqMac.
+    </eqm-label>
+
+    <ng-container *ngIf="available">
+      <div
+        class="hotkey-row"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+        fxLayoutGap="10px"
+        *ngFor="let row of rows"
+      >
+        <eqm-checkbox
+          [checked]="!!bindings[row.action]?.enabled"
+          [enabled]="!!bindings[row.action]"
+          (checkedChange)="setEnabled(row, $event)"
+        ></eqm-checkbox>
+
+        <eqm-label fxFlex>{{ row.label }}</eqm-label>
+
+        <eqm-label
+          class="combo"
+          [class.not-set]="!displayFor(row.action)"
+        >{{ displayFor(row.action) || 'Not set' }}</eqm-label>
+
+        <eqm-button
+          type="narrow"
+          [width]="90"
+          [state]="recording === row.action"
+          [enabled]="!recording || recording === row.action"
+          (pressed)="record(row)"
+        >
+          <eqm-label [clickable]="true">{{ recordButtonLabel(row) }}</eqm-label>
+        </eqm-button>
+
+        <eqm-icon
+          *ngIf="bindings[row.action]; else clearPlaceholder"
+          class="clear-button"
+          name="cross"
+          [size]="14"
+          (click)="clear(row)"
+        ></eqm-icon>
+        <ng-template #clearPlaceholder>
+          <div class="clear-placeholder"></div>
+        </ng-template>
+      </div>
+
+      <eqm-label class="hint" [fontSize]="11">
+        Click Record, then press a key combination. Press Esc to cancel. Hotkeys work system wide, even while eqMac is in the background.
+      </eqm-label>
+    </ng-container>
+  </ng-container>
+
+  <div fxLayout="row">
+    <eqm-button type="narrow" fxFlex (pressed)="close()">
+      <eqm-label [clickable]="true">Done</eqm-label>
+    </eqm-button>
+  </div>
+</div>

@@ -32,7 +32,12 @@ class BasicEqualizerDataBus: DataBus {
       let peakLimiter = data["peakLimiter"] as? Bool ?? false
       if let id = data["id"] as? String {
         // Update
-        if (BASIC_EQUALIZER_DEFAULT_PRESETS.keys.contains(id)) {
+        // NOTE: checks preset.isDefault instead of BASIC_EQUALIZER_DEFAULT_PRESETS.keys.contains(id)
+        // because those dictionary keys are display names ("Flat") while preset ids are
+        // camelCased ("flat"), so the keys check can never match.
+        // The synthesized "manual" preset reports isDefault = true but must stay updatable
+        // (special preset contract).
+        if let preset = BasicEqualizer.getPreset(id: id), preset.isDefault && preset.id != "manual" {
           throw "Default Presets aren't updatable."
         }
         BasicEqualizer.updatePreset(id: id, peakLimiter: peakLimiter, gains: gains)
@@ -75,6 +80,74 @@ class BasicEqualizerDataBus: DataBus {
       BasicEqualizer.deletePreset(preset)
       Application.dispatchAction(BasicEqualizerAction.selectPreset("flat", true))
       return "Basic Equalizer Preset has been deleted."
+    }
+
+    self.on(.GET, "/presets/export") { data, res in
+      File.save(extensions: ["json"]) { file in
+        if file != nil {
+          let presets = JSON(BasicEqualizer.userPresets.map { $0.dictionary })
+          let json = presets.rawString()!
+          do {
+            try json.write(to: file!, atomically: true, encoding: .utf8)
+            res.send(JSON("Exported \(presets.count) Presets"))
+          } catch {
+            res.error("Something went wrong")
+          }
+        } else {
+          res.error("Cancelled")
+        }
+      }
+      return nil
+    }
+
+    self.on(.GET, "/presets/import") { data, res in
+      File.select() { file in
+        if file == nil {
+          res.error("No file selected")
+          return
+        }
+        if file!.pathExtension != "json" {
+          res.error("Invalid File format, must be a JSON")
+          return
+        }
+
+        if let json = try? String(contentsOf: file!) {
+          let presets = JSON(parseJSON: json).arrayValue
+          var imported = 0
+          for preset in presets {
+            if let gains = preset["gains"].dictionary, let name = preset["name"].string {
+              guard let bass = gains["bass"]?.double,
+                let mid = gains["mid"]?.double,
+                let treble = gains["treble"]?.double else {
+                  continue
+              }
+              if [ bass, mid, treble ].contains(where: { !(-24.0...24.0).contains($0) }) {
+                continue
+              }
+              let peakLimiter = preset["peakLimiter"].bool ?? false
+              let presetGains = BasicEqualizerPresetGains(
+                bass: bass,
+                mid: mid,
+                treble: treble
+              )
+              if preset["id"].string == "manual" {
+                BasicEqualizer.updatePreset(id: "manual", peakLimiter: peakLimiter, gains: presetGains)
+              } else if let existing = BasicEqualizer.presets.first(where: { !$0.isDefault && $0.name == name }) {
+                // Name collision with an existing user preset - overwrite it
+                BasicEqualizer.updatePreset(id: existing.id, peakLimiter: peakLimiter, gains: presetGains)
+              } else {
+                _ = BasicEqualizer.createPreset(name: name, peakLimiter: peakLimiter, gains: presetGains)
+              }
+              imported += 1
+            }
+          }
+          res.send(JSON("Imported \(imported) Presets"))
+        } else {
+          res.error("File is not readable format.")
+        }
+
+      }
+      return nil
     }
   }
   

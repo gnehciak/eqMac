@@ -9,6 +9,12 @@ public struct EQMDeviceCustomProperties: Loopable {
   public let shown = AudioObjectPropertySelector.fromString("shwn")
   public let latency = AudioObjectPropertySelector.fromString("cltc")
   public let name = AudioObjectPropertySelector.fromString("eqmn")
+  // App Mixer - per-app volumes
+  // (settable, CFDictionary: bundleId -> { volume, muted })
+  public let appVolumes = AudioObjectPropertySelector.fromString("apvl")
+  // App Mixer - device client list
+  // (read-only, CFArray of CFDictionary: { clientId, processId, bundleId, volume, muted })
+  public let clients = AudioObjectPropertySelector.fromString("clts")
 
   public var count: UInt32 {
     return UInt32(properties.count)
@@ -36,6 +42,18 @@ public struct EQMDeviceCustomAddresses {
 
   public var name = AudioObjectPropertyAddress(
     mSelector: EQMDeviceCustom.properties.name,
+    mScope: kAudioObjectPropertyScopeGlobal,
+    mElement: kAudioObjectPropertyElementMaster
+  )
+
+  public var appVolumes = AudioObjectPropertyAddress(
+    mSelector: EQMDeviceCustom.properties.appVolumes,
+    mScope: kAudioObjectPropertyScopeGlobal,
+    mElement: kAudioObjectPropertyElementMaster
+  )
+
+  public var clients = AudioObjectPropertyAddress(
+    mSelector: EQMDeviceCustom.properties.clients,
     mScope: kAudioObjectPropertyScopeGlobal,
     mElement: kAudioObjectPropertyElementMaster
   )

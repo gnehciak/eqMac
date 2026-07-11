@@ -1,0 +1,65 @@
+<div class="spatial" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
+
+  <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="5px" fxFlex="60px">
+    <eqm-label>Spatial</eqm-label>
+    <eqm-checkbox
+      [enabled]="available && app.enabled"
+      [checked]="enabled"
+      (checkedChange)="setEnabled($event)"
+      [eqmTooltip]="available ? (enabled ? 'Disable Spatial audio' : 'Enable Spatial audio') : ('Spatial audio\nOnly available after v' + minNativeVersion)"
+      eqmTooltipPositionSide="bottom"
+    ></eqm-checkbox>
+  </div>
+
+  <div fxFlex fxLayout="column" fxLayoutAlign="center stretch" fxLayoutGap="5px">
+    <eqm-label [fontSize]="10">Environment</eqm-label>
+    <eqm-dropdown
+      [items]="environments"
+      labelParam="name"
+      [searchable]="false"
+      [enabled]="available && enabled && app.enabled"
+      placeholder="Select Environment"
+      noItemsPlaceholder="No Environments"
+      [selectedItem]="selectedEnvironmentItem"
+      (itemSelected)="selectEnvironment($event)"
+    ></eqm-dropdown>
+  </div>
+
+  <!-- Knob control -->
+  <div *ngIf="!replaceKnobsWithSliders" fxLayout="row" fxLayoutAlign="center center" class="knob-control">
+    <eqm-knob
+      [enabled]="available && enabled && app.enabled"
+      size="small"
+      [min]="0" [max]="100"
+      [(value)]="wetDryMix"
+      (userChangedValue)="setWetDryMix($event)"
+      [doubleClickToAnimateToMiddle]="false"
+      [stickToMiddle]="false"
+      [controlStyle]="ui.settings.knobControlStyle"
+    ></eqm-knob>
+    <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
+      <eqm-label>Mix</eqm-label>
+      <eqm-value-screen [enabled]="available && enabled && app.enabled">{{ wetDryMix | fixFloat:0:false }}%</eqm-value-screen>
+    </div>
+  </div>
+
+  <!-- Slider control -->
+  <div *ngIf="replaceKnobsWithSliders" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px" fxFlex="35" class="slider-control">
+    <div fxFlex>
+      <eqm-flat-slider
+        [enabled]="available && enabled && app.enabled"
+        [min]="0" [max]="100"
+        [(value)]="wetDryMix"
+        (userChangedValue)="setWetDryMix($event)"
+        [doubleClickToAnimateToMiddle]="false"
+        [stickToMiddle]="false"
+        [thickness]="4" [thumbRadius]="5"
+      ></eqm-flat-slider>
+    </div>
+    <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
+      <eqm-label>Mix</eqm-label>
+      <eqm-value-screen [enabled]="available && enabled && app.enabled">{{ wetDryMix | fixFloat:0:false }}%</eqm-value-screen>
+    </div>
+  </div>
+
+</div>

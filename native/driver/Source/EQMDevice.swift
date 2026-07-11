@@ -77,7 +77,9 @@ class EQMDevice: EQMObject {
          EQMDeviceCustom.properties.shown,
          EQMDeviceCustom.properties.version,
          EQMDeviceCustom.properties.latency,
-         EQMDeviceCustom.properties.name:
+         EQMDeviceCustom.properties.name,
+         EQMDeviceCustom.properties.appVolumes,
+         EQMDeviceCustom.properties.clients:
       return true
 
     case kAudioDevicePropertyDeviceCanBeDefaultDevice,
@@ -97,7 +99,8 @@ class EQMDevice: EQMObject {
     case kAudioDevicePropertyNominalSampleRate,
          EQMDeviceCustom.properties.shown,
          EQMDeviceCustom.properties.latency,
-         EQMDeviceCustom.properties.name:
+         EQMDeviceCustom.properties.name,
+         EQMDeviceCustom.properties.appVolumes:
       return true
 
     default:
@@ -159,6 +162,8 @@ class EQMDevice: EQMObject {
     case EQMDeviceCustom.properties.shown: return Memory.sizeof(CFBoolean.self)
     case EQMDeviceCustom.properties.version: return Memory.sizeof(CFString.self)
     case EQMDeviceCustom.properties.name: return Memory.sizeof(CFString.self)
+    case EQMDeviceCustom.properties.appVolumes: return Memory.sizeof(CFDictionary.self)
+    case EQMDeviceCustom.properties.clients: return Memory.sizeof(CFArray.self)
 
     default:
       return nil
@@ -396,6 +401,16 @@ class EQMDevice: EQMObject {
           mSelector: EQMDeviceCustom.properties.name,
           mPropertyDataType: kAudioServerPlugInCustomPropertyDataTypeCFString,
           mQualifierDataType: kAudioServerPlugInCustomPropertyDataTypeNone
+        ),
+        AudioServerPlugInCustomPropertyInfo(
+          mSelector: EQMDeviceCustom.properties.appVolumes,
+          mPropertyDataType: kAudioServerPlugInCustomPropertyDataTypeCFPropertyList,
+          mQualifierDataType: kAudioServerPlugInCustomPropertyDataTypeNone
+        ),
+        AudioServerPlugInCustomPropertyInfo(
+          mSelector: EQMDeviceCustom.properties.clients,
+          mPropertyDataType: kAudioServerPlugInCustomPropertyDataTypeCFPropertyList,
+          mQualifierDataType: kAudioServerPlugInCustomPropertyDataTypeNone
         )
       ])
 
@@ -410,6 +425,19 @@ class EQMDevice: EQMObject {
       return .string(version!)
     case EQMDeviceCustom.properties.shown:
       return .bool(shown ? kCFBooleanTrue : kCFBooleanFalse)
+    case EQMDeviceCustom.properties.appVolumes:
+      // App Mixer - per-app volumes (bundleId -> { volume, muted }).
+      // Per the CoreAudio custom property convention the caller is
+      // responsible for releasing the returned CFObject, so hand over
+      // an unbalanced +1 retain.
+      let volumes = NSDictionary(dictionary: EQMClients.appVolumesDictionary)
+      return .cfPropertyList(Unmanaged.passRetained(volumes).takeUnretainedValue() as CFPropertyList)
+    case EQMDeviceCustom.properties.clients:
+      // App Mixer - the current device client list
+      // ({ clientId, processId, bundleId, volume, muted } per client).
+      // Same ownership convention as above - the caller releases.
+      let clientList = NSArray(array: EQMClients.list.map { $0.dictionary })
+      return .cfPropertyList(Unmanaged.passRetained(clientList).takeUnretainedValue() as CFPropertyList)
     default: return nil
     }
   }
@@ -496,6 +524,33 @@ class EQMDevice: EQMObject {
           )
         )
       }
+
+      return noErr
+    case EQMDeviceCustom.properties.appVolumes:
+      // Only allow eqMac app to set this property
+      guard client?.bundleId == APP_BUNDLE_ID else { return noErr }
+
+      let appVolumes = data.load(as: CFDictionary.self) as NSDictionary
+
+      for (key, value) in appVolumes {
+        guard
+          let bundleId = key as? String,
+          let volumeDict = value as? NSDictionary
+        else { continue }
+
+        var volume = (volumeDict["volume"] as? NSNumber)?.floatValue ?? 1
+        let muted = (volumeDict["muted"] as? NSNumber)?.boolValue ?? false
+
+        // Clamp to unity range - per-app boost is not supported at driver level
+        if volume.isNaN { volume = 1 }
+        if volume < 0 { volume = 0 }
+        if volume > 1 { volume = 1 }
+
+        EQMClients.setAppVolume(bundleId: bundleId, volume: volume, muted: muted)
+      }
+
+      // Notify listeners (the eqMac app) that client volumes have changed
+      changedProperties.append(EQMDeviceCustom.addresses.clients)
 
       return noErr
     default: return kAudioHardwareUnknownPropertyError
@@ -592,6 +647,16 @@ class EQMDevice: EQMObject {
     switch operationID {
     // Store
     case AudioServerPlugInIOOperation.writeMix.rawValue:
+      // App Mixer - the HAL invokes this operation once per client before
+      // mixing, so scaling here applies that client's per-app volume.
+      // The gain is resolved once per IO cycle from a lock-free snapshot
+      // (no dictionary access on the realtime path) and the eqMac app's
+      // own audio is never scaled.
+      var gain: Float32 = 1
+      if client != nil && !client!.isAppClient {
+        gain = EQMClients.gain(clientId: client!.clientId)
+      }
+
       let sampleTime = Int(cycleInfo.mOutputTime.mSampleTime)
       for frame in 0 ..< frameSize {
         for channel in 0 ..< kChannelCount {
@@ -605,7 +670,7 @@ class EQMDevice: EQMObject {
           let writePosition = sampleTime + Int(frame)
           let writeRemainder = writePosition % Int(ringBufferSize)
           let writeFrame = writeRemainder * Int(kChannelCount) + Int(channel)
-          buffer[writeFrame] += sample[readFrame]
+          buffer[writeFrame] += sample[readFrame] * gain
 
           // Clean up buffer
           let cleanCleanPosition = sampleTime + Int(frame) + 8192

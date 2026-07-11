@@ -1,0 +1,82 @@
+<div class="audio-units" fxLayout="column" fxLayoutAlign="start stretch">
+
+  <div *ngIf="synced && supported" class="chain-list" fxFlex>
+    <div
+      class="unit-row"
+      *ngFor="let unit of chain; let i = index; trackBy: trackUnit"
+      [class.loading]="unit.status !== 'ready'"
+      fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="6px"
+      [style.height.px]="rowHeight"
+    >
+      <eqm-checkbox
+        [checked]="unit.enabled"
+        [interactive]="unit.status === 'ready'"
+        (checkedChange)="setUnitEnabled(unit, $event)"
+        eqmTooltip="Enable / Disable"
+        eqmTooltipPositionSide="bottom"
+      ></eqm-checkbox>
+
+      <eqm-label fxFlex class="unit-name" [fontSize]="11">
+        {{ unitLabel(unit) }}
+      </eqm-label>
+
+      <eqm-icon
+        class="row-button"
+        [class.disabled]="i === 0"
+        name="triangle" [rotate]="-90" [size]="10"
+        (click)="moveUnit(unit, -1)"
+        eqmTooltip="Move up"
+        eqmTooltipPositionSide="bottom"
+      ></eqm-icon>
+
+      <eqm-icon
+        class="row-button"
+        [class.disabled]="i === chain.length - 1"
+        name="triangle" [rotate]="90" [size]="10"
+        (click)="moveUnit(unit, 1)"
+        eqmTooltip="Move down"
+        eqmTooltipPositionSide="bottom"
+      ></eqm-icon>
+
+      <eqm-icon
+        class="row-button"
+        [class.disabled]="unit.status !== 'ready'"
+        name="pencil" [size]="13"
+        (click)="openEditor(unit)"
+        eqmTooltip="Open Editor"
+        eqmTooltipPositionSide="bottom"
+      ></eqm-icon>
+
+      <eqm-icon
+        class="row-button"
+        name="cross" [size]="12"
+        (click)="removeUnit(unit)"
+        eqmTooltip="Remove"
+        eqmTooltipPositionSide="bottom"
+      ></eqm-icon>
+    </div>
+
+    <div *ngIf="chain.length === 0" class="placeholder" fxLayout="row" fxLayoutAlign="center center">
+      <eqm-label [fontSize]="11">No Audio Units in the chain</eqm-label>
+    </div>
+  </div>
+
+  <div *ngIf="synced && supported" class="add-row" fxLayout="row" fxLayoutAlign="start center" [style.height.px]="addRowHeight">
+    <eqm-virtual-dropdown
+      fxFlex
+      [items]="availableItems"
+      labelParam="label"
+      placeholder="Add Audio Unit"
+      noItemsPlaceholder="No Audio Units found"
+      searchPlaceholder="Search Audio Units"
+      [numberOfVisibleItems]="6"
+      (refChanged)="dropdown = $event"
+      (itemSelected)="addUnit($event)"
+    ></eqm-virtual-dropdown>
+  </div>
+
+  <div *ngIf="synced && !supported" class="placeholder" fxLayout="row" fxLayoutAlign="center center">
+    <eqm-label [fontSize]="11">Audio Units require a newer version of eqMac</eqm-label>
+  </div>
+
+</div>

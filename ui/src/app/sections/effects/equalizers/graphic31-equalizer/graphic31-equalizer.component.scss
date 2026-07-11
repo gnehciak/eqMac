@@ -1,0 +1,39 @@
+
+:host {
+  display: block;
+}
+
+.band {
+  padding: 0px;
+  display: inline-block;
+  overflow: hidden;
+  text-align: center;
+  min-width: 0;
+}
+
+// 31 columns need slim sliders to fit into the 680px window width.
+// The skeuomorph slider host is 31px wide by default (:host of the widget),
+// so it needs an !important override from this parent stylesheet.
+.band eqm-skeuomorph-slider {
+  width: 16px !important;
+}
+
+// eqm-value-screen sizes itself to fontSize * 4 via an inline style,
+// clamp it to the slim column width.
+.band ::ng-deep eqm-value-screen .screen {
+  width: 20px !important;
+}
+
+.gain {
+  margin-top: 2px;
+  margin-bottom: 5px;
+  height: 15px;
+}
+
+.frequency {
+  white-space: nowrap;
+}
+
+.annotations {
+  width: 5%;
+}

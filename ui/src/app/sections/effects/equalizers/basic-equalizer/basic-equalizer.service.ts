@@ -53,6 +53,14 @@ export class BasicEqualizerService extends EqualizersService {
     return this.request({ method: 'DELETE', endpoint: '/presets', data: { ...preset } as any })
   }
 
+  importPresets () {
+    return this.request({ method: 'GET', endpoint: '/presets/import' })
+  }
+
+  exportPresets () {
+    return this.request({ method: 'GET', endpoint: '/presets/export' })
+  }
+
   onPresetsChanged (callback: BasicEqualizerPresetsChangedEventCallback) {
     this.on('/presets', callback)
   }
