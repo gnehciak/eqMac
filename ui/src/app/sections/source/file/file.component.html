@@ -3,7 +3,7 @@
       <eqm-icon [name]="playing ? 'pause' : 'triangle'" [height]="playing ? 20 : 25" [width]="playing ? 20 : 25"></eqm-icon>
     </eqm-button>
     <div fxLayout="column" fxFill fxFlex="100%" fxLayoutAlign="center start">
-      <eqm-label>{{meta.name || 'Please open an Audio File.' }}</eqm-label>
+      <eqm-label>{{ meta.name || ('source.openAudioFile' | translate) }}</eqm-label>
       <div fxLayout="row" fxFill fxLayoutGap="10px" fxLayoutAlign="space-between center">
         <eqm-flat-slider [enabled]="selected" [scrollEnabled]="false" [(value)]="progress" (valueChange)="setProgress()" orientation="horizontal"></eqm-flat-slider>
         <eqm-label fxFlex="17" class="timestamp">{{utils.getTimestampFromDurationAndProgress(meta.duration, progress)}}</eqm-label>

@@ -9,10 +9,10 @@
   </div>
 
   <div *ngIf="synced && available && apps.length === 0" class="placeholder" fxLayout="row" fxLayoutAlign="center center">
-    <eqm-label [fontSize]="11">No apps are playing audio</eqm-label>
+    <eqm-label [fontSize]="11">{{ 'appMixer.noApps' | translate }}</eqm-label>
   </div>
 
   <div *ngIf="synced && !available" class="placeholder" fxLayout="row" fxLayoutAlign="center center">
-    <eqm-label [fontSize]="11">App Mixer requires a newer version of eqMac</eqm-label>
+    <eqm-label [fontSize]="11">{{ 'appMixer.requiresNewerVersion' | translate }}</eqm-label>
   </div>
 </div>

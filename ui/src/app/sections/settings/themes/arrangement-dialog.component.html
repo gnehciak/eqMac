@@ -1,14 +1,14 @@
 <div class="arrangement-dialog" fxLayout="column" fxLayoutGap="10px">
   <div fxLayout="row" fxLayoutAlign="space-between center">
     <eqm-label class="title">{{ title }}</eqm-label>
-    <eqm-icon class="clickable" name="cross" [size]="12" (click)="close()" eqmTooltip="Close"></eqm-icon>
+    <eqm-icon class="clickable" name="cross" [size]="12" (click)="close()" [eqmTooltip]="'common.close' | translate"></eqm-icon>
   </div>
 
   <eqm-label class="hint" [fontSize]="11">
-    Reorder the main window sections and choose which ones are visible.
+    {{ 'arrangement.reorderHint' | translate }}
   </eqm-label>
 
-  <eqm-label *ngIf="!synced" [fontSize]="12">Loading...</eqm-label>
+  <eqm-label *ngIf="!synced" [fontSize]="12">{{ 'common.loading' | translate }}</eqm-label>
 
   <div *ngIf="synced" fxLayout="column" fxLayoutGap="6px">
     <ng-container *ngFor="let row of rows; let i = index; trackBy: trackRow">
@@ -16,18 +16,18 @@
         <eqm-checkbox
           [checked]="row.enabled"
           (checkedChange)="setSectionEnabled(row, $event)"
-          eqmTooltip="Show / Hide"
+          [eqmTooltip]="'arrangement.showHide' | translate"
           eqmTooltipPositionSide="bottom"
         ></eqm-checkbox>
 
-        <eqm-label fxFlex [fontSize]="12">{{ row.label }}</eqm-label>
+        <eqm-label fxFlex [fontSize]="12">{{ row.labelKey | translate }}</eqm-label>
 
         <eqm-icon
           class="row-button"
           [class.disabled]="i === 0"
           name="triangle" [rotate]="-90" [size]="10"
           (click)="move(row, -1)"
-          eqmTooltip="Move up"
+          [eqmTooltip]="'common.moveUp' | translate"
           eqmTooltipPositionSide="bottom"
         ></eqm-icon>
 
@@ -36,7 +36,7 @@
           [class.disabled]="i === rows.length - 1"
           name="triangle" [rotate]="90" [size]="10"
           (click)="move(row, 1)"
-          eqmTooltip="Move down"
+          [eqmTooltip]="'common.moveDown' | translate"
           eqmTooltipPositionSide="bottom"
         ></eqm-icon>
       </div>
@@ -49,13 +49,13 @@
         (click)="toggleBalance()"
       >
         <eqm-checkbox labelSide="right" [interactive]="false" [checked]="balanceEnabled">
-          Balance
+          {{ 'settings.balance' | translate }}
         </eqm-checkbox>
       </div>
     </ng-container>
   </div>
 
   <eqm-label class="hint" [fontSize]="10">
-    Hidden sections keep their settings and continue to process audio.
+    {{ 'arrangement.hiddenHint' | translate }}
   </eqm-label>
 </div>

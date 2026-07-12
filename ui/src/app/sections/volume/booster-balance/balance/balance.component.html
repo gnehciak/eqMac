@@ -1,15 +1,15 @@
-<eqm-label>Balance</eqm-label>
+<eqm-label>{{ 'balance.title' | translate }}</eqm-label>
 
 <ng-template #left>
   <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
-    <eqm-label>Left</eqm-label>
+    <eqm-label>{{ 'balance.left' | translate }}</eqm-label>
     <eqm-value-screen [enabled]="app.enabled">{{(balance | mapValue:0:1:100:0 | clipValue:0:100 | fixFloat:0:false)}}%</eqm-value-screen>
   </div>
 </ng-template>
 
 <ng-template #right>
   <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
-    <eqm-label>Right</eqm-label>
+    <eqm-label>{{ 'balance.right' | translate }}</eqm-label>
     <eqm-value-screen [enabled]="app.enabled">{{(balance | mapValue:0:-1:100:0 | clipValue:0:100 | fixFloat:0:false)}}%</eqm-value-screen>
   </div>
 </ng-template>

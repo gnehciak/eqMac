@@ -1,7 +1,7 @@
 <div class="theme-picker-dialog" fxLayout="column" fxLayoutGap="10px">
   <div fxLayout="row" fxLayoutAlign="space-between center">
     <eqm-label class="title">{{ title }}</eqm-label>
-    <eqm-icon class="clickable" name="cross" [size]="12" (click)="close()" eqmTooltip="Close"></eqm-icon>
+    <eqm-icon class="clickable" name="cross" [size]="12" (click)="close()" [eqmTooltip]="'common.close' | translate"></eqm-icon>
   </div>
 
   <div class="theme-grid">
@@ -15,7 +15,7 @@
         <div class="swatch" *ngFor="let color of card.swatches" [style.background]="color"></div>
       </div>
       <eqm-label class="theme-name" [fontSize]="11" [color]="card.textColor" [clickable]="true">
-        {{ card.theme.name }}
+        {{ card.theme.nameKey ? (card.theme.nameKey | translate) : card.theme.name }}
       </eqm-label>
     </div>
   </div>
@@ -23,13 +23,13 @@
   <eqm-divider orientation="horizontal"></eqm-divider>
 
   <div fxLayout="row" fxLayoutAlign="space-between center">
-    <eqm-label [fontSize]="12">Custom Accent</eqm-label>
+    <eqm-label [fontSize]="12">{{ 'themes.customAccent' | translate }}</eqm-label>
     <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
       <div class="accent-swatch" [class.active]="hasCustomAccent" [style.background]="accentPreview"></div>
       <eqm-icon *ngIf="hasCustomAccent"
         class="clickable" name="cross" [size]="10"
         (click)="clearCustomAccent()"
-        eqmTooltip="Remove the custom accent"
+        [eqmTooltip]="'themes.removeCustomAccent' | translate"
       ></eqm-icon>
     </div>
   </div>
@@ -46,6 +46,6 @@
   </div>
 
   <eqm-label class="hint" [fontSize]="10">
-    Click a theme to apply it instantly, or drag the hue slider to override the accent color.
+    {{ 'themes.pickerHint' | translate }}
   </eqm-label>
 </div>

@@ -16,9 +16,11 @@ import {
   ExpertEqualizerSelectedPresetChangedEventCallback
 } from 'src/app/sections/effects/equalizers/expert-equalizer/expert-equalizer.service'
 import { EqualizerComponent } from '../equalizer.component'
-import { Options, CheckboxOption } from 'src/app/components/options/options.component'
+import { Options, CheckboxOption, ButtonOption } from 'src/app/components/options/options.component'
 import { ApplicationService } from '../../../../services/app.service'
 import { ToastService } from '../../../../services/toast.service'
+import { TranslateService } from '../../../../services/translate.service'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'eqm-expert-equalizer',
@@ -35,36 +37,49 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
 
   public ShowDefaultPresetsCheckbox: CheckboxOption = {
     type: 'checkbox',
-    label: 'Show Default Presets',
+    label: '',  // set by applyTranslations()
     value: false,
     toggled: (show) => this.service.setShowDefaultPresets(show)
   }
 
-  settings: Options = [ [
-    {
-      type: 'button',
-      label: 'Import Presets',
-      action: async () => {
-        const log = await this.service.importPresets()
-        this.toast.show({
-          type: 'success',
-          message: log
-        })
-      }
-    }, {
-      type: 'button',
-      label: 'Export Presets',
-      action: async () => {
-        const log = await this.service.exportPresets()
-        this.toast.show({
-          type: 'success',
-          message: log
-        })
-      }
+  private readonly importPresetsButton: ButtonOption = {
+    type: 'button',
+    label: '',  // set by applyTranslations()
+    action: async () => {
+      const log = await this.service.importPresets()
+      this.toast.show({
+        type: 'success',
+        message: log
+      })
     }
+  }
+
+  private readonly exportPresetsButton: ButtonOption = {
+    type: 'button',
+    label: '',  // set by applyTranslations()
+    action: async () => {
+      const log = await this.service.exportPresets()
+      this.toast.show({
+        type: 'success',
+        message: log
+      })
+    }
+  }
+
+  settings: Options = [ [
+    this.importPresetsButton,
+    this.exportPresetsButton
   ], [
     this.ShowDefaultPresetsCheckbox
   ] ]
+
+  // Options arrays carry TS-built labels — retranslate them in place when
+  // the user switches language (object identity is preserved)
+  private applyTranslations () {
+    this.ShowDefaultPresetsCheckbox.label = this.translate.instant('equalizers.showDefaultPresets')
+    this.importPresetsButton.label = this.translate.instant('equalizers.importPresets')
+    this.exportPresetsButton.label = this.translate.instant('equalizers.exportPresets')
+  }
 
   public _presets: ExpertEqualizerPreset[]
   @Output() presetsChange = new EventEmitter<ExpertEqualizerPreset[]>()
@@ -110,12 +125,20 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
     public service: ExpertEqualizerService,
     public change: ChangeDetectorRef,
     public app: ApplicationService,
-    public toast: ToastService
+    public toast: ToastService,
+    private readonly translate: TranslateService
   ) {
     super()
+    this.applyTranslations()
   }
 
+  private localeChangedSubscription: Subscription
+
   async ngOnInit () {
+    this.localeChangedSubscription = this.translate.localeChanged.subscribe(() => {
+      this.applyTranslations()
+      this.change.detectChanges()
+    })
     await this.sync()
     this.setupEvents()
     try {
@@ -335,6 +358,9 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
     if (this.ignoreUpdatesDebouncer) {
       clearTimeout(this.ignoreUpdatesDebouncer)
       this.ignoreUpdatesDebouncer = null
+    }
+    if (this.localeChangedSubscription) {
+      this.localeChangedSubscription.unsubscribe()
     }
     this.destroyEvents()
     // Let the native FFT idle while the Expert EQ is not visible

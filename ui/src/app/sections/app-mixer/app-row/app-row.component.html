@@ -25,7 +25,7 @@
     name="volume"
     [size]="16"
     [color]="muted ? colors.warning : colors.accent"
-    [eqmTooltip]="muted ? 'Unmute' : 'Mute'"
+    [eqmTooltip]="(muted ? 'appMixer.unmute' : 'appMixer.mute') | translate"
     (click)="toggleMute()"
   ></eqm-icon>
 </div>

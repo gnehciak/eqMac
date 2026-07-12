@@ -1,25 +1,25 @@
 <div class="spatial" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
 
   <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="5px" fxFlex="60px">
-    <eqm-label>Spatial</eqm-label>
+    <eqm-label>{{ 'spatial.title' | translate }}</eqm-label>
     <eqm-checkbox
       [enabled]="available && app.enabled"
       [checked]="enabled"
       (checkedChange)="setEnabled($event)"
-      [eqmTooltip]="available ? (enabled ? 'Disable Spatial audio' : 'Enable Spatial audio') : ('Spatial audio\nOnly available after v' + minNativeVersion)"
+      [eqmTooltip]="available ? ((enabled ? 'spatial.disable' : 'spatial.enable') | translate) : ('spatial.unavailable' | translate: { version: minNativeVersion })"
       eqmTooltipPositionSide="bottom"
     ></eqm-checkbox>
   </div>
 
   <div fxFlex fxLayout="column" fxLayoutAlign="center stretch" fxLayoutGap="5px">
-    <eqm-label [fontSize]="10">Environment</eqm-label>
+    <eqm-label [fontSize]="10">{{ 'spatial.environment' | translate }}</eqm-label>
     <eqm-dropdown
       [items]="environments"
       labelParam="name"
       [searchable]="false"
       [enabled]="available && enabled && app.enabled"
-      placeholder="Select Environment"
-      noItemsPlaceholder="No Environments"
+      [placeholder]="'spatial.selectEnvironment' | translate"
+      [noItemsPlaceholder]="'spatial.noEnvironments' | translate"
       [selectedItem]="selectedEnvironmentItem"
       (itemSelected)="selectEnvironment($event)"
     ></eqm-dropdown>
@@ -38,7 +38,7 @@
       [controlStyle]="ui.settings.knobControlStyle"
     ></eqm-knob>
     <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
-      <eqm-label>Mix</eqm-label>
+      <eqm-label>{{ 'spatial.mix' | translate }}</eqm-label>
       <eqm-value-screen [enabled]="available && enabled && app.enabled">{{ wetDryMix | fixFloat:0:false }}%</eqm-value-screen>
     </div>
   </div>
@@ -57,7 +57,7 @@
       ></eqm-flat-slider>
     </div>
     <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
-      <eqm-label>Mix</eqm-label>
+      <eqm-label>{{ 'spatial.mix' | translate }}</eqm-label>
       <eqm-value-screen [enabled]="available && enabled && app.enabled">{{ wetDryMix | fixFloat:0:false }}%</eqm-value-screen>
     </div>
   </div>

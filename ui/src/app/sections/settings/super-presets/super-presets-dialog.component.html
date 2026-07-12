@@ -1,32 +1,31 @@
 <div class="super-presets-dialog" fxLayout="column" fxLayoutGap="10px">
   <div fxLayout="row" fxLayoutAlign="space-between center">
     <eqm-label class="title">{{ title }}</eqm-label>
-    <eqm-icon class="clickable" name="cross" [size]="12" (click)="close()" eqmTooltip="Close"></eqm-icon>
+    <eqm-icon class="clickable" name="cross" [size]="12" (click)="close()" [eqmTooltip]="'common.close' | translate"></eqm-icon>
   </div>
 
-  <eqm-label *ngIf="!synced" [fontSize]="12">Loading...</eqm-label>
+  <eqm-label *ngIf="!synced" [fontSize]="12">{{ 'common.loading' | translate }}</eqm-label>
 
   <ng-container *ngIf="synced">
     <eqm-label *ngIf="!available" [fontSize]="12">
-      Super Presets require a newer version of the eqMac app. Please update eqMac to use this feature.
+      {{ 'superPresets.requiresNewerVersion' | translate }}
     </eqm-label>
 
     <ng-container *ngIf="available">
       <div class="pointer" fxLayout="row" fxLayoutAlign="start center" (click)="toggleEnabled()">
         <eqm-checkbox labelSide="right" [interactive]="false" [checked]="enabled">
-          Automatically switch Presets
+          {{ 'superPresets.autoSwitch' | translate }}
         </eqm-checkbox>
       </div>
 
       <eqm-label class="hint" [fontSize]="11">
-        Switch to a Preset when an Output Device is selected or an App comes to the front.
-        App rules take priority over Device rules.
+        {{ 'superPresets.hint' | translate }}
       </eqm-label>
 
       <eqm-divider orientation="horizontal"></eqm-divider>
 
       <eqm-label *ngIf="rows.length === 0" class="hint" [fontSize]="12">
-        No rules yet. Add a rule to get started.
+        {{ 'superPresets.noRules' | translate }}
       </eqm-label>
 
       <div *ngIf="rows.length > 0" class="rules" fxLayout="column" fxLayoutGap="8px">
@@ -44,12 +43,12 @@
               [items]="row.targetItems"
               labelParam="name"
               [selectedItem]="row.targetItem"
-              [placeholder]="row.rule.trigger.kind === 'device' ? 'Select Device' : 'Select App'"
-              [noItemsPlaceholder]="row.rule.trigger.kind === 'device' ? 'No Devices' : 'No Apps'"
+              [placeholder]="(row.rule.trigger.kind === 'device' ? 'superPresets.selectDevice' : 'superPresets.selectApp') | translate"
+              [noItemsPlaceholder]="(row.rule.trigger.kind === 'device' ? 'superPresets.noDevices' : 'superPresets.noApps') | translate"
               (itemSelected)="selectTarget(row, $event)"
             ></eqm-dropdown>
             <eqm-icon class="clickable delete-button" name="cross" [size]="12"
-              eqmTooltip="Delete Rule" (click)="deleteRule(row)"
+              [eqmTooltip]="'superPresets.deleteRule' | translate" (click)="deleteRule(row)"
             ></eqm-icon>
           </div>
           <div fxLayout="row" fxLayoutGap="6px" fxLayoutAlign="start center">
@@ -59,21 +58,21 @@
               [selectedItem]="row.typeItem"
               [searchable]="false"
               [numberOfVisibleItems]="4"
-              placeholder="EQ Type"
+              [placeholder]="'superPresets.eqType' | translate"
               (itemSelected)="selectType(row, $event)"
             ></eqm-dropdown>
             <eqm-dropdown fxFlex
               [items]="row.presetItems"
               labelParam="name"
               [selectedItem]="row.presetItem"
-              placeholder="Select Preset"
-              noItemsPlaceholder="No Presets"
+              [placeholder]="'presets.selectPreset' | translate"
+              [noItemsPlaceholder]="'presets.noPresets' | translate"
               (itemSelected)="selectPreset(row, $event)"
             ></eqm-dropdown>
             <div class="pointer" fxLayout="row" fxLayoutAlign="start center" (click)="toggleRevert(row)"
-              eqmTooltip="Restore the previous Preset when this trigger stops matching">
+              [eqmTooltip]="'superPresets.revertTooltip' | translate">
               <eqm-checkbox labelSide="right" [interactive]="false" [checked]="row.rule.revert">
-                Revert
+                {{ 'superPresets.revert' | translate }}
               </eqm-checkbox>
             </div>
           </div>
@@ -81,7 +80,7 @@
       </div>
 
       <eqm-button type="narrow" (pressed)="addRule()">
-        <eqm-label [clickable]="true">Add Rule</eqm-label>
+        <eqm-label [clickable]="true">{{ 'superPresets.addRule' | translate }}</eqm-label>
       </eqm-button>
     </ng-container>
   </ng-container>

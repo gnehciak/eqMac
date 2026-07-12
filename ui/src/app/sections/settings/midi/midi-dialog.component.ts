@@ -15,6 +15,8 @@ import {
 } from './midi.service'
 import { ApplicationService } from '../../../services/app.service'
 import { SemanticVersion } from '../../../services/semantic-version.service'
+import { TranslateService } from '../../../services/translate.service'
+import { Subscription } from 'rxjs'
 
 // First native version that ships the /midi DataBus routes.
 // Keep in sync with the actual release version of the MIDI native feature.
@@ -125,24 +127,41 @@ export class MIDIDialogComponent implements OnInit, OnDestroy {
   // Target picked in the "Add mapping" row, not learned yet
   draftTarget: MIDITargetOption = null
 
+  // Labels come from the i18n catalog (midi.targets.*) — retranslated in
+  // place on locale change so dropdown selection references stay valid
   readonly targets: MIDITargetOption[] = [
-    { id: 'volume', name: 'Volume' },
-    { id: 'balance', name: 'Balance' },
-    { id: 'preampGain', name: 'Preamp Gain' },
-    { id: 'presetNext', name: 'Next Preset' },
-    { id: 'presetPrevious', name: 'Previous Preset' },
-    { id: 'muteToggle', name: 'Mute On/Off' },
-    { id: 'enabledToggle', name: 'eqMac On/Off' }
+    { id: 'volume', name: '' },
+    { id: 'balance', name: '' },
+    { id: 'preampGain', name: '' },
+    { id: 'presetNext', name: '' },
+    { id: 'presetPrevious', name: '' },
+    { id: 'muteToggle', name: '' },
+    { id: 'enabledToggle', name: '' }
   ]
+
+  private applyTranslations () {
+    for (const target of this.targets) {
+      target.name = this.translate.instant(`midi.targets.${target.id}`)
+    }
+  }
 
   constructor (
     public dialogRef: MatDialogRef<MIDIDialogComponent>,
     public midi: MIDIService,
     public app: ApplicationService,
+    private readonly translate: TranslateService,
     private readonly changeRef: ChangeDetectorRef
-  ) {}
+  ) {
+    this.applyTranslations()
+  }
+
+  private localeChangedSubscription: Subscription
 
   ngOnInit () {
+    this.localeChangedSubscription = this.translate.localeChanged.subscribe(() => {
+      this.applyTranslations()
+      this.detectChanges()
+    })
     this.sync()
   }
 
@@ -199,9 +218,14 @@ export class MIDIDialogComponent implements OnInit, OnDestroy {
   }
 
   sourceLabel (mapping: MIDIMapping) {
-    if (!mapping || !mapping.source) return 'Not learned'
-    const kind = mapping.source.kind === 'cc' ? `CC ${mapping.source.number}` : `Note ${mapping.source.number}`
-    const channel = mapping.source.channel >= 0 ? `Ch ${mapping.source.channel + 1}` : 'Any Ch'
+    if (!mapping || !mapping.source) return this.translate.instant('midi.notLearned')
+    const kind = this.translate.instant(
+      mapping.source.kind === 'cc' ? 'midi.cc' : 'midi.note',
+      { number: mapping.source.number }
+    )
+    const channel = mapping.source.channel >= 0
+      ? this.translate.instant('midi.channel', { channel: mapping.source.channel + 1 })
+      : this.translate.instant('midi.anyChannel')
     return `${kind} · ${channel}`
   }
 
@@ -304,6 +328,7 @@ export class MIDIDialogComponent implements OnInit, OnDestroy {
 
   ngOnDestroy () {
     this.destroyed = true
+    this.localeChangedSubscription?.unsubscribe()
     if (this.learningTarget) {
       this.cancelLearn()
     }

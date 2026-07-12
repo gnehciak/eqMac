@@ -5,6 +5,7 @@ import { FadeInOutAnimation } from '@eqmac/components'
 import { MatDialog } from '@angular/material/dialog'
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component'
 import { SettingsService, IconMode } from '../settings/settings.service'
+import { TranslateService } from '../../services/translate.service'
 
 @Component({
   selector: 'eqm-header',
@@ -26,7 +27,8 @@ export class HeaderComponent implements OnInit {
     public app: ApplicationService,
     public ui: UIService,
     public dialog: MatDialog,
-    public settings: SettingsService
+    public settings: SettingsService,
+    private readonly translate: TranslateService
   ) { }
 
   async ngOnInit () {
@@ -64,9 +66,9 @@ export class HeaderComponent implements OnInit {
       hasBackdrop: true,
       disableClose: true,
       data: {
-        confirmText: 'Yes, quit',
-        cancelText: 'No, cancel',
-        text: 'Are you sure you want to quit eqMac?'
+        confirmText: this.translate.instant('header.yesQuit'),
+        cancelText: this.translate.instant('common.noCancel'),
+        text: this.translate.instant('header.quitConfirmation')
       }
     })
 

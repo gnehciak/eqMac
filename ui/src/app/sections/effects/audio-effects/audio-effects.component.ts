@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs'
 import { UIService, UISettings } from '../../../services/ui.service'
 import { ApplicationService } from '../../../services/app.service'
 import { SemanticVersion } from '../../../services/semantic-version.service'
+import { TranslateService } from '../../../services/translate.service'
 import { EffectEnabledChangedEventCallback } from '../effect.service'
 import {
   CrossfeedService,
@@ -93,15 +94,31 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
 
   // Routing
   routingEnabled = false
+  // Labels come from the i18n catalog — rebuilt in place on locale change
+  // (item identity is preserved so the dropdown selection stays valid)
   routingModes: RoutingModeItem[] = [
-    { id: 'stereo', name: 'Stereo' },
-    { id: 'monoDownmix', name: 'Mono' },
-    { id: 'swap', name: 'Swap L/R' },
-    { id: 'leftToBoth', name: 'Left to Both' },
-    { id: 'rightToBoth', name: 'Right to Both' }
+    { id: 'stereo', name: '' },
+    { id: 'monoDownmix', name: '' },
+    { id: 'swap', name: '' },
+    { id: 'leftToBoth', name: '' },
+    { id: 'rightToBoth', name: '' }
   ]
 
+  private readonly routingModeLabelKeys: { [mode in RoutingMode]?: string } = {
+    stereo: 'effects.routing.modes.stereo',
+    monoDownmix: 'effects.routing.modes.mono',
+    swap: 'effects.routing.modes.swap',
+    leftToBoth: 'effects.routing.modes.leftToBoth',
+    rightToBoth: 'effects.routing.modes.rightToBoth'
+  }
+
   selectedRoutingMode: RoutingModeItem = this.routingModes[0]
+
+  private applyTranslations () {
+    for (const item of this.routingModes) {
+      item.name = this.translate.instant(this.routingModeLabelKeys[item.id] || item.id)
+    }
+  }
 
   // Preamp
   preampEnabled = false
@@ -131,8 +148,11 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
     public preampService: PreampService,
     public app: ApplicationService,
     public ui: UIService,
+    private readonly translate: TranslateService,
     private readonly changeRef: ChangeDetectorRef
-  ) {}
+  ) {
+    this.applyTranslations()
+  }
 
   get crossfeedControlsEnabled () {
     return this.app.enabled && this.crossfeedEnabled
@@ -245,6 +265,7 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
   private onPreampGainChangedEventCallback: PreampGainChangedEventCallback
   private onPreampAutoGainChangedEventCallback: PreampAutoGainChangedEventCallback
   private onUISettingsChangedEventSubscription: Subscription
+  private onLocaleChangedSubscription: Subscription
 
   private setupUIEvents () {
     this.onUISettingsChangedEventSubscription = this.ui.settingsChanged
@@ -254,6 +275,11 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
         if (typeof settings.showEffects === 'boolean') {
           this.show = settings.showEffects
         }
+        this.detectChanges()
+      })
+    this.onLocaleChangedSubscription = this.translate.localeChanged
+      .subscribe(() => {
+        this.applyTranslations()
         this.detectChanges()
       })
   }
@@ -352,6 +378,9 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
     }
     if (this.onUISettingsChangedEventSubscription) {
       this.onUISettingsChangedEventSubscription.unsubscribe()
+    }
+    if (this.onLocaleChangedSubscription) {
+      this.onLocaleChangedSubscription.unsubscribe()
     }
   }
 

@@ -1,0 +1,58 @@
+:host {
+  display: block;
+  min-width: 420px;
+  max-width: 480px;
+}
+
+.title {
+  margin-bottom: 10px;
+}
+
+.warning {
+  color: var(--eqm-caution, #FFD500);
+}
+
+.hint {
+  opacity: 0.6;
+}
+
+.progress-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--eqm-surface, #16191c);
+  overflow: hidden;
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--eqm-accent, #4f8d71);
+    transition: width 0.3s ease;
+  }
+}
+
+.tone-info {
+  padding: 10px 0;
+}
+
+.ear-badge {
+  color: var(--eqm-accent-light, #4DAD82);
+
+  &.right {
+    color: var(--eqm-warning, #eb3f42);
+  }
+}
+
+.legend {
+  .legend-left {
+    color: var(--eqm-accent-light, #4DAD82);
+  }
+
+  .legend-right {
+    color: var(--eqm-warning, #eb3f42);
+  }
+}
+
+.graph {
+  height: 220px;
+  width: 100%;
+}

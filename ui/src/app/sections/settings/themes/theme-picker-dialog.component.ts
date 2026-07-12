@@ -10,6 +10,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { Subscription } from 'rxjs'
 import { FlatSliderValueChangedEvent } from '@eqmac/components'
 import { Theme, ThemeService } from '../../../services/theme.service'
+import { TranslateService } from '../../../services/translate.service'
 
 export interface ThemePickerDialogData {
   title?: string
@@ -36,7 +37,7 @@ export const CUSTOM_ACCENT_LIGHTNESS = 48
   styleUrls: [ './theme-picker-dialog.component.scss' ]
 })
 export class ThemePickerDialogComponent implements OnInit, OnDestroy {
-  title = 'Theme'
+  title = ''
 
   cards: ThemeCard[] = []
 
@@ -60,10 +61,12 @@ export class ThemePickerDialogComponent implements OnInit, OnDestroy {
 
   constructor (
     public themeService: ThemeService,
+    private readonly translate: TranslateService,
     private readonly changeRef: ChangeDetectorRef,
     public dialogRef: MatDialogRef<ThemePickerDialogComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: ThemePickerDialogData
   ) {
+    this.title = this.translate.instant('settings.theme')
     if (this.data && this.data.title) {
       this.title = this.data.title
     }

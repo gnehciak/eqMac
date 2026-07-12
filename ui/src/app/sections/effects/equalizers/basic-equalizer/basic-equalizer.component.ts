@@ -2,11 +2,12 @@ import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, Host
 import { BasicEqualizerService, BasicEqualizerPreset, BasicEqualizerBand, BasicEqualizerPresetGains } from './basic-equalizer.service'
 import { EqualizerComponent } from '../equalizer.component'
 import { KnobValueChangedEvent } from '@eqmac/components'
-import { Options } from 'src/app/components/options/options.component'
+import { Options, ButtonOption } from 'src/app/components/options/options.component'
 import { TransitionService } from '../../../../services/transitions.service'
 import { ApplicationService } from '../../../../services/app.service'
 import { ToastService } from '../../../../services/toast.service'
 import { UIService } from '../../../../services/ui.service'
+import { TranslateService } from '../../../../services/translate.service'
 
 @Component({
   selector: 'eqm-basic-equalizer',
@@ -53,30 +54,42 @@ export class BasicEqualizerComponent extends EqualizerComponent implements OnIni
 
   get selectedPreset () { return this._selectedPreset }
 
-  settings: Options = [ [
-    {
-      type: 'button',
-      label: 'Import Presets',
-      action: async () => {
-        const log = await this.service.importPresets()
-        await this.syncPresets()
-        this.toast.show({
-          type: 'success',
-          message: log
-        })
-      }
-    }, {
-      type: 'button',
-      label: 'Export Presets',
-      action: async () => {
-        const log = await this.service.exportPresets()
-        this.toast.show({
-          type: 'success',
-          message: log
-        })
-      }
+  private readonly importPresetsButton: ButtonOption = {
+    type: 'button',
+    label: '',  // set by applyTranslations()
+    action: async () => {
+      const log = await this.service.importPresets()
+      await this.syncPresets()
+      this.toast.show({
+        type: 'success',
+        message: log
+      })
     }
+  }
+
+  private readonly exportPresetsButton: ButtonOption = {
+    type: 'button',
+    label: '',  // set by applyTranslations()
+    action: async () => {
+      const log = await this.service.exportPresets()
+      this.toast.show({
+        type: 'success',
+        message: log
+      })
+    }
+  }
+
+  settings: Options = [ [
+    this.importPresetsButton,
+    this.exportPresetsButton
   ] ]
+
+  // Options arrays carry TS-built labels — retranslate them in place when
+  // the user switches language (object identity is preserved)
+  private applyTranslations () {
+    this.importPresetsButton.label = this.translate.instant('equalizers.importPresets')
+    this.exportPresetsButton.label = this.translate.instant('equalizers.exportPresets')
+  }
 
   constructor (
     public service: BasicEqualizerService,
@@ -84,12 +97,18 @@ export class BasicEqualizerComponent extends EqualizerComponent implements OnIni
     public ui: UIService,
     public change: ChangeDetectorRef,
     public transition: TransitionService,
-    public toast: ToastService
+    public toast: ToastService,
+    private readonly translate: TranslateService
   ) {
     super()
+    this.applyTranslations()
   }
 
   async ngOnInit () {
+    this.translate.localeChanged.subscribe(() => {
+      this.applyTranslations()
+      this.change.detectChanges()
+    })
     await this.sync()
     this.setupEvents()
   }

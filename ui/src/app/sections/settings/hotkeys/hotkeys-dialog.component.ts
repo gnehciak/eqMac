@@ -8,6 +8,8 @@ import {
 } from './hotkeys.service'
 import { ApplicationService } from '../../../services/app.service'
 import { SemanticVersion } from '../../../services/semantic-version.service'
+import { TranslateService } from '../../../services/translate.service'
+import { Subscription } from 'rxjs'
 
 export const HOTKEYS_MIN_NATIVE_VERSION = '1.4.0'
 
@@ -54,16 +56,24 @@ export interface HotkeyRow {
   ` ]
 })
 export class HotkeysDialogComponent implements OnInit, OnDestroy {
+  // Labels come from the i18n catalog (hotkeys.actions.*) — retranslated
+  // in place on locale change so row identity is preserved
   rows: HotkeyRow[] = [
-    { action: 'volumeUp', label: 'Volume Up' },
-    { action: 'volumeDown', label: 'Volume Down' },
-    { action: 'muteToggle', label: 'Mute / Unmute' },
-    { action: 'boostToggle', label: 'Volume Boost On / Off' },
-    { action: 'nextPreset', label: 'Next Preset' },
-    { action: 'previousPreset', label: 'Previous Preset' },
-    { action: 'eqMacEnabledToggle', label: 'Enable / Disable eqMac' },
-    { action: 'showHideWindow', label: 'Show / Hide Window' }
+    { action: 'volumeUp', label: '' },
+    { action: 'volumeDown', label: '' },
+    { action: 'muteToggle', label: '' },
+    { action: 'boostToggle', label: '' },
+    { action: 'nextPreset', label: '' },
+    { action: 'previousPreset', label: '' },
+    { action: 'eqMacEnabledToggle', label: '' },
+    { action: 'showHideWindow', label: '' }
   ]
+
+  private applyTranslations () {
+    for (const row of this.rows) {
+      row.label = this.translate.instant(`hotkeys.actions.${row.action}`)
+    }
+  }
 
   bindings: HotkeyBindings = {}
   recording: HotkeyAction | null = null
@@ -75,14 +85,24 @@ export class HotkeysDialogComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<HotkeysDialogComponent>,
     public hotkeysService: HotkeysService,
     public app: ApplicationService,
+    private readonly translate: TranslateService,
     private readonly changeRef: ChangeDetectorRef
-  ) {}
+  ) {
+    this.applyTranslations()
+  }
+
+  private localeChangedSubscription: Subscription
 
   ngOnInit () {
+    this.localeChangedSubscription = this.translate.localeChanged.subscribe(() => {
+      this.applyTranslations()
+      this.changeRef.detectChanges()
+    })
     this.sync()
   }
 
   ngOnDestroy () {
+    this.localeChangedSubscription?.unsubscribe()
     this.hotkeysService.offBindingsChanged(this.onBindingsChanged)
   }
 
@@ -108,8 +128,8 @@ export class HotkeysDialogComponent implements OnInit, OnDestroy {
   }
 
   recordButtonLabel (row: HotkeyRow) {
-    if (this.recording === row.action) return 'Listening…'
-    return this.bindings[row.action] ? 'Change' : 'Record'
+    if (this.recording === row.action) return this.translate.instant('common.listening')
+    return this.translate.instant(this.bindings[row.action] ? 'hotkeys.change' : 'hotkeys.record')
   }
 
   async record (row: HotkeyRow) {

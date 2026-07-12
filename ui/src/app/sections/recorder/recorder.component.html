@@ -9,12 +9,12 @@
         [width]="25"
         [enabled]="available"
         (pressed)="toggleRecording()"
-        [eqmTooltip]="available ? (recording ? 'Stop recording' : 'Start recording') : ('Recording\nOnly available after v' + minNativeVersion)"
+        [eqmTooltip]="available ? ((recording ? 'recorder.stopRecording' : 'recorder.startRecording') | translate) : ('recorder.unavailable' | translate: { version: minNativeVersion })"
         eqmTooltipPositionSide="bottom"
       >
         <div [class]="'record-button ' + (recording ? 'stop-recording' : 'start-recording')"></div>
       </eqm-button>
-      <eqm-label>Record{{ recording ? 'ing' : '' }}</eqm-label>
+      <eqm-label>{{ (recording ? 'recorder.recording' : 'recorder.record') | translate }}</eqm-label>
       <eqm-label *ngIf="recording">{{ utils.getTimestampFromDurationAndProgress(seconds) }}</eqm-label>
     </div>
 
@@ -25,7 +25,7 @@
       [size]="18"
       [color]="colors.accent"
       (click)="revealLastRecording()"
-      eqmTooltip="Show the last recording in Finder"
+      [eqmTooltip]="'recorder.revealLast' | translate"
       eqmTooltipPositionSide="left"
     ></eqm-icon>
   </div>
@@ -36,7 +36,7 @@
       name="open"
       [size]="16"
       (click)="selectDestination()"
-      eqmTooltip="Change the recordings folder"
+      [eqmTooltip]="'recorder.changeFolder' | translate"
       eqmTooltipPositionSide="top"
     ></eqm-icon>
     <div
@@ -45,7 +45,7 @@
       [eqmTooltip]="destination ? destination.path : ''"
       eqmTooltipPositionSide="top"
     >
-      <eqm-label [fontSize]="10">Saving to: {{ destinationFolderName }}</eqm-label>
+      <eqm-label [fontSize]="10">{{ 'recorder.savingTo' | translate: { folder: destinationFolderName } }}</eqm-label>
     </div>
     <eqm-icon
       *ngIf="destination && !destination.isDefault"
@@ -53,7 +53,7 @@
       name="reset"
       [size]="14"
       (click)="resetDestination()"
-      eqmTooltip="Reset to the default recordings folder"
+      [eqmTooltip]="'recorder.resetFolder' | translate"
       eqmTooltipPositionSide="top"
     ></eqm-icon>
   </div>

@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject, Input } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
+import { TranslateService } from '../../services/translate.service'
 
 export interface ConfirmDialogData {
   text: string
@@ -14,14 +15,17 @@ export interface ConfirmDialogData {
 })
 export class ConfirmDialogComponent implements OnInit {
   @Input() text: string
-  @Input() confirmText = 'Ok'
+  @Input() confirmText: string
   @Input() onConfirm: () => any
-  @Input() cancelText = 'Cancel'
+  @Input() cancelText: string
 
   constructor (
     public dialogRef: MatDialogRef<ConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData
+    @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData,
+    protected translate: TranslateService
   ) {
+    this.confirmText = this.translate.instant('common.ok')
+    this.cancelText = this.translate.instant('common.cancel')
   }
 
   ngOnInit () {

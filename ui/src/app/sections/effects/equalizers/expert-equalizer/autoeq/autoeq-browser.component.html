@@ -1,0 +1,46 @@
+<div class="autoeq-browser" fxLayout="column" fxLayoutGap="8px">
+
+  <div class="header" fxLayout="row" fxLayoutAlign="space-between center">
+    <eqm-label class="title">{{ title }}</eqm-label>
+    <eqm-icon class="close" name="cross" [width]="10" [height]="10" [color]="colors.accent" (click)="close()"></eqm-icon>
+  </div>
+
+  <eqm-input-field
+    [text]="searchQuery"
+    (textChange)="onSearchChanged($event)"
+    [placeholder]="'autoeq.searchPlaceholder' | translate"
+    [fontSize]="12">
+  </eqm-input-field>
+
+  <eqm-label class="status" [fontSize]="10">{{ statusText }}</eqm-label>
+
+  <div #viewport class="viewport" [style.height.px]="viewportHeight" (scroll)="onScroll()">
+    <div class="spacer" [style.height.px]="totalHeight" *ngIf="results.length">
+      <div class="window" [style.transform]="'translateY(' + translateY + 'px)'">
+        <div *ngFor="let result of visibleResults; trackBy: trackById"
+          class="row"
+          [class.selected]="selected && selected.id === result.id"
+          [style.height.px]="rowHeight"
+          (click)="select(result)"
+          (dblclick)="apply()">
+          <eqm-label class="name" [fontSize]="12" [color]="colors.accent">{{ result.name }}</eqm-label>
+          <eqm-label class="subtitle" [fontSize]="10">{{ result.source }} — {{ result.rig }}</eqm-label>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty" *ngIf="!results.length" fxLayout="column" fxLayoutAlign="center center">
+      <eqm-label [fontSize]="11">{{ statusText }}</eqm-label>
+    </div>
+  </div>
+
+  <div fxLayout="row" fxLayoutGap="8px">
+    <eqm-button type="narrow" fxFlex [enabled]="!!selected && !applying" (pressed)="apply()">
+      <eqm-label [clickable]="true">{{ 'common.apply' | translate }}</eqm-label>
+    </eqm-button>
+    <eqm-button type="narrow" fxFlex [enabled]="!!selected && !applying" (pressed)="saveAsPreset()">
+      <eqm-label [clickable]="true">{{ 'autoeq.saveAsPreset' | translate }}</eqm-label>
+    </eqm-button>
+  </div>
+
+</div>

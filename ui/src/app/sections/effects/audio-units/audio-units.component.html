@@ -12,7 +12,7 @@
         [checked]="unit.enabled"
         [interactive]="unit.status === 'ready'"
         (checkedChange)="setUnitEnabled(unit, $event)"
-        eqmTooltip="Enable / Disable"
+        [eqmTooltip]="'audioUnits.enableDisable' | translate"
         eqmTooltipPositionSide="bottom"
       ></eqm-checkbox>
 
@@ -25,7 +25,7 @@
         [class.disabled]="i === 0"
         name="triangle" [rotate]="-90" [size]="10"
         (click)="moveUnit(unit, -1)"
-        eqmTooltip="Move up"
+        [eqmTooltip]="'common.moveUp' | translate"
         eqmTooltipPositionSide="bottom"
       ></eqm-icon>
 
@@ -34,7 +34,7 @@
         [class.disabled]="i === chain.length - 1"
         name="triangle" [rotate]="90" [size]="10"
         (click)="moveUnit(unit, 1)"
-        eqmTooltip="Move down"
+        [eqmTooltip]="'common.moveDown' | translate"
         eqmTooltipPositionSide="bottom"
       ></eqm-icon>
 
@@ -43,7 +43,7 @@
         [class.disabled]="unit.status !== 'ready'"
         name="pencil" [size]="13"
         (click)="openEditor(unit)"
-        eqmTooltip="Open Editor"
+        [eqmTooltip]="'audioUnits.openEditor' | translate"
         eqmTooltipPositionSide="bottom"
       ></eqm-icon>
 
@@ -51,13 +51,13 @@
         class="row-button"
         name="cross" [size]="12"
         (click)="removeUnit(unit)"
-        eqmTooltip="Remove"
+        [eqmTooltip]="'common.remove' | translate"
         eqmTooltipPositionSide="bottom"
       ></eqm-icon>
     </div>
 
     <div *ngIf="chain.length === 0" class="placeholder" fxLayout="row" fxLayoutAlign="center center">
-      <eqm-label [fontSize]="11">No Audio Units in the chain</eqm-label>
+      <eqm-label [fontSize]="11">{{ 'audioUnits.emptyChain' | translate }}</eqm-label>
     </div>
   </div>
 
@@ -66,9 +66,9 @@
       fxFlex
       [items]="availableItems"
       labelParam="label"
-      placeholder="Add Audio Unit"
-      noItemsPlaceholder="No Audio Units found"
-      searchPlaceholder="Search Audio Units"
+      [placeholder]="'audioUnits.add' | translate"
+      [noItemsPlaceholder]="'audioUnits.noneFound' | translate"
+      [searchPlaceholder]="'audioUnits.search' | translate"
       [numberOfVisibleItems]="6"
       (refChanged)="dropdown = $event"
       (itemSelected)="addUnit($event)"
@@ -76,7 +76,7 @@
   </div>
 
   <div *ngIf="synced && !supported" class="placeholder" fxLayout="row" fxLayoutAlign="center center">
-    <eqm-label [fontSize]="11">Audio Units require a newer version of eqMac</eqm-label>
+    <eqm-label [fontSize]="11">{{ 'audioUnits.requiresNewerVersion' | translate }}</eqm-label>
   </div>
 
 </div>

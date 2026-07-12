@@ -11,11 +11,13 @@ import {
 } from '@angular/core'
 import { AdvancedEqualizerService, AdvancedEqualizerPreset, AdvancedEqualizerPresetsChangedEventCallback, AdvancedEqualizerSelectedPresetChangedEventCallback } from 'src/app/sections/effects/equalizers/advanced-equalizer/advanced-equalizer.service'
 import { EqualizerComponent } from '../equalizer.component'
-import { Options, CheckboxOption } from 'src/app/components/options/options.component'
+import { Options, CheckboxOption, ButtonOption } from 'src/app/components/options/options.component'
 import { TransitionService } from '../../../../services/transitions.service'
 import { ApplicationService } from '../../../../services/app.service'
 import { ToastService } from '../../../../services/toast.service'
+import { TranslateService } from '../../../../services/translate.service'
 import { ColorsService } from '@eqmac/components'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'eqm-advanced-equalizer',
@@ -29,36 +31,66 @@ export class AdvancedEqualizerComponent extends EqualizerComponent implements On
 
   public ShowDefaultPresetsCheckbox: CheckboxOption = {
     type: 'checkbox',
-    label: 'Show Default Presets',
+    label: '',  // set by applyTranslations()
     value: false,
     toggled: (show) => this.service.setShowDefaultPresets(show)
   }
 
-  settings: Options = [ [
-    {
-      type: 'button',
-      label: 'Import Presets',
-      action: async () => {
-        const log = await this.service.importPresets()
-        this.toast.show({
-          type: 'success',
-          message: log
-        })
-      }
-    }, {
-      type: 'button',
-      label: 'Export Presets',
-      action: async () => {
-        const log = await this.service.exportPresets()
-        this.toast.show({
-          type: 'success',
-          message: log
-        })
-      }
+  private readonly importPresetsButton: ButtonOption = {
+    type: 'button',
+    label: '',  // set by applyTranslations()
+    action: async () => {
+      const log = await this.service.importPresets()
+      this.toast.show({
+        type: 'success',
+        message: log
+      })
     }
+  }
+
+  private readonly exportPresetsButton: ButtonOption = {
+    type: 'button',
+    label: '',  // set by applyTranslations()
+    action: async () => {
+      const log = await this.service.exportPresets()
+      this.toast.show({
+        type: 'success',
+        message: log
+      })
+    }
+  }
+
+  // Pushed into settings later, only if legacy import is available
+  private readonly importLegacyPresetsButton: ButtonOption = {
+    type: 'button',
+    label: '',  // set by applyTranslations()
+    action: async () => {
+      const log = await this.service.importLegacyPresets()
+      if (this.settingsDialog) {
+        this.settingsDialog.close()
+      }
+      this.toast.show({
+        type: 'success',
+        message: log
+      })
+    }
+  }
+
+  settings: Options = [ [
+    this.importPresetsButton,
+    this.exportPresetsButton
   ], [
     this.ShowDefaultPresetsCheckbox
   ] ]
+
+  // Options arrays carry TS-built labels — retranslate them in place when
+  // the user switches language (object identity is preserved)
+  private applyTranslations () {
+    this.ShowDefaultPresetsCheckbox.label = this.translate.instant('equalizers.showDefaultPresets')
+    this.importPresetsButton.label = this.translate.instant('equalizers.importPresets')
+    this.exportPresetsButton.label = this.translate.instant('equalizers.exportPresets')
+    this.importLegacyPresetsButton.label = this.translate.instant('equalizers.importLegacyPresets')
+  }
 
   public _presets: AdvancedEqualizerPreset[]
   @Output() presetsChange = new EventEmitter<AdvancedEqualizerPreset[]>()
@@ -125,13 +157,21 @@ export class AdvancedEqualizerComponent extends EqualizerComponent implements On
     public change: ChangeDetectorRef,
     public app: ApplicationService,
     public toast: ToastService,
-    public colors: ColorsService
+    public colors: ColorsService,
+    private readonly translate: TranslateService
   ) {
     super()
+    this.applyTranslations()
     this.getImportLegacyAvailable()
   }
 
+  private localeChangedSubscription: Subscription
+
   async ngOnInit () {
+    this.localeChangedSubscription = this.translate.localeChanged.subscribe(() => {
+      this.applyTranslations()
+      this.change.detectChanges()
+    })
     await this.sync()
     this.setupEvents()
   }
@@ -145,22 +185,7 @@ export class AdvancedEqualizerComponent extends EqualizerComponent implements On
 
   public async getImportLegacyAvailable () {
     if (await this.service.getImportLegacyAvailable()) {
-      this.settings[1].push(
-        {
-          type: 'button',
-          label: 'Import eqMac2 Presets',
-          action: async () => {
-            const log = await this.service.importLegacyPresets()
-            if (this.settingsDialog) {
-              this.settingsDialog.close()
-            }
-            this.toast.show({
-              type: 'success',
-              message: log
-            })
-          }
-        }
-      )
+      this.settings[1].push(this.importLegacyPresetsButton)
     }
   }
 
@@ -286,6 +311,9 @@ export class AdvancedEqualizerComponent extends EqualizerComponent implements On
   }
 
   ngOnDestroy () {
+    if (this.localeChangedSubscription) {
+      this.localeChangedSubscription.unsubscribe()
+    }
     this.destroyEvents()
   }
 }

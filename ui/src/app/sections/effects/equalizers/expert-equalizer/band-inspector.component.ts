@@ -3,14 +3,18 @@ import {
   Input,
   Output,
   EventEmitter,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  OnInit,
+  OnDestroy
 } from '@angular/core'
+import { Subscription } from 'rxjs'
 import { FlatSliderValueChangedEvent } from '@eqmac/components'
 import {
   ExpertEqualizerBand,
   ExpertEqualizerBandChannel,
   ExpertEqualizerFilterType
 } from './expert-equalizer.service'
+import { TranslateService } from '../../../../services/translate.service'
 
 export interface ExpertEqualizerFilterTypeItem {
   id: ExpertEqualizerFilterType
@@ -65,7 +69,7 @@ export interface ExpertEqualizerFilterTypeItem {
     }
   ` ]
 })
-export class BandInspectorComponent {
+export class BandInspectorComponent implements OnInit, OnDestroy {
   @Input() band: ExpertEqualizerBand | null = null
   @Input() enabled = true
   @Input() canAddBand = true
@@ -75,20 +79,46 @@ export class BandInspectorComponent {
   @Output() bandRemove = new EventEmitter<ExpertEqualizerBand>()
   @Output() addBand = new EventEmitter<void>()
 
+  // Labels come from the i18n catalog — retranslated in place on locale
+  // change so the dropdown's selected item reference stays valid
   readonly filterTypes: ExpertEqualizerFilterTypeItem[] = [
-    { id: 'peak', name: 'Peak' },
-    { id: 'lowPass', name: 'Low Pass' },
-    { id: 'highPass', name: 'High Pass' },
-    { id: 'lowShelf', name: 'Low Shelf' },
-    { id: 'highShelf', name: 'High Shelf' },
-    { id: 'bandPass', name: 'Band Pass' },
-    { id: 'notch', name: 'Notch' },
-    { id: 'allPass', name: 'All Pass' }
+    { id: 'peak', name: '' },
+    { id: 'lowPass', name: '' },
+    { id: 'highPass', name: '' },
+    { id: 'lowShelf', name: '' },
+    { id: 'highShelf', name: '' },
+    { id: 'bandPass', name: '' },
+    { id: 'notch', name: '' },
+    { id: 'allPass', name: '' }
   ]
 
+  private localeChangedSubscription: Subscription
+
   constructor (
-    public change: ChangeDetectorRef
-  ) {}
+    public change: ChangeDetectorRef,
+    private readonly translate: TranslateService
+  ) {
+    this.applyTranslations()
+  }
+
+  ngOnInit () {
+    this.localeChangedSubscription = this.translate.localeChanged.subscribe(() => {
+      this.applyTranslations()
+      this.change.detectChanges()
+    })
+  }
+
+  ngOnDestroy () {
+    if (this.localeChangedSubscription) {
+      this.localeChangedSubscription.unsubscribe()
+    }
+  }
+
+  private applyTranslations () {
+    for (const item of this.filterTypes) {
+      item.name = this.translate.instant(`equalizers.filterTypes.${item.id}`)
+    }
+  }
 
   get selectedFilterTypeItem (): ExpertEqualizerFilterTypeItem | null {
     const band = this.band

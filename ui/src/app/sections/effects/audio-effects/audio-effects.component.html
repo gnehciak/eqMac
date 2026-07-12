@@ -2,7 +2,7 @@
   <div fxFlex="20" fxLayoutGap="10px" fxLayout="row" fxLayoutAlign="start center"></div>
 
   <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
-    <eqm-label>Effects</eqm-label>
+    <eqm-label>{{ 'effects.title' | translate }}</eqm-label>
   </div>
 
   <div fxFlex="10" fxLayoutGap="5px" fxLayout="row" fxLayoutAlign="end center">
@@ -17,7 +17,7 @@
   [style.height.px]="contentHeight"
   fxLayout="row" fxLayoutAlign="center center"
 >
-  <eqm-label [fontSize]="11">Effects require a newer version of eqMac</eqm-label>
+  <eqm-label [fontSize]="11">{{ 'effects.requiresNewerVersion' | translate }}</eqm-label>
 </div>
 
 <div *ngIf="show && loaded && available"
@@ -34,13 +34,13 @@
       <eqm-checkbox
         [enabled]="app.enabled"
         [checked]="crossfeedEnabled" (checkedChange)="setCrossfeedEnabled($event)"
-        [eqmTooltip]="crossfeedEnabled ? 'Disable Crossfeed' : 'Enable Crossfeed'"
+        [eqmTooltip]="(crossfeedEnabled ? 'effects.crossfeed.disable' : 'effects.crossfeed.enable') | translate"
       ></eqm-checkbox>
-      <eqm-label [fontSize]="11">Crossfeed</eqm-label>
+      <eqm-label [fontSize]="11">{{ 'effects.crossfeed.title' | translate }}</eqm-label>
     </div>
 
     <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
-      <eqm-label [fontSize]="10">Cutoff</eqm-label>
+      <eqm-label [fontSize]="10">{{ 'effects.crossfeed.cutoff' | translate }}</eqm-label>
       <eqm-value-screen [enabled]="crossfeedControlsEnabled">{{ crossfeedCutoff | fixFloat:0:false }} Hz</eqm-value-screen>
     </div>
 
@@ -64,7 +64,7 @@
     </div>
 
     <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
-      <eqm-label [fontSize]="10">Level</eqm-label>
+      <eqm-label [fontSize]="10">{{ 'effects.crossfeed.level' | translate }}</eqm-label>
       <eqm-value-screen [enabled]="crossfeedControlsEnabled">{{ crossfeedLevel | fixFloat:1:false }} dB</eqm-value-screen>
     </div>
 
@@ -94,12 +94,12 @@
       <eqm-checkbox
         [enabled]="app.enabled"
         [checked]="delayEnabled" (checkedChange)="setDelayEnabled($event)"
-        [eqmTooltip]="delayEnabled ? 'Disable Channel Delay' : 'Enable Channel Delay'"
+        [eqmTooltip]="(delayEnabled ? 'effects.delay.disable' : 'effects.delay.enable') | translate"
       ></eqm-checkbox>
-      <eqm-label [fontSize]="11">Delay</eqm-label>
+      <eqm-label [fontSize]="11">{{ 'effects.delay.title' | translate }}</eqm-label>
     </div>
 
-    <eqm-label [fontSize]="10">L</eqm-label>
+    <eqm-label [fontSize]="10">{{ 'common.leftShort' | translate }}</eqm-label>
     <eqm-value-screen fxFlex="48px" [enabled]="delayControlsEnabled">{{ delayLeftMs | fixFloat:1:false }} ms</eqm-value-screen>
     <div fxFlex>
       <eqm-flat-slider
@@ -111,7 +111,7 @@
       ></eqm-flat-slider>
     </div>
 
-    <eqm-label [fontSize]="10">R</eqm-label>
+    <eqm-label [fontSize]="10">{{ 'common.rightShort' | translate }}</eqm-label>
     <eqm-value-screen fxFlex="48px" [enabled]="delayControlsEnabled">{{ delayRightMs | fixFloat:1:false }} ms</eqm-value-screen>
     <div fxFlex>
       <eqm-flat-slider
@@ -132,9 +132,9 @@
       <eqm-checkbox
         [enabled]="app.enabled"
         [checked]="routingEnabled" (checkedChange)="setRoutingEnabled($event)"
-        [eqmTooltip]="routingEnabled ? 'Disable Routing' : 'Enable Routing'"
+        [eqmTooltip]="(routingEnabled ? 'effects.routing.disable' : 'effects.routing.enable') | translate"
       ></eqm-checkbox>
-      <eqm-label [fontSize]="11">Routing</eqm-label>
+      <eqm-label [fontSize]="11">{{ 'effects.routing.title' | translate }}</eqm-label>
     </div>
 
     <eqm-dropdown fxFlex
@@ -142,7 +142,7 @@
       [items]="routingModes" labelParam="name"
       [selectedItem]="selectedRoutingMode" (itemSelected)="setRoutingMode($event)"
       [searchable]="false" [numberOfVisibleItems]="5"
-      placeholder="Select Mode" noItemsPlaceholder="No Modes"
+      [placeholder]="'effects.routing.selectMode' | translate" [noItemsPlaceholder]="'effects.routing.noModes' | translate"
     ></eqm-dropdown>
   </div>
 
@@ -154,9 +154,9 @@
       <eqm-checkbox
         [enabled]="app.enabled"
         [checked]="preampEnabled" (checkedChange)="setPreampEnabled($event)"
-        [eqmTooltip]="preampEnabled ? 'Disable Preamp' : 'Enable Preamp'"
+        [eqmTooltip]="(preampEnabled ? 'effects.preamp.disable' : 'effects.preamp.enable') | translate"
       ></eqm-checkbox>
-      <eqm-label [fontSize]="11">Preamp</eqm-label>
+      <eqm-label [fontSize]="11">{{ 'effects.preamp.title' | translate }}</eqm-label>
     </div>
 
     <eqm-value-screen fxFlex="52px" [enabled]="preampControlsEnabled">{{ preampGain > 0 ? '+' : '' }}{{ preampGain | fixFloat:1:false }} dB</eqm-value-screen>
@@ -174,9 +174,9 @@
     <eqm-checkbox
       [enabled]="preampControlsEnabled"
       [checked]="autoGain" (checkedChange)="setAutoGain($event)"
-      eqmTooltip="Automatically compensate for Equalizer gain"
+      [eqmTooltip]="'effects.preamp.autoGainTooltip' | translate"
     ></eqm-checkbox>
-    <eqm-label [fontSize]="10">Auto Gain</eqm-label>
+    <eqm-label [fontSize]="10">{{ 'effects.preamp.autoGain' | translate }}</eqm-label>
   </div>
 
 </div>

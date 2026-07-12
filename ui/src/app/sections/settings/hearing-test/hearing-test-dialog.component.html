@@ -1,0 +1,118 @@
+<div class="hearing-test" fxLayout="column" fxLayoutGap="10px">
+  <eqm-label class="title">{{ 'hearingTest.title' | translate }}</eqm-label>
+
+  <ng-container *ngIf="loaded">
+    <eqm-label *ngIf="!available">
+      {{ 'hearingTest.requiresNewerVersion' | translate: { version: minNativeVersion } }}
+    </eqm-label>
+
+    <ng-container *ngIf="available">
+      <!-- INTRO -->
+      <ng-container *ngIf="step === 'intro'">
+        <eqm-label>
+          {{ 'hearingTest.intro' | translate: { count: frequencies.length } }}
+        </eqm-label>
+
+        <eqm-label class="warning" [fontSize]="12">
+          {{ 'hearingTest.calibrationWarning' | translate }}
+        </eqm-label>
+
+        <eqm-label class="hint" [fontSize]="11">
+          {{ 'hearingTest.quietRoomHint' | translate }}
+        </eqm-label>
+
+        <div fxLayout="row" fxLayoutGap="10px">
+          <eqm-button type="narrow" fxFlex (pressed)="close()">
+            <eqm-label [clickable]="true">{{ 'common.close' | translate }}</eqm-label>
+          </eqm-button>
+          <eqm-button type="narrow" fxFlex (pressed)="start()">
+            <eqm-label [clickable]="true">{{ 'hearingTest.startTest' | translate }}</eqm-label>
+          </eqm-button>
+        </div>
+      </ng-container>
+
+      <!-- TEST -->
+      <ng-container *ngIf="step === 'test'">
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="progressFraction * 100"></div>
+        </div>
+        <eqm-label class="hint" [fontSize]="11">{{ progressLabel }}</eqm-label>
+
+        <div class="tone-info" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="14px">
+          <eqm-label
+            class="ear-badge"
+            [class.right]="currentEar === 'right'"
+            [fontSize]="13"
+          >{{ (currentEar === 'left' ? 'hearingTest.leftEar' : 'hearingTest.rightEar') | translate }}</eqm-label>
+          <eqm-label class="freq" [fontSize]="18">{{ currentFrequencyLabel }}</eqm-label>
+        </div>
+
+        <eqm-label class="hint" [fontSize]="11">
+          {{ 'hearingTest.toneInstructions' | translate }}
+        </eqm-label>
+
+        <div fxLayout="row" fxLayoutGap="10px">
+          <eqm-button type="narrow" fxFlex [enabled]="toneStarted" (pressed)="heard()">
+            <eqm-label [clickable]="true">{{ 'hearingTest.canHear' | translate }}</eqm-label>
+          </eqm-button>
+          <eqm-button type="narrow" fxFlex [enabled]="toneStarted" (pressed)="notHeard()">
+            <eqm-label [clickable]="true">{{ 'hearingTest.cantHear' | translate }}</eqm-label>
+          </eqm-button>
+        </div>
+
+        <div fxLayout="row">
+          <eqm-button type="narrow" fxFlex (pressed)="cancelTest()">
+            <eqm-label [clickable]="true">{{ 'hearingTest.cancelTest' | translate }}</eqm-label>
+          </eqm-button>
+        </div>
+      </ng-container>
+
+      <!-- RESULTS -->
+      <ng-container *ngIf="step === 'results'">
+        <eqm-label>
+          {{ 'hearingTest.resultsIntro' | translate }}
+        </eqm-label>
+
+        <div class="legend" fxLayout="row" fxLayoutGap="14px">
+          <eqm-label class="legend-left" [fontSize]="11">{{ 'hearingTest.legendLeft' | translate }}</eqm-label>
+          <eqm-label class="legend-right" [fontSize]="11">{{ 'hearingTest.legendRight' | translate }}</eqm-label>
+        </div>
+
+        <div class="graph">
+          <eqm-eq-graph
+            [bands]="resultBands"
+            [enabled]="false"
+            [minGain]="-15"
+            [maxGain]="15"
+          ></eqm-eq-graph>
+        </div>
+
+        <eqm-label *ngIf="isFlat" class="hint" [fontSize]="11">
+          {{ 'hearingTest.flatHint' | translate }}
+        </eqm-label>
+
+        <eqm-label class="hint" [fontSize]="11">
+          {{ 'hearingTest.saveHint' | translate }}
+        </eqm-label>
+
+        <div fxLayout="row" fxLayoutGap="10px">
+          <eqm-button type="narrow" fxFlex [enabled]="!saving" (pressed)="saveExpertPreset()">
+            <eqm-label [clickable]="true">{{ 'hearingTest.saveExpert' | translate }}</eqm-label>
+          </eqm-button>
+          <eqm-button type="narrow" fxFlex [enabled]="!saving" (pressed)="saveAdvancedPreset()">
+            <eqm-label [clickable]="true">{{ 'hearingTest.saveAdvanced' | translate }}</eqm-label>
+          </eqm-button>
+        </div>
+
+        <div fxLayout="row" fxLayoutGap="10px">
+          <eqm-button type="narrow" fxFlex [enabled]="!saving" (pressed)="start()">
+            <eqm-label [clickable]="true">{{ 'hearingTest.retake' | translate }}</eqm-label>
+          </eqm-button>
+          <eqm-button type="narrow" fxFlex (pressed)="close()">
+            <eqm-label [clickable]="true">{{ 'common.done' | translate }}</eqm-label>
+          </eqm-button>
+        </div>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</div>

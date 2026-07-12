@@ -15,6 +15,7 @@ import {
 import { ApplicationService } from '../../../services/app.service'
 import { SemanticVersion } from '../../../services/semantic-version.service'
 import { UISettings } from '../../../services/ui.service'
+import { TranslateService } from '../../../services/translate.service'
 
 // First native version that ships the /effects/audio-units DataBus routes.
 // Keep in sync with the actual release version of the Audio Unit hosting
@@ -56,6 +57,7 @@ export class AudioUnitsComponent implements OnInit, OnDestroy {
   constructor (
     public audioUnits: AudioUnitsService,
     public app: ApplicationService,
+    public translate: TranslateService,
     public changeRef: ChangeDetectorRef
   ) {}
 
@@ -70,7 +72,13 @@ export class AudioUnitsComponent implements OnInit, OnDestroy {
     return rows * this.rowHeight + this.addRowHeight + this.verticalPadding
   }
 
+  private onLocaleChangedSubscription: any
+
   ngOnInit () {
+    // Chain rows build their labels in TS (unitLabel) — refresh them when
+    // the user switches language
+    this.onLocaleChangedSubscription = this.translate.localeChanged
+      .subscribe(() => this.detectChanges())
     this.sync()
   }
 
@@ -112,8 +120,8 @@ export class AudioUnitsComponent implements OnInit, OnDestroy {
   }
 
   unitLabel (unit: AudioUnitChainItem) {
-    if (unit.status === 'loading') return `${unit.name} (loading...)`
-    if (unit.status === 'failed') return `${unit.name} (failed to load)`
+    if (unit.status === 'loading') return this.translate.instant('audioUnits.unitLoading', { name: unit.name })
+    if (unit.status === 'failed') return this.translate.instant('audioUnits.unitFailed', { name: unit.name })
     return unit.name
   }
 
@@ -191,6 +199,9 @@ export class AudioUnitsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy () {
     this.destroyed = true
+    if (this.onLocaleChangedSubscription) {
+      this.onLocaleChangedSubscription.unsubscribe()
+    }
     this.destroyEvents()
   }
 }

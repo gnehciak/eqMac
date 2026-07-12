@@ -17,6 +17,8 @@ import {
 } from './super-presets.service'
 import { ApplicationService } from '../../../services/app.service'
 import { SemanticVersion } from '../../../services/semantic-version.service'
+import { TranslateService } from '../../../services/translate.service'
+import { Subscription } from 'rxjs'
 import { BasicEqualizerService } from '../../effects/equalizers/basic-equalizer/basic-equalizer.service'
 import { AdvancedEqualizerService } from '../../effects/equalizers/advanced-equalizer/advanced-equalizer.service'
 import { ExpertEqualizerService } from '../../effects/equalizers/expert-equalizer/expert-equalizer.service'
@@ -76,7 +78,7 @@ interface RuleRow {
   ` ]
 })
 export class SuperPresetsDialogComponent implements OnInit, OnDestroy {
-  title = 'Super Presets'
+  title = ''
 
   synced = false
   available = false
@@ -85,17 +87,37 @@ export class SuperPresetsDialogComponent implements OnInit, OnDestroy {
   rules: SuperPresetRule[] = []
   rows: RuleRow[] = []
 
+  // Labels come from the i18n catalog — retranslated in place on locale
+  // change so dropdown selection references stay valid
   readonly kindItems: DropdownItem[] = [
-    { id: 'device', name: 'Device' },
-    { id: 'app', name: 'App' }
+    { id: 'device', name: '' },
+    { id: 'app', name: '' }
   ]
 
   readonly typeItems: DropdownItem[] = [
-    { id: 'Basic', name: 'Basic' },
-    { id: 'Advanced', name: 'Advanced' },
-    { id: 'Expert', name: 'Expert' },
-    { id: 'Graphic31', name: 'Graphic 31' }
+    { id: 'Basic', name: '' },
+    { id: 'Advanced', name: '' },
+    { id: 'Expert', name: '' },
+    { id: 'Graphic31', name: '' }
   ]
+
+  private readonly typeLabelKeys: { [type: string]: string } = {
+    Basic: 'equalizers.basic',
+    Advanced: 'equalizers.advanced',
+    Expert: 'equalizers.expert',
+    Graphic31: 'equalizers.graphic31'
+  }
+
+  private applyTranslations () {
+    this.kindItems[0].name = this.translate.instant('superPresets.kinds.device')
+    this.kindItems[1].name = this.translate.instant('superPresets.kinds.app')
+    for (const item of this.typeItems) {
+      item.name = this.translate.instant(this.typeLabelKeys[item.id] || item.id)
+    }
+    if (!this.data || !this.data.title) {
+      this.title = this.translate.instant('superPresets.title')
+    }
+  }
 
   deviceItems: DropdownItem[] = []
   appItems: DropdownItem[] = []
@@ -112,16 +134,25 @@ export class SuperPresetsDialogComponent implements OnInit, OnDestroy {
     private readonly advancedEqualizer: AdvancedEqualizerService,
     private readonly expertEqualizer: ExpertEqualizerService,
     private readonly graphic31Equalizer: Graphic31EqualizerService,
+    private readonly translate: TranslateService,
     private readonly changeRef: ChangeDetectorRef,
     public dialogRef: MatDialogRef<SuperPresetsDialogComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: SuperPresetsDialogData
   ) {
+    this.applyTranslations()
     if (this.data && this.data.title) {
       this.title = this.data.title
     }
   }
 
+  private localeChangedSubscription: Subscription
+
   ngOnInit () {
+    this.localeChangedSubscription = this.translate.localeChanged.subscribe(() => {
+      this.applyTranslations()
+      this.buildRows()
+      this.detectChanges()
+    })
     this.sync()
   }
 
@@ -208,7 +239,10 @@ export class SuperPresetsDialogComponent implements OnInit, OnDestroy {
       // Referenced device / app is currently unavailable - still show it
       row.targetItem = {
         id: targetId,
-        name: `${targetId} (${isDevice ? 'Disconnected' : 'Not running'})`
+        name: this.translate.instant(
+          isDevice ? 'superPresets.disconnected' : 'superPresets.notRunning',
+          { id: targetId }
+        )
       }
       row.targetItems.push(row.targetItem)
     }
@@ -392,6 +426,7 @@ export class SuperPresetsDialogComponent implements OnInit, OnDestroy {
 
   ngOnDestroy () {
     this.destroyed = true
+    this.localeChangedSubscription?.unsubscribe()
     if (this.ignoreUpdatesTimer) {
       clearTimeout(this.ignoreUpdatesTimer)
     }

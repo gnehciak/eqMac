@@ -22,6 +22,7 @@ import { EffectEnabledChangedEventCallback } from '../effect.service'
 import { ApplicationService } from '../../../services/app.service'
 import { UIService } from '../../../services/ui.service'
 import { SemanticVersion } from '../../../services/semantic-version.service'
+import { TranslateService } from '../../../services/translate.service'
 
 // First native version that ships the /effects/reverb DataBus routes.
 // Keep in sync with the actual release version of the Spatial native feature.
@@ -32,21 +33,10 @@ export interface SpatialEnvironmentItem {
   name: string
 }
 
-const ENVIRONMENT_NAMES: { [environment in SpatialEnvironment]: string } = {
-  smallRoom: 'Small Room',
-  mediumRoom: 'Medium Room',
-  largeRoom: 'Large Room',
-  mediumHall: 'Medium Hall',
-  largeHall: 'Large Hall',
-  plate: 'Plate',
-  mediumChamber: 'Medium Chamber',
-  largeChamber: 'Large Chamber',
-  cathedral: 'Cathedral',
-  largeRoom2: 'Large Room 2',
-  mediumHall2: 'Medium Hall 2',
-  mediumHall3: 'Medium Hall 3',
-  largeHall2: 'Large Hall 2'
-}
+// Display names come from the i18n catalog (spatial.environments.*) —
+// items are retranslated in place on locale change so the dropdown's
+// selected item reference stays valid
+const ENVIRONMENT_NAME_KEY_PREFIX = 'spatial.environments.'
 
 @Component({
   selector: 'eqm-spatial',
@@ -55,7 +45,13 @@ const ENVIRONMENT_NAMES: { [environment in SpatialEnvironment]: string } = {
 })
 export class SpatialComponent implements OnInit, OnDestroy {
   environments: SpatialEnvironmentItem[] = SpatialEnvironments
-    .map(id => ({ id, name: ENVIRONMENT_NAMES[id] }))
+    .map(id => ({ id, name: '' }))
+
+  private applyTranslations () {
+    for (const item of this.environments) {
+      item.name = this.translate.instant(`${ENVIRONMENT_NAME_KEY_PREFIX}${item.id}`)
+    }
+  }
 
   minNativeVersion = SPATIAL_MIN_NATIVE_VERSION
 
@@ -78,10 +74,19 @@ export class SpatialComponent implements OnInit, OnDestroy {
     public spatialService: SpatialService,
     public app: ApplicationService,
     public ui: UIService,
+    private readonly translate: TranslateService,
     private readonly changeRef: ChangeDetectorRef
-  ) {}
+  ) {
+    this.applyTranslations()
+  }
+
+  private onLocaleChangedSubscription: Subscription
 
   ngOnInit () {
+    this.onLocaleChangedSubscription = this.translate.localeChanged.subscribe(() => {
+      this.applyTranslations()
+      this.detectChanges()
+    })
     this.sync()
   }
 
@@ -231,6 +236,7 @@ export class SpatialComponent implements OnInit, OnDestroy {
 
   ngOnDestroy () {
     this.destroyed = true
+    this.onLocaleChangedSubscription?.unsubscribe()
     this.destroyEvents()
   }
 }

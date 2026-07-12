@@ -1,9 +1,9 @@
 <div fxLayout="column" fxLayoutGap="6px">
-  <eqm-label class="title">Global Hotkeys</eqm-label>
+  <eqm-label class="title">{{ 'hotkeys.title' | translate }}</eqm-label>
 
   <ng-container *ngIf="loaded">
     <eqm-label *ngIf="!available">
-      Global Hotkeys require eqMac version {{ minNativeVersion }} or newer. Please update eqMac.
+      {{ 'hotkeys.requiresNewerVersion' | translate: { version: minNativeVersion } }}
     </eqm-label>
 
     <ng-container *ngIf="available">
@@ -25,7 +25,7 @@
         <eqm-label
           class="combo"
           [class.not-set]="!displayFor(row.action)"
-        >{{ displayFor(row.action) || 'Not set' }}</eqm-label>
+        >{{ displayFor(row.action) || ('hotkeys.notSet' | translate) }}</eqm-label>
 
         <eqm-button
           type="narrow"
@@ -50,14 +50,14 @@
       </div>
 
       <eqm-label class="hint" [fontSize]="11">
-        Click Record, then press a key combination. Press Esc to cancel. Hotkeys work system wide, even while eqMac is in the background.
+        {{ 'hotkeys.hint' | translate }}
       </eqm-label>
     </ng-container>
   </ng-container>
 
   <div fxLayout="row">
     <eqm-button type="narrow" fxFlex (pressed)="close()">
-      <eqm-label [clickable]="true">Done</eqm-label>
+      <eqm-label [clickable]="true">{{ 'common.done' | translate }}</eqm-label>
     </eqm-button>
   </div>
 </div>

@@ -9,6 +9,7 @@ import {
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { Subscription } from 'rxjs'
 import { UIService, UISettings } from '../../../services/ui.service'
+import { TranslateService } from '../../../services/translate.service'
 
 // UISettings keys this dialog reads / writes inside the existing opaque JSON
 // blob (native side merges partial POSTs - zero native change needed).
@@ -36,7 +37,10 @@ export type SectionFeatureFlag =
 
 export interface SectionDefinition {
   id: string
+  // English fallback label — templates should render labelKey | translate
   label: string
+  // i18n catalog key for the display label (sections.*)
+  labelKey: string
   flag: SectionFeatureFlag
 }
 
@@ -44,14 +48,14 @@ export interface SectionDefinition {
 // ids are the cross-package section identifiers persisted in
 // UISettings.sectionOrder and consumed by AppComponent (integration).
 export const SECTION_DEFINITIONS: SectionDefinition[] = [
-  { id: 'volume', label: 'Volume', flag: 'volumeFeatureEnabled' },
-  { id: 'app-mixer', label: 'App Mixer', flag: 'appMixerFeatureEnabled' },
-  { id: 'equalizers', label: 'Equalizers', flag: 'equalizersFeatureEnabled' },
-  { id: 'effects', label: 'Effects', flag: 'effectsFeatureEnabled' },
-  { id: 'spatial', label: 'Spatial Audio', flag: 'spatialFeatureEnabled' },
-  { id: 'audio-units', label: 'Audio Units', flag: 'audioUnitsFeatureEnabled' },
-  { id: 'recorder', label: 'Recorder', flag: 'recorderFeatureEnabled' },
-  { id: 'outputs', label: 'Output', flag: 'outputFeatureEnabled' }
+  { id: 'volume', label: 'Volume', labelKey: 'sections.volume', flag: 'volumeFeatureEnabled' },
+  { id: 'app-mixer', label: 'App Mixer', labelKey: 'sections.appMixer', flag: 'appMixerFeatureEnabled' },
+  { id: 'equalizers', label: 'Equalizers', labelKey: 'sections.equalizers', flag: 'equalizersFeatureEnabled' },
+  { id: 'effects', label: 'Effects', labelKey: 'sections.effects', flag: 'effectsFeatureEnabled' },
+  { id: 'spatial', label: 'Spatial Audio', labelKey: 'sections.spatial', flag: 'spatialFeatureEnabled' },
+  { id: 'audio-units', label: 'Audio Units', labelKey: 'sections.audioUnits', flag: 'audioUnitsFeatureEnabled' },
+  { id: 'recorder', label: 'Recorder', labelKey: 'sections.recorder', flag: 'recorderFeatureEnabled' },
+  { id: 'outputs', label: 'Output', labelKey: 'sections.output', flag: 'outputFeatureEnabled' }
 ]
 
 export const DEFAULT_SECTION_ORDER: string[] = SECTION_DEFINITIONS.map(section => section.id)
@@ -122,7 +126,7 @@ interface SectionRow extends SectionDefinition {
   ` ]
 })
 export class ArrangementDialogComponent implements OnInit, OnDestroy {
-  title = 'Arrange Features'
+  title = ''
 
   synced = false
   rows: SectionRow[] = []
@@ -137,10 +141,12 @@ export class ArrangementDialogComponent implements OnInit, OnDestroy {
 
   constructor (
     public ui: UIService,
+    private readonly translate: TranslateService,
     private readonly changeRef: ChangeDetectorRef,
     public dialogRef: MatDialogRef<ArrangementDialogComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: ArrangementDialogData
   ) {
+    this.title = this.translate.instant('settings.arrangeFeatures')
     if (this.data && this.data.title) {
       this.title = this.data.title
     }

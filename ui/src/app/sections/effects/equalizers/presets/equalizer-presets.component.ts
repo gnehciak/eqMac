@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { PromptDialogComponent } from 'src/app/components/prompt-dialog/prompt-dialog.component'
 import { ConfirmDialogComponent } from 'src/app/components/confirm-dialog/confirm-dialog.component'
+import { TranslateService } from 'src/app/services/translate.service'
 import { IconName } from '@eqmac/components'
 
 export interface EqualizerPreset {
@@ -33,7 +34,8 @@ export class EqualizerPresetsComponent implements OnInit {
   @Input() additionalRightOption?: AdditionalPresetOption
 
   constructor (
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private readonly translate: TranslateService
   ) { }
 
   ngOnInit () {
@@ -44,10 +46,10 @@ export class EqualizerPresetsComponent implements OnInit {
       hasBackdrop: true,
       disableClose: true,
       data: {
-        confirmText: 'Save',
-        cancelText: 'Cancel',
-        text: 'Please enter a name',
-        placeholder: 'New Preset name',
+        confirmText: this.translate.instant('presets.save'),
+        cancelText: this.translate.instant('presets.cancel'),
+        text: this.translate.instant('presets.enterName'),
+        placeholder: this.translate.instant('presets.newPresetName'),
         prompt: presetName
       }
     }).afterClosed().toPromise()
@@ -60,9 +62,9 @@ export class EqualizerPresetsComponent implements OnInit {
             hasBackdrop: true,
             disableClose: true,
             data: {
-              confirmText: 'Yes, save',
-              cancelText: 'No, cancel',
-              text: 'A Default preset with this name already exists. Would you like to use this name anyway? You might see Duplicate names in the Preset list.'
+              confirmText: this.translate.instant('presets.yesSave'),
+              cancelText: this.translate.instant('presets.noCancel'),
+              text: this.translate.instant('presets.defaultNameExists')
             }
           }).afterClosed().toPromise()
           if (!saveAnyway) return this.savePreset(presetName)
@@ -71,9 +73,9 @@ export class EqualizerPresetsComponent implements OnInit {
             hasBackdrop: true,
             disableClose: true,
             data: {
-              confirmText: 'Yes, overwrite',
-              cancelText: 'No, cancel',
-              text: 'A preset with this name already exists. Would you like to overwrite it?'
+              confirmText: this.translate.instant('presets.yesOverwrite'),
+              cancelText: this.translate.instant('presets.noCancel'),
+              text: this.translate.instant('presets.nameExists')
             }
           }).afterClosed().toPromise()
           if (!overwrite) return this.savePreset(presetName)
@@ -88,9 +90,9 @@ export class EqualizerPresetsComponent implements OnInit {
       hasBackdrop: true,
       disableClose: true,
       data: {
-        confirmText: 'Yes, remove',
-        cancelText: 'No, cancel',
-        text: 'Are you sure you want to remove this Preset?'
+        confirmText: this.translate.instant('presets.yesRemove'),
+        cancelText: this.translate.instant('presets.noCancel'),
+        text: this.translate.instant('presets.removeConfirmation')
       }
     }).afterClosed().toPromise()
 

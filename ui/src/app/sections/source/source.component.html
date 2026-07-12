@@ -1,17 +1,17 @@
 <div fxLayout="column" class="container" fxFill fxLayoutAlign="space-between center">
-  <eqm-label>Audio Source</eqm-label>
+  <eqm-label>{{ 'source.title' | translate }}</eqm-label>
   <div fxLayout="row" fxFlex="100" class="button-container" fxLayoutAlign="space-around center">
     <eqm-button [depressable]="false" [toggle]="true" [state]="source === 'File'" (click)="setSource('File')"
       class="button" size="narrow">
-      <eqm-label>FILE</eqm-label>
+      <eqm-label>{{ 'source.file' | translate }}</eqm-label>
     </eqm-button>
     <eqm-button [depressable]="false" [toggle]="true" [state]="source === 'Input'" (click)="setSource('Input')"
       class="button" size="narrow">
-      <eqm-label>DEVICE</eqm-label>
+      <eqm-label>{{ 'source.device' | translate }}</eqm-label>
     </eqm-button>
     <eqm-button [depressable]="false" [toggle]="true" [state]="source === 'System'" (click)="setSource('System')"
       class="button" size="narrow">
-      <eqm-label>SYSTEM</eqm-label>
+      <eqm-label>{{ 'source.system' | translate }}</eqm-label>
     </eqm-button>
   </div>
 
