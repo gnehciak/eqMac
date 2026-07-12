@@ -16,23 +16,15 @@
   </div>
 
   <div class="fader" fxFlex>
-    <div class="fader-ticks"></div>
-    <div class="fader-fill" [style.height]="fillHeight"></div>
-    <eqm-flat-slider
+    <eqm-fader
       class="fader-slider"
       orientation="vertical"
       [min]="0"
       [max]="1"
-      [enabled]="enabled"
-      [value]="1 - volume"
-      (userChangedValue)="setVolume(1 - $event.value)"
-      [stickToMiddle]="false"
-      [showMiddleNotch]="false"
-      [doubleClickToAnimateToMiddle]="false"
-      [scrollEnabled]="false"
-      [thickness]="3"
-      [thumbRadius]="5"
-    ></eqm-flat-slider>
+      [disabled]="!enabled"
+      [value]="volume"
+      (userChangedValue)="setVolume($event.value)"
+    ></eqm-fader>
   </div>
 
   <eqm-value-screen class="strip-value" [fontSize]="10" [enabled]="enabled && !muted">{{ volumePercent }}%</eqm-value-screen>

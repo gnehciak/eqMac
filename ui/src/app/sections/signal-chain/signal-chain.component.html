@@ -1,0 +1,34 @@
+<div class="chain" role="group" [attr.aria-label]="ariaChainLabel">
+  <ng-container *ngFor="let node of nodes; let last = last; trackBy: trackById">
+    <div
+      class="node"
+      [class.io]="node.io"
+      [class.bypassed]="!node.io && (!node.enabled || !node.available)"
+      [class.unavailable]="!node.available"
+    >
+      <button
+        *ngIf="!node.io"
+        type="button"
+        class="power-dot"
+        [class.on]="node.available && node.enabled"
+        [disabled]="!node.available"
+        [attr.aria-pressed]="node.available && node.enabled"
+        [attr.aria-label]="powerLabel(node)"
+        [attr.title]="powerLabel(node)"
+        (click)="toggle(node, $event)"
+      ></button>
+
+      <button
+        type="button"
+        class="node-body"
+        [attr.aria-label]="focusLabel(node)"
+        (click)="focus(node)"
+      >
+        <span class="name">{{ node.label }}</span>
+        <span class="status">{{ node.status }}</span>
+      </button>
+    </div>
+
+    <span class="arrow" *ngIf="!last" aria-hidden="true">&#9656;</span>
+  </ng-container>
+</div>

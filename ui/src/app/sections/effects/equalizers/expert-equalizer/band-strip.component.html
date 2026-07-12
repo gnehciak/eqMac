@@ -28,20 +28,16 @@
 
     <eqm-label class="freq-label" [fontSize]="9">{{ frequencyLabel(band) }}</eqm-label>
 
-    <!-- Vertical gain slider over fine tick marks -->
+    <!-- Full-travel console fader over fine tick marks (bottom = min gain) -->
     <div class="gain-slider">
-      <div class="ticks"></div>
-      <eqm-flat-slider
+      <eqm-fader
         orientation="vertical"
-        [enabled]="enabled"
+        [disabled]="!enabled"
         [min]="minGain" [max]="maxGain"
-        [middle]="0"
-        [stickToMiddle]="true"
-        [scrollEnabled]="false"
         [color]="color(i)"
         [value]="band.gain"
         (userChangedValue)="setGain(band, $event)">
-      </eqm-flat-slider>
+      </eqm-fader>
     </div>
 
     <eqm-label class="gain-label" [fontSize]="9">{{ gainLabel(band) }}</eqm-label>

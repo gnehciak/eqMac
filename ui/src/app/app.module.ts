@@ -17,7 +17,8 @@ import {
   ComponentsModule,
   EqGraphComponent,
   SpectrumComponent,
-  VirtualDropdownComponent
+  VirtualDropdownComponent,
+  FaderComponent
 } from '@eqmac/components'
 
 import { PipesModule } from './modules/pipes/pipes.module'
@@ -96,6 +97,7 @@ import { ThemePickerDialogComponent } from './sections/settings/themes/theme-pic
 import { ArrangementDialogComponent } from './sections/settings/themes/arrangement-dialog.component'
 import { HearingTestDialogComponent } from './sections/settings/hearing-test/hearing-test-dialog.component'
 import { SuperPresetBarComponent } from './sections/super-preset-bar/super-preset-bar.component'
+import { SignalChainComponent } from './sections/signal-chain/signal-chain.component'
 
 @NgModule({
   imports: [
@@ -149,6 +151,9 @@ import { SuperPresetBarComponent } from './sections/super-preset-bar/super-prese
     EqGraphComponent,
     SpectrumComponent,
     VirtualDropdownComponent,
+    // eqm-fader ships in @eqmac/components' barrel but ComponentsModule does
+    // not declare it, so AppModule owns the declaration (single-module rule).
+    FaderComponent,
     // Wave 2/3 sections and dialogs
     ExpertEqualizerComponent,
     BandInspectorComponent,
@@ -161,6 +166,7 @@ import { SuperPresetBarComponent } from './sections/super-preset-bar/super-prese
     AudioEffectsComponent,
     SpatialComponent,
     AudioUnitsComponent,
+    SignalChainComponent,
     SuperPresetsDialogComponent,
     HotkeysDialogComponent,
     MIDIDialogComponent,

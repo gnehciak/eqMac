@@ -11,19 +11,27 @@ import {
 import { Observable, Subscription } from 'rxjs'
 import { UtilitiesService } from '../../services/utilities.service'
 import { ColorsService } from '../../services/colors.service'
+import {
+  SPECTRUM_FLOOR_DB,
+  SPECTRUM_CEIL_DB,
+  spectrumBinX
+} from '../eq-graph/eq-graph.component'
 
 /**
  * Canvas spectrum analyzer.
  *
  * Renders FFT magnitude frames (~64 log-spaced bins, 20Hz-20kHz) pushed via
- * the `frames` Input observable. Bins are assumed to be log-spaced over the
- * same frequency axis eqm-eq-graph uses, so equal-width bars line up with the
- * graph's log-x axis and the component can underlay it (pointer-events are
- * disabled so the graph above stays interactive).
+ * the `frames` Input observable as a warning-red translucent area (current
+ * magnitudes) plus a brighter peak-hold line — the same visual eqm-eq-graph
+ * draws for its internal underlay. Bins are log-spaced over the same frequency
+ * axis eqm-eq-graph uses (`spectrumBinX`) and share its dBFS scale
+ * (SPECTRUM_FLOOR_DB..SPECTRUM_CEIL_DB), so the trace lines up pixel-for-pixel
+ * whether it is layered inside the graph or underlaid as a sibling. Pointer
+ * events are disabled so the graph above stays interactive.
  *
- * Does zero work when there is no subscription, no recent frames or the
- * canvas is not visible: the requestAnimationFrame loop only runs while
- * there is something to animate.
+ * The rAF loop only runs while visible and while there is something to animate;
+ * it parks at the floor when the signal drops. Under prefers-reduced-motion it
+ * falls back to a 1 fps interval (decay still resolves, just coarsely).
  */
 @Component({
   selector: 'eqm-spectrum',
@@ -40,19 +48,18 @@ export class SpectrumComponent implements OnInit, OnDestroy {
 
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>
 
-  /** Magnitude of the quietest expected frame value (dB floor) */
-  @Input() minValue = -90
-  /** Magnitude of the loudest expected frame value */
-  @Input() maxValue = 0
-  /** Normalized units (0..1) the bars fall per second when the signal drops */
+  /** Magnitude of the quietest expected frame value (dBFS floor). Defaults to
+   * the shared spectrum scale so a standalone sibling lines up with the graph. */
+  @Input() minValue = SPECTRUM_FLOOR_DB
+  /** Magnitude of the loudest expected frame value (dBFS ceiling) */
+  @Input() maxValue = SPECTRUM_CEIL_DB
+  /** Normalized units (0..1) the area falls per second when the signal drops */
   @Input() decayPerSecond = 1.5
   @Input() peakHold = true
   /** How long a peak marker holds before it starts falling, in ms */
   @Input() peakHoldMs = 1000
-  /** Normalized units (0..1) the peak markers fall per second after the hold */
+  /** Normalized units (0..1) the peak line falls per second after the hold */
   @Input() peakDecayPerSecond = 0.4
-  /** Gap between bars in CSS pixels */
-  @Input() barGap = 1
 
   private subscription?: Subscription
   private subscribed = false
@@ -77,11 +84,17 @@ export class SpectrumComponent implements OnInit, OnDestroy {
   private peakTimestamps = new Float32Array(0)
 
   private animationFrame?: number
+  private intervalId?: ReturnType<typeof setInterval>
   private running = false
   private visible = true
   private lastFrameAt = 0
   private lastTickAt = 0
   private readonly idleTimeoutMs = 2000
+  // Resolved at construction (before Angular binds the frames input) so an
+  // early binding under reduced motion still takes the 1 fps path
+  private reducedMotion = typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   private intersectionObserver?: IntersectionObserver
 
@@ -129,7 +142,15 @@ export class SpectrumComponent implements OnInit, OnDestroy {
     if (this.running || !this.visible || !this.subscribed) return
     this.running = true
     this.lastTickAt = performance.now()
-    this.animationFrame = requestAnimationFrame(this.tick)
+    if (this.reducedMotion) {
+      // 1 fps fallback — decay still resolves, just coarsely; the interval
+      // keeps ticking (cheaply) so the trace sits at the floor rather than
+      // vanishing when the signal drops
+      this.draw()
+      this.intervalId = setInterval(() => this.advance(performance.now()), 1000)
+    } else {
+      this.animationFrame = requestAnimationFrame(this.tick)
+    }
   }
 
   private stopLoop () {
@@ -138,13 +159,27 @@ export class SpectrumComponent implements OnInit, OnDestroy {
       cancelAnimationFrame(this.animationFrame)
       this.animationFrame = undefined
     }
+    if (this.intervalId !== undefined) {
+      clearInterval(this.intervalId)
+      this.intervalId = undefined
+    }
   }
 
   private readonly tick = (now: number) => {
     this.animationFrame = undefined
     if (!this.running) return
+    const idle = this.advance(now)
+    if (idle) {
+      // Nothing left to animate — park the loop until the next frame arrives
+      this.running = false
+      return
+    }
+    this.animationFrame = requestAnimationFrame(this.tick)
+  }
 
-    const dt = Math.min((now - this.lastTickAt) / 1000, 0.1)
+  /** One decay/peak-hold step + redraw. Returns true when idle (at the floor). */
+  private advance (now: number): boolean {
+    const dt = Math.min((now - this.lastTickAt) / 1000, this.reducedMotion ? 1.1 : 0.1)
     this.lastTickAt = now
 
     let energy = 0
@@ -170,13 +205,7 @@ export class SpectrumComponent implements OnInit, OnDestroy {
 
     this.draw()
 
-    const idle = (now - this.lastFrameAt) > this.idleTimeoutMs && energy < 0.001
-    if (idle) {
-      // Nothing left to animate — park the loop until the next frame arrives
-      this.running = false
-      return
-    }
-    this.animationFrame = requestAnimationFrame(this.tick)
+    return (now - this.lastFrameAt) > this.idleTimeoutMs && energy < 0.001
   }
 
   private cssWidth = 0
@@ -223,31 +252,35 @@ export class SpectrumComponent implements OnInit, OnDestroy {
     const binCount = this.displayed.length
     if (!binCount) return
 
-    // Bins are log-spaced over 20Hz-20kHz, matching the eq-graph x axis,
-    // so each bin maps to an equal-width column.
-    const barWidth = width / binCount
-    const gap = Math.min(this.barGap, barWidth / 2)
+    // Colors are read from ColorsService at draw time so a live theme change
+    // is picked up on the next frame. Warning-red, matching the graph underlay.
+    const areaColor = this.rgbaFromHex(this.colors.warning, 0.16)
+    const lineColor = this.rgbaFromHex(this.colors.warning, 0.6)
 
-    // Colors are read from ColorsService at draw time so a live theme
-    // change is picked up on the next animation frame.
-    const barColor = this.rgbaFromHex(this.colors.accent, 0.35)
-    const peakColor = this.rgbaFromHex(this.colors.accentLight, 0.7)
-
-    context.fillStyle = barColor
+    // Area under the current magnitudes. Bins are log-spaced over 20Hz-20kHz,
+    // so `spectrumBinX` places bin i exactly where eqm-eq-graph's log-x axis
+    // puts that frequency.
+    context.beginPath()
+    context.moveTo(0, height)
     for (let i = 0; i < binCount; i++) {
-      const barHeight = this.displayed[i] * height
-      if (barHeight <= 0) continue
-      context.fillRect(i * barWidth, height - barHeight, barWidth - gap, barHeight)
+      context.lineTo(spectrumBinX(i, binCount, width), height * (1 - this.displayed[i]))
     }
+    context.lineTo(width, height)
+    context.closePath()
+    context.fillStyle = areaColor
+    context.fill()
 
+    // Brighter peak-hold line
     if (this.peakHold) {
-      context.fillStyle = peakColor
+      context.beginPath()
       for (let i = 0; i < binCount; i++) {
-        const peak = this.peaks[i]
-        if (peak <= 0.001) continue
-        const y = height - peak * height
-        context.fillRect(i * barWidth, y, barWidth - gap, 1.5)
+        const y = height * (1 - this.peaks[i])
+        if (i) context.lineTo(spectrumBinX(i, binCount, width), y)
+        else context.moveTo(spectrumBinX(i, binCount, width), y)
       }
+      context.strokeStyle = lineColor
+      context.lineWidth = 1.2
+      context.stroke()
     }
   }
 

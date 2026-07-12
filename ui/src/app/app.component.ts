@@ -26,6 +26,7 @@ import { SpatialComponent } from './sections/effects/spatial/spatial.component'
 import { AudioUnitsComponent } from './sections/effects/audio-units/audio-units.component'
 import { RecorderComponent } from './sections/recorder/recorder.component'
 import { SuperPresetBarComponent } from './sections/super-preset-bar/super-preset-bar.component'
+import { SignalChainComponent, SignalStageId } from './sections/signal-chain/signal-chain.component'
 import { normalizeSectionOrder } from './sections/settings/themes/arrangement-dialog.component'
 import { ThemeService } from './services/theme.service'
 import { TranslateService } from './services/translate.service'
@@ -49,6 +50,51 @@ export class AppComponent implements OnInit, AfterContentInit {
   @ViewChild('audioUnits', { static: false }) audioUnits: AudioUnitsComponent
   @ViewChild('recorder', { static: false }) recorder: RecorderComponent
   @ViewChild('superPresetBar', { static: false }) superPresetBar: SuperPresetBarComponent
+  @ViewChild('signalChain', { static: false }) signalChain: SignalChainComponent
+
+  // Console redesign: which pipeline stage the signal-chain strip last
+  // focused. Drives a transient [class.focused] highlight on the matching
+  // deck section (cleared after a short delay).
+  focusedStage: string | null = null
+  private focusedStageTimer: any
+
+  // Map an emitted signal-chain stage id to the deck section element id
+  // that hosts its controls, then scroll it into view + flash the highlight.
+  onFocusStage (stageId: string) {
+    const elementId = this.stageElementId(stageId as SignalStageId)
+    this.focusedStage = stageId
+    if (this.focusedStageTimer) clearTimeout(this.focusedStageTimer)
+    this.focusedStageTimer = setTimeout(() => { this.focusedStage = null }, 1600)
+    const element = document.getElementById(elementId)
+    if (element && typeof element.scrollIntoView === 'function') {
+      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }
+
+  private stageElementId (stageId: SignalStageId): string {
+    switch (stageId) {
+      case 'system': return 'stage-master'
+      case 'routing':
+      case 'crossfeed':
+      case 'delay':
+      case 'preamp': return 'stage-effects'
+      case 'eq': return 'stage-eq'
+      case 'spatial': return 'stage-spatial'
+      case 'fx': return 'stage-fx'
+      case 'output': return 'stage-output'
+      default: return 'stage-eq'
+    }
+  }
+
+  // Status bar (bottom of the console). API/WS port surfacing is a native
+  // follow-up (no endpoint exposes them today); version + transport are live.
+  get statusVersion (): string {
+    return `eqMac ${this.ui.version}`
+  }
+
+  get statusTransport (): string {
+    return this.ui.isLocal ? 'native bridge' : 'remote'
+  }
 
   // Main-section rendering order (Arrangement dialog persists
   // UISettings.sectionOrder; normalizeSectionOrder always returns all
@@ -117,78 +163,63 @@ export class AppComponent implements OnInit, AfterContentInit {
   // the App Mixer, matching the template). ViewChild refs are
   // null-guarded: right after a visibility toggle a ref can be undefined
   // for one CD cycle and the 1s dimensions poll must not throw.
-  private leftColumnHeight (): number {
+  // Sum a set of section heights, inserting a 3px divider between each pair
+  // that is actually present (nulls / disabled sections are skipped).
+  private sumSections (heights: Array<number | null | undefined>): number {
+    const present = heights.filter((h): h is number => typeof h === 'number')
     const divider = 3
-
-    const {
-      volumeFeatureEnabled, balanceFeatureEnabled,
-      appMixerFeatureEnabled,
-      effectsFeatureEnabled,
-      spatialFeatureEnabled,
-      audioUnitsFeatureEnabled,
-      recorderFeatureEnabled,
-      outputFeatureEnabled,
-      superPresetsBarFeatureEnabled
-    } = this.ui.settings
-
-    const heights: number[] = []
-    for (const sectionId of this.leftSectionOrder) {
-      switch (sectionId) {
-        case 'volume':
-          if ((volumeFeatureEnabled || balanceFeatureEnabled) && this.volumeBoosterBalance) {
-            heights.push(this.volumeBoosterBalance.height)
-          }
-          break
-        case 'app-mixer':
-          if (appMixerFeatureEnabled && this.appMixer) {
-            heights.push(this.appMixer.height)
-          }
-          if (superPresetsBarFeatureEnabled && this.superPresetBar) {
-            heights.push(this.superPresetBar.height)
-          }
-          break
-        case 'effects':
-          if (effectsFeatureEnabled && this.audioEffects) {
-            heights.push(this.audioEffects.height)
-          }
-          break
-        case 'spatial':
-          if (spatialFeatureEnabled && this.spatial) {
-            heights.push(this.spatial.height)
-          }
-          break
-        case 'audio-units':
-          if (audioUnitsFeatureEnabled && this.audioUnits) {
-            heights.push(this.audioUnits.height)
-          }
-          break
-        case 'recorder':
-          if (recorderFeatureEnabled && this.recorder) {
-            heights.push(this.recorder.height)
-          }
-          break
-        case 'outputs':
-          if (outputFeatureEnabled && this.outputs) {
-            heights.push(this.outputs.height)
-          }
-          break
-      }
-    }
-
-    return heights.reduce((sum, height) => sum + height, 0) +
-      Math.max(heights.length - 1, 0) * divider
+    return present.reduce((sum, h) => sum + h, 0) +
+      Math.max(present.length - 1, 0) * divider
   }
 
-  private rightColumnHeight ({ useEqualizersMaxHeight }: { useEqualizersMaxHeight: boolean }): number {
+  // LEFT RAIL: master (volume + balance) + app mixer + super preset bar
+  private leftColumnHeight (): number {
+    const s = this.ui.settings
+    return this.sumSections([
+      (s.volumeFeatureEnabled || s.balanceFeatureEnabled) && this.volumeBoosterBalance
+        ? this.volumeBoosterBalance.height : null,
+      s.appMixerFeatureEnabled && this.appMixer ? this.appMixer.height : null,
+      s.superPresetsBarFeatureEnabled && this.superPresetBar ? this.superPresetBar.height : null
+    ])
+  }
+
+  // RIGHT RAIL: audio effects · spatial · audio units · recorder · outputs
+  private rightColumnHeight (): number {
+    const s = this.ui.settings
+    return this.sumSections([
+      s.effectsFeatureEnabled && this.audioEffects ? this.audioEffects.height : null,
+      s.spatialFeatureEnabled && this.spatial ? this.spatial.height : null,
+      s.audioUnitsFeatureEnabled && this.audioUnits ? this.audioUnits.height : null,
+      s.recorderFeatureEnabled && this.recorder ? this.recorder.height : null,
+      s.outputFeatureEnabled && this.outputs ? this.outputs.height : null
+    ])
+  }
+
+  // CENTER: the EQ instrument
+  private centerColumnHeight ({ useEqualizersMaxHeight }: { useEqualizersMaxHeight: boolean }): number {
     if (!this.ui.settings.equalizersFeatureEnabled || !this.equalizers) return 0
     return useEqualizersMaxHeight ? this.equalizers.maxHeight : this.equalizers.height
   }
 
-  // Two-column window height: header chrome + the taller of the two columns
+  // Extra vertical chrome the console adds around the three columns:
+  // the signal-chain strip (fixed 54) + its divider, and the status bar.
+  private readonly signalChainHeight = 54
+  private readonly statusBarHeight = 26
+  private consoleChromeHeight (): number {
+    const divider = 3
+    let chrome = divider + this.statusBarHeight // status bar + its top divider
+    if (this.ui.settings.signalChainFeatureEnabled) {
+      chrome += this.signalChainHeight + divider
+    }
+    return chrome
+  }
+
+  // Console window height: header chrome + strip/status chrome + tallest column
   private columnsHeight ({ useEqualizersMaxHeight }: { useEqualizersMaxHeight: boolean }): number {
-    return Math.max(
+    return this.consoleChromeHeight() + Math.max(
       this.leftColumnHeight(),
-      this.rightColumnHeight({ useEqualizersMaxHeight })
+      this.centerColumnHeight({ useEqualizersMaxHeight }),
+      this.rightColumnHeight()
     )
   }
 
@@ -209,21 +240,20 @@ export class AppComponent implements OnInit, AfterContentInit {
     return minHeight
   }
 
-  // Keep in sync with app.component.scss (.left-column / .right-column
-  // widths + the 3px vertical eqm-divider between the columns)
-  private readonly leftColumnWidth = 420
+  // Keep in sync with app.component.scss (.left-rail / .right-rail widths
+  // + the two 3px vertical eqm-dividers between the three columns).
+  private readonly leftRailWidth = 210
+  private readonly rightRailWidth = 262
   private readonly columnDividerWidth = 3
-  private readonly rightColumnMinWidth = 620
+  private readonly centerMinWidth = 390
 
+  // Fixed three-column console width (~1080). Left rail + right rail +
+  // two column dividers + a flexible EQ center that never drops below
+  // centerMinWidth.
   get minWidth () {
-    // Right EQ column only renders when the Equalizers feature is on;
-    // without it the window collapses back to the single left rail.
-    if (!this.ui.settings.equalizersFeatureEnabled) {
-      return this.leftColumnWidth
-    }
-    // 420 + 3 + 620 = 1043 -> pad the EQ column up to the ~1080 Pro default
     return Math.max(
-      this.leftColumnWidth + this.columnDividerWidth + this.rightColumnMinWidth,
+      this.leftRailWidth + this.rightRailWidth +
+        (this.columnDividerWidth * 2) + this.centerMinWidth,
       1080
     )
   }

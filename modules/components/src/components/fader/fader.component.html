@@ -1,0 +1,15 @@
+<div
+  #track
+  class="fader"
+  [class.dragging]="dragging"
+  [style.--eqm-fader-progress]="progress"
+  [style.--eqm-fader-pad]="thumbPaddingPx"
+  [style.--eqm-fader-fill]="fillVar"
+>
+  <div class="rail"></div>
+  <div *ngIf="showTicks" class="ticks" [style.background]="ticksBackground"></div>
+  <div class="fill"></div>
+  <div class="thumb">
+    <span class="groove"></span>
+  </div>
+</div>

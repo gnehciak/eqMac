@@ -14,10 +14,24 @@
   filter: none;
 }
 
+// Live-spectrum underlay canvas, layered behind the SVG. Never intercepts
+// pointer events so the graph's handles stay fully interactive.
+.spectrum-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .eq-graph {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+  z-index: 1;
 
   text {
     pointer-events: none;

@@ -29,5 +29,19 @@
         white-space: nowrap;
       }
     }
+
+    // Full-travel console faders for the L/R channel-delay times. The
+    // horizontal eqm-fader has no intrinsic length, so give it the row width
+    // and a compact fixed height.
+    .delay-fader {
+      display: flex;
+      align-items: center;
+
+      eqm-fader {
+        display: block;
+        width: 100%;
+        height: 22px;
+      }
+    }
   }
 }

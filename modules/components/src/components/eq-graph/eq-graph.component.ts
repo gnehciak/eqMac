@@ -8,10 +8,11 @@ import {
   HostListener,
   OnInit,
   OnDestroy,
+  ViewChild,
   ChangeDetectionStrategy,
   ChangeDetectorRef
 } from '@angular/core'
-import { Subscription } from 'rxjs'
+import { Observable, Subscription } from 'rxjs'
 import { UtilitiesService } from '../../services/utilities.service'
 import { ColorsService } from '../../services/colors.service'
 import {
@@ -21,6 +22,47 @@ import {
   eqBandColor,
   logSpacedFrequencies
 } from './biquad-response'
+
+// MARK: - Shared spectrum axis contract
+//
+// Single source of truth for the live-spectrum dB range and log-x placement so
+// the internal spectrum underlay drawn here and the standalone <eqm-spectrum>
+// component (which imports these) map identical frames to identical pixels and
+// can be layered / swapped interchangeably. Matches the Console reference mock
+// (spectrum scale roughly -96..+20 dBFS, log-spaced bins over 20Hz..20kHz).
+
+/** Bottom of the spectrum dBFS scale (quietest represented magnitude) */
+export const SPECTRUM_FLOOR_DB = -96
+/** Top of the spectrum dBFS scale (loudest represented magnitude, with headroom) */
+export const SPECTRUM_CEIL_DB = 20
+
+/**
+ * X position (in the graph's pixel space) of spectrum bin `index` of
+ * `binCount`. Frames are log-spaced over 20Hz..20kHz, so equal bin index ==
+ * equal log-frequency == equal x on the graph's log-x axis: bin i sits at
+ * i / (binCount - 1) of the width — exactly where eqm-eq-graph's log-x axis
+ * puts that frequency.
+ */
+export function spectrumBinX (index: number, binCount: number, width: number): number {
+  return binCount <= 1 ? 0 : (index / (binCount - 1)) * width
+}
+
+/**
+ * Maps a spectrum magnitude in dBFS to a 0..1 vertical ratio (0 = top of the
+ * graph, 1 = bottom) on the shared spectrum scale. Used for the left-hand
+ * dBFS axis labels; clamps outside [floorDb, ceilDb].
+ */
+export function spectrumDbToYRatio (
+  db: number,
+  floorDb: number = SPECTRUM_FLOOR_DB,
+  ceilDb: number = SPECTRUM_CEIL_DB
+): number {
+  const span = (ceilDb - floorDb) || 1
+  let ratio = (db - floorDb) / span
+  if (ratio < 0) ratio = 0
+  if (ratio > 1) ratio = 1
+  return 1 - ratio
+}
 
 export interface EqGraphBandContextEvent {
   band: EqGraphBand
@@ -125,6 +167,43 @@ export class EqGraphComponent implements OnInit, OnDestroy {
   @Input() showLabels = true
   @Input() handleRadius = 5
 
+  // MARK: - Spectrum underlay inputs
+  //
+  // The live spectrum renders behind the band curves on an internal canvas
+  // layer so the graph is one layered surface (per the Console redesign). It
+  // stays completely inert — canvas cleared, no animation loop — until a
+  // `spectrumFrames` observable is bound, so a host that underlays a separate
+  // <eqm-spectrum> sibling instead is unaffected.
+
+  /** Show the live-spectrum underlay (still requires `spectrumFrames`) */
+  @Input() showSpectrum = true
+  /** Bottom of the spectrum dBFS scale (see SPECTRUM_FLOOR_DB) */
+  @Input() spectrumMinDb = SPECTRUM_FLOOR_DB
+  /** Top of the spectrum dBFS scale (see SPECTRUM_CEIL_DB) */
+  @Input() spectrumMaxDb = SPECTRUM_CEIL_DB
+
+  private _spectrumFrames?: Observable<number[]> | null = null
+  /**
+   * Live FFT magnitude frames (dBFS, log-spaced bins over 20Hz..20kHz — the
+   * same stream `<eqm-spectrum [frames]>` accepts). When bound, the underlay
+   * animates with peak-hold decay whenever the graph is visible, in every EQ
+   * mode; when the observable is silent it settles to the floor rather than
+   * vanishing.
+   */
+  @Input()
+  set spectrumFrames (observable: Observable<number[]> | null | undefined) {
+    this._spectrumFrames = observable ?? null
+    this.unsubscribeFromSpectrum()
+    if (observable) {
+      this.spectrumSubscription = observable.subscribe(frame => this.onSpectrumFrame(frame))
+    }
+    // Reflect the active/inert state right away (draw the floor or clear)
+    this.drawSpectrum()
+    if (this._spectrumFrames && this.specVisible) this.startSpectrumLoop()
+  }
+
+  get spectrumFrames () { return this._spectrumFrames }
+
   @HostBinding('class.enabled') @Input() enabled = true
 
   private _selectedBandId?: string | null = null
@@ -150,6 +229,36 @@ export class EqGraphComponent implements OnInit, OnDestroy {
   handles: EqGraphHandle[] = []
   freqGridLines: EqGraphGridLine[] = []
   gainGridLines: EqGraphGridLine[] = []
+  /** Left-hand spectrum dBFS axis labels (0, -24, -48, -72) */
+  spectrumScaleLines: EqGraphGridLine[] = []
+
+  @ViewChild('spectrumCanvas', { static: true }) spectrumCanvasRef?: ElementRef<HTMLCanvasElement>
+
+  // Spectrum underlay engine state (imperative canvas; independent of the
+  // SVG's OnPush change detection)
+  private spectrumSubscription?: Subscription
+  private specTargets = new Float32Array(0)
+  private specDisplayed = new Float32Array(0)
+  private specPeaks = new Float32Array(0)
+  private specPeakTimestamps = new Float32Array(0)
+  private specAnimationFrame?: number
+  private specIntervalId?: ReturnType<typeof setInterval>
+  private specRunning = false
+  private specVisible = true
+  private specLastFrameAt = 0
+  private specLastTickAt = 0
+  private readonly specIdleTimeoutMs = 2000
+  private readonly specDecayPerSecond = 1.5
+  private readonly specPeakHoldMs = 1000
+  private readonly specPeakDecayPerSecond = 0.4
+  private specCssWidth = 0
+  private specCssHeight = 0
+  // Resolved at construction (before Angular binds inputs) so an early
+  // spectrumFrames binding under reduced motion still takes the 1 fps path
+  private reducedMotion = typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  private spectrumIntersectionObserver?: IntersectionObserver
 
   hoveredBandId?: string | null = null
 
@@ -176,18 +285,30 @@ export class EqGraphComponent implements OnInit, OnDestroy {
 
   async ngOnInit () {
     // Re-render on theme swaps so curve / composite colors pick up the new tokens
-    this.themeChangedSubscription = this.colors.themeChanged.subscribe(() => this.render())
+    this.themeChangedSubscription = this.colors.themeChanged.subscribe(() => {
+      this.render()
+      this.drawSpectrum()
+    })
     this.measure()
+    this.resizeSpectrumCanvas()
+    this.setupSpectrumVisibility()
+    // Paint the floor / start the loop if frames were bound before view init
+    this.drawSpectrum()
+    if (this._spectrumFrames && this.specVisible) this.startSpectrumLoop()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const _ of [ ...Array(3) ]) {
       await this.utils.delay(100)
       this.measure()
+      this.resizeSpectrumCanvas()
+      this.drawSpectrum()
     }
   }
 
   @HostListener('window:resize')
   onWindowResize () {
     this.measure()
+    this.resizeSpectrumCanvas()
+    this.drawSpectrum()
   }
 
   private measure () {
@@ -306,26 +427,42 @@ export class EqGraphComponent implements OnInit, OnDestroy {
   }
 
   private buildGrid () {
+    // Log-spaced frequency gridlines (decade anchors brighter, per the mock)
     const freqMarks = [ 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000 ]
+    const emphasizedMarks = [ 100, 1000, 10000 ]
     this.freqGridLines = freqMarks
       .filter(frequency => frequency >= this.minFrequency && frequency <= this.maxFrequency)
       .map(frequency => ({
         position: this.freqToX(frequency),
-        label: frequency >= 1000 ? `${frequency / 1000}k` : `${frequency}`,
-        emphasized: false
+        label: frequency >= 1000 ? `${frequency / 1000}K` : `${frequency}`,
+        emphasized: emphasizedMarks.includes(frequency)
       }))
 
+    // Horizontal EQ-gain gridlines (right-hand axis). Interior lines only —
+    // the extreme min/max sit on the border, so the mock draws e.g. ±18 on a
+    // ±24 scale, with the 0 dB line emphasized.
     const range = this.maxGain - this.minGain
     const step = range <= 24 ? 3 : (range <= 48 ? 6 : 12)
     this.gainGridLines = []
     const first = Math.ceil(this.minGain / step) * step
     for (let gain = first; gain <= this.maxGain; gain += step) {
+      if (gain <= this.minGain || gain >= this.maxGain) continue
       this.gainGridLines.push({
         position: this.gainToY(gain),
         label: `${gain > 0 ? '+' : ''}${gain}`,
         emphasized: gain === 0
       })
     }
+
+    // Left-hand spectrum dBFS scale labels (text only, no gridlines — the
+    // horizontal lines belong to the EQ-gain axis)
+    this.spectrumScaleLines = [ 0, -24, -48, -72 ]
+      .filter(db => db >= this.spectrumMinDb && db <= this.spectrumMaxDb)
+      .map(db => ({
+        position: spectrumDbToYRatio(db, this.spectrumMinDb, this.spectrumMaxDb) * this.height,
+        label: `${db}`,
+        emphasized: false
+      }))
   }
 
   // MARK: - Interaction
@@ -522,6 +659,189 @@ export class EqGraphComponent implements OnInit, OnDestroy {
     this.render()
   }
 
+  // MARK: - Spectrum underlay
+  //
+  // Renders the live spectrum as a warning-red translucent area (current
+  // magnitudes) plus a brighter peak-hold line, on a canvas layered behind the
+  // SVG band curves. Fast attack / slow release, peak-hold decay. Runs on rAF
+  // while visible; falls back to a 1 fps interval under prefers-reduced-motion.
+
+  private setupSpectrumVisibility () {
+    if (typeof IntersectionObserver === 'undefined') return
+    this.spectrumIntersectionObserver = new IntersectionObserver(entries => {
+      const entry = entries[entries.length - 1]
+      this.specVisible = !!entry && entry.isIntersecting
+      if (this.specVisible) {
+        this.drawSpectrum()
+        this.startSpectrumLoop()
+      } else {
+        this.stopSpectrumLoop()
+      }
+    })
+    this.spectrumIntersectionObserver.observe(this.elem.nativeElement)
+  }
+
+  private onSpectrumFrame (frame: number[]) {
+    if (!frame || !frame.length) return
+    if (this.specTargets.length !== frame.length) {
+      this.specTargets = new Float32Array(frame.length)
+      this.specDisplayed = new Float32Array(frame.length)
+      this.specPeaks = new Float32Array(frame.length)
+      this.specPeakTimestamps = new Float32Array(frame.length)
+    }
+    const range = (this.spectrumMaxDb - this.spectrumMinDb) || 1
+    for (let i = 0; i < frame.length; i++) {
+      let normalized = (frame[i] - this.spectrumMinDb) / range
+      if (normalized < 0) normalized = 0
+      if (normalized > 1) normalized = 1
+      this.specTargets[i] = normalized
+    }
+    this.specLastFrameAt = performance.now()
+    this.startSpectrumLoop()
+  }
+
+  private startSpectrumLoop () {
+    if (this.specRunning || !this.specVisible || !this.showSpectrum || !this._spectrumFrames) return
+    this.specRunning = true
+    this.specLastTickAt = performance.now()
+    if (this.reducedMotion) {
+      this.drawSpectrum()
+      // 1 fps fallback — decay still resolves, just coarsely; the interval
+      // keeps the floor alive so the trace never blanks out
+      this.specIntervalId = setInterval(() => this.advanceSpectrum(performance.now()), 1000)
+    } else {
+      this.specAnimationFrame = requestAnimationFrame(this.spectrumTick)
+    }
+  }
+
+  private stopSpectrumLoop () {
+    this.specRunning = false
+    if (this.specAnimationFrame !== undefined) {
+      cancelAnimationFrame(this.specAnimationFrame)
+      this.specAnimationFrame = undefined
+    }
+    if (this.specIntervalId !== undefined) {
+      clearInterval(this.specIntervalId)
+      this.specIntervalId = undefined
+    }
+  }
+
+  private readonly spectrumTick = (now: number) => {
+    this.specAnimationFrame = undefined
+    if (!this.specRunning) return
+    const idle = this.advanceSpectrum(now)
+    if (idle) {
+      // Nothing left to animate — park at the floor until the next frame
+      this.specRunning = false
+      return
+    }
+    this.specAnimationFrame = requestAnimationFrame(this.spectrumTick)
+  }
+
+  private advanceSpectrum (now: number): boolean {
+    const dt = Math.min((now - this.specLastTickAt) / 1000, this.reducedMotion ? 1.1 : 0.1)
+    this.specLastTickAt = now
+    let energy = 0
+    const decay = this.specDecayPerSecond * dt
+    const peakDecay = this.specPeakDecayPerSecond * dt
+    for (let i = 0; i < this.specDisplayed.length; i++) {
+      const target = this.specTargets[i]
+      const fallen = this.specDisplayed[i] - decay
+      this.specDisplayed[i] = target > fallen ? target : (fallen > 0 ? fallen : 0)
+
+      if (this.specDisplayed[i] >= this.specPeaks[i]) {
+        this.specPeaks[i] = this.specDisplayed[i]
+        this.specPeakTimestamps[i] = now
+      } else if (now - this.specPeakTimestamps[i] > this.specPeakHoldMs) {
+        const peakFallen = this.specPeaks[i] - peakDecay
+        this.specPeaks[i] = peakFallen > this.specDisplayed[i] ? peakFallen : this.specDisplayed[i]
+      }
+      energy += this.specPeaks[i] + this.specDisplayed[i]
+    }
+    this.drawSpectrum()
+    return (now - this.specLastFrameAt) > this.specIdleTimeoutMs && energy < 0.001
+  }
+
+  private resizeSpectrumCanvas () {
+    const canvas = this.spectrumCanvasRef?.nativeElement
+    if (!canvas) return
+    const width = this.elem.nativeElement.offsetWidth
+    const height = this.elem.nativeElement.offsetHeight
+    if (!width || !height) return
+    if (width === this.specCssWidth && height === this.specCssHeight) return
+    this.specCssWidth = width
+    this.specCssHeight = height
+    const dpr = window.devicePixelRatio || 1
+    canvas.width = Math.round(width * dpr)
+    canvas.height = Math.round(height * dpr)
+    canvas.style.width = `${width}px`
+    canvas.style.height = `${height}px`
+    const context = canvas.getContext('2d')
+    if (context) context.setTransform(dpr, 0, 0, dpr, 0, 0)
+  }
+
+  private rgba (hex: string, alpha: number) {
+    const { r, g, b } = this.utils.hexToRgb(hex)
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  }
+
+  private drawSpectrum () {
+    const canvas = this.spectrumCanvasRef?.nativeElement
+    if (!canvas) return
+    const context = canvas.getContext('2d')
+    if (!context) return
+    if (this.elem.nativeElement.offsetWidth !== this.specCssWidth ||
+        this.elem.nativeElement.offsetHeight !== this.specCssHeight) {
+      this.resizeSpectrumCanvas()
+    }
+    const width = this.specCssWidth
+    const height = this.specCssHeight
+    if (!width || !height) return
+
+    context.clearRect(0, 0, width, height)
+    // Inert (transparent) unless a frames observable is bound — so hosts that
+    // underlay a separate <eqm-spectrum> sibling see nothing drawn here.
+    if (!this.showSpectrum || !this._spectrumFrames) return
+
+    const areaColor = this.rgba(this.colors.warning, 0.16)
+    const lineColor = this.rgba(this.colors.warning, 0.6)
+    const n = this.specDisplayed.length
+
+    // Area under the current magnitudes (floor when there are no bins yet)
+    context.beginPath()
+    context.moveTo(0, height)
+    for (let i = 0; i < n; i++) {
+      context.lineTo(spectrumBinX(i, n, width), height * (1 - this.specDisplayed[i]))
+    }
+    context.lineTo(width, height)
+    context.closePath()
+    context.fillStyle = areaColor
+    context.fill()
+
+    // Brighter peak-hold line
+    context.beginPath()
+    if (n) {
+      for (let i = 0; i < n; i++) {
+        const y = height * (1 - this.specPeaks[i])
+        if (i) context.lineTo(spectrumBinX(i, n, width), y)
+        else context.moveTo(spectrumBinX(i, n, width), y)
+      }
+    } else {
+      context.moveTo(0, height)
+      context.lineTo(width, height)
+    }
+    context.strokeStyle = lineColor
+    context.lineWidth = 1.2
+    context.stroke()
+  }
+
+  private unsubscribeFromSpectrum () {
+    if (this.spectrumSubscription) {
+      this.spectrumSubscription.unsubscribe()
+      this.spectrumSubscription = undefined
+    }
+  }
+
   // MARK: - Helpers
 
   private clamp (value: number, min: number, max: number) {
@@ -558,6 +878,12 @@ export class EqGraphComponent implements OnInit, OnDestroy {
     if (this.themeChangedSubscription) {
       this.themeChangedSubscription.unsubscribe()
       this.themeChangedSubscription = undefined
+    }
+    this.unsubscribeFromSpectrum()
+    this.stopSpectrumLoop()
+    if (this.spectrumIntersectionObserver) {
+      this.spectrumIntersectionObserver.disconnect()
+      this.spectrumIntersectionObserver = undefined
     }
     this.dettachWindowEvents()
   }

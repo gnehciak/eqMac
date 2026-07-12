@@ -5,11 +5,14 @@
     </div>
 
     <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
-      <eqm-label>{{ 'equalizers.title' | translate }} </eqm-label>
-      <eqm-label class="type" [class.active]="type === 'Basic'" (click)="setType('Basic')">{{ 'equalizers.basic' | translate }}</eqm-label>
-      <eqm-label class="type" [class.active]="type === 'Advanced'" (click)="setType('Advanced')">{{ 'equalizers.advanced' | translate }}</eqm-label>
-      <eqm-label class="type" [class.active]="type === 'Expert'" (click)="setType('Expert')">{{ 'equalizers.expert' | translate }}</eqm-label>
-      <eqm-label class="type" [class.active]="type === 'Graphic31'" (click)="setType('Graphic31')">{{ 'equalizers.graphic31' | translate }}</eqm-label>
+      <eqm-label class="eq-title">{{ 'equalizers.title' | translate }}</eqm-label>
+      <!-- Density switch: one instrument, four densities (Basic / 10 / 31 / Para) -->
+      <div class="density-switch" role="tablist">
+        <eqm-label class="seg" role="tab" [class.active]="type === 'Basic'" (click)="setType('Basic')">{{ 'equalizers.basic' | translate }}</eqm-label>
+        <eqm-label class="seg" role="tab" [class.active]="type === 'Advanced'" (click)="setType('Advanced')">{{ 'equalizers.advanced' | translate }}</eqm-label>
+        <eqm-label class="seg" role="tab" [class.active]="type === 'Graphic31'" (click)="setType('Graphic31')">{{ 'equalizers.graphic31' | translate }}</eqm-label>
+        <eqm-label class="seg" role="tab" [class.active]="type === 'Expert'" (click)="setType('Expert')">{{ 'equalizers.expert' | translate }}</eqm-label>
+      </div>
     </div>
 
     <div fxFlex="10" fxLayoutGap="5px" fxLayout="row" fxLayoutAlign="end center">

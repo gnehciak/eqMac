@@ -1,4 +1,4 @@
-<div #container fxLayout="column" class="container" [ngStyle]="containerStyle">
+<div #container fxLayout="column" class="container console" [ngStyle]="containerStyle">
   <eqm-loading class="loader" *ngIf="!loaded"></eqm-loading>
   <eqm-header class="header" id="header" #header
     (settingsToggled)="toggleDropdownSection('settings')"
@@ -21,53 +21,82 @@
     *ngIf="showDropdownSections.help"
   ></eqm-help>
 
-  <!-- Pro-look two-column layout: fixed-width left rail + flexible EQ column -->
-  <div fxLayout="row" fxFlex class="columns">
+  <!-- Console redesign: the audio pipeline as an always-visible strip -->
+  <eqm-signal-chain
+    #signalChain
+    class="signal-chain-strip"
+    *ngIf="ui.settings.signalChainFeatureEnabled"
+    (focusStage)="onFocusStage($event)"
+  ></eqm-signal-chain>
+  <eqm-divider *ngIf="ui.settings.signalChainFeatureEnabled"></eqm-divider>
 
-    <div class="left-column" fxLayout="column">
-      <ng-container *ngFor="let sectionId of leftSectionOrder">
-        <ng-container [ngSwitch]="sectionId">
-          <ng-container *ngSwitchCase="'volume'">
-            <eqm-volume-booster-balance *ngIf="ui.settings.volumeFeatureEnabled || ui.settings.balanceFeatureEnabled" #volumeBoosterBalance></eqm-volume-booster-balance>
-            <eqm-divider *ngIf="(ui.settings.volumeFeatureEnabled || ui.settings.balanceFeatureEnabled) && !isLastLeftSection(sectionId)"></eqm-divider>
-          </ng-container>
-          <ng-container *ngSwitchCase="'app-mixer'">
-            <eqm-app-mixer *ngIf="ui.settings.appMixerFeatureEnabled" #appMixer></eqm-app-mixer>
-            <eqm-divider *ngIf="ui.settings.appMixerFeatureEnabled && ui.settings.superPresetsBarFeatureEnabled"></eqm-divider>
-            <!-- Pro reference places the Super Preset bar right under the App Mixer -->
-            <eqm-super-preset-bar *ngIf="ui.settings.superPresetsBarFeatureEnabled" #superPresetBar></eqm-super-preset-bar>
-            <eqm-divider *ngIf="(ui.settings.appMixerFeatureEnabled || ui.settings.superPresetsBarFeatureEnabled) && !isLastLeftSection(sectionId)"></eqm-divider>
-          </ng-container>
-          <ng-container *ngSwitchCase="'effects'">
-            <eqm-audio-effects *ngIf="ui.settings.effectsFeatureEnabled" #audioEffects></eqm-audio-effects>
-            <eqm-divider *ngIf="ui.settings.effectsFeatureEnabled && !isLastLeftSection(sectionId)"></eqm-divider>
-          </ng-container>
-          <ng-container *ngSwitchCase="'spatial'">
-            <eqm-spatial *ngIf="ui.settings.spatialFeatureEnabled" #spatial></eqm-spatial>
-            <eqm-divider *ngIf="ui.settings.spatialFeatureEnabled && !isLastLeftSection(sectionId)"></eqm-divider>
-          </ng-container>
-          <ng-container *ngSwitchCase="'audio-units'">
-            <eqm-audio-units *ngIf="ui.settings.audioUnitsFeatureEnabled" #audioUnits></eqm-audio-units>
-            <eqm-divider *ngIf="ui.settings.audioUnitsFeatureEnabled && !isLastLeftSection(sectionId)"></eqm-divider>
-          </ng-container>
-          <ng-container *ngSwitchCase="'recorder'">
-            <eqm-recorder *ngIf="ui.settings.recorderFeatureEnabled" #recorder></eqm-recorder>
-            <eqm-divider *ngIf="ui.settings.recorderFeatureEnabled && !isLastLeftSection(sectionId)"></eqm-divider>
-          </ng-container>
-          <ng-container *ngSwitchCase="'outputs'">
-            <eqm-outputs *ngIf="ui.settings.outputFeatureEnabled" #outputs></eqm-outputs>
-            <eqm-divider *ngIf="ui.settings.outputFeatureEnabled && !isLastLeftSection(sectionId)"></eqm-divider>
-          </ng-container>
-        </ng-container>
-      </ng-container>
+  <!-- Three-column console deck: left rail · EQ instrument · right rail -->
+  <div fxLayout="row" fxFlex class="deck">
+
+    <!-- LEFT RAIL: master + app mixer -->
+    <div class="rail left-rail" fxLayout="column">
+      <div id="stage-master" class="deck-section" [class.focused]="focusedStage === 'system'">
+        <eqm-volume-booster-balance
+          *ngIf="ui.settings.volumeFeatureEnabled || ui.settings.balanceFeatureEnabled"
+          #volumeBoosterBalance
+        ></eqm-volume-booster-balance>
+      </div>
+      <eqm-divider *ngIf="(ui.settings.volumeFeatureEnabled || ui.settings.balanceFeatureEnabled) && ui.settings.appMixerFeatureEnabled"></eqm-divider>
+
+      <div id="stage-mixer" class="deck-section" [class.focused]="focusedStage === 'mixer'">
+        <eqm-app-mixer *ngIf="ui.settings.appMixerFeatureEnabled" #appMixer></eqm-app-mixer>
+      </div>
+      <eqm-divider *ngIf="ui.settings.appMixerFeatureEnabled && ui.settings.superPresetsBarFeatureEnabled"></eqm-divider>
+      <eqm-super-preset-bar *ngIf="ui.settings.superPresetsBarFeatureEnabled" #superPresetBar></eqm-super-preset-bar>
     </div>
 
-    <eqm-divider orientation="vertical" class="column-divider" *ngIf="ui.settings.equalizersFeatureEnabled"></eqm-divider>
+    <eqm-divider orientation="vertical" class="column-divider"></eqm-divider>
 
-    <div class="right-column" fxLayout="column" fxFlex *ngIf="ui.settings.equalizersFeatureEnabled">
-      <eqm-equalizers fxFlex #equalizers></eqm-equalizers>
+    <!-- CENTER: the EQ instrument -->
+    <div class="center-column" fxLayout="column" fxFlex>
+      <div id="stage-eq" class="deck-section eq-instrument" [class.focused]="focusedStage === 'eq'">
+        <eqm-equalizers fxFlex #equalizers *ngIf="ui.settings.equalizersFeatureEnabled"></eqm-equalizers>
+      </div>
     </div>
 
+    <eqm-divider orientation="vertical" class="column-divider"></eqm-divider>
+
+    <!-- RIGHT RAIL: every effect module, parameters surfaced -->
+    <div class="rail right-rail" fxLayout="column">
+      <div id="stage-effects" class="deck-section"
+        [class.focused]="focusedStage === 'routing' || focusedStage === 'crossfeed' || focusedStage === 'delay' || focusedStage === 'preamp'">
+        <eqm-audio-effects *ngIf="ui.settings.effectsFeatureEnabled" #audioEffects></eqm-audio-effects>
+      </div>
+      <eqm-divider *ngIf="ui.settings.effectsFeatureEnabled && ui.settings.spatialFeatureEnabled"></eqm-divider>
+
+      <div id="stage-spatial" class="deck-section" [class.focused]="focusedStage === 'spatial'">
+        <eqm-spatial *ngIf="ui.settings.spatialFeatureEnabled" #spatial></eqm-spatial>
+      </div>
+      <eqm-divider *ngIf="ui.settings.spatialFeatureEnabled && ui.settings.audioUnitsFeatureEnabled"></eqm-divider>
+
+      <div id="stage-fx" class="deck-section" [class.focused]="focusedStage === 'fx'">
+        <eqm-audio-units *ngIf="ui.settings.audioUnitsFeatureEnabled" #audioUnits></eqm-audio-units>
+      </div>
+      <eqm-divider *ngIf="ui.settings.audioUnitsFeatureEnabled && ui.settings.recorderFeatureEnabled"></eqm-divider>
+
+      <div id="stage-recorder" class="deck-section">
+        <eqm-recorder *ngIf="ui.settings.recorderFeatureEnabled" #recorder></eqm-recorder>
+      </div>
+      <eqm-divider *ngIf="ui.settings.recorderFeatureEnabled && ui.settings.outputFeatureEnabled"></eqm-divider>
+
+      <div id="stage-output" class="deck-section" [class.focused]="focusedStage === 'output'">
+        <eqm-outputs *ngIf="ui.settings.outputFeatureEnabled" #outputs></eqm-outputs>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Status bar: version · transport (API/WS ports are a native follow-up) -->
+  <eqm-divider></eqm-divider>
+  <div class="status-bar" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
+    <span class="status-item">{{ statusVersion }}</span>
+    <span class="status-sep">·</span>
+    <span class="status-item">{{ statusTransport }}</span>
   </div>
 
 </div>

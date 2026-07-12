@@ -95,29 +95,85 @@ $noise: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyA
     z-index: 3;
   }
 
-  // Pro-look two-column layout: fixed left rail + flexible EQ column.
-  // Widths are kept in sync with AppComponent.leftColumnWidth / minWidth.
-  .columns {
+  // Console redesign: the audio pipeline strip pinned under the titlebar.
+  .signal-chain-strip {
+    width: 100%;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  // Three-column console deck: fixed left rail · flexible EQ · fixed right
+  // rail. Widths kept in sync with AppComponent.leftRailWidth /
+  // rightRailWidth / minWidth. Each column scrolls independently.
+  .deck {
     width: 100%;
     align-items: stretch;
     box-sizing: border-box;
+    min-height: 0;
 
-    .left-column {
-      width: 420px;
-      min-width: 420px;
-      max-width: 420px;
+    .rail {
       box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 6px;
+
+      &.left-rail {
+        width: 210px;
+        min-width: 210px;
+        max-width: 210px;
+      }
+
+      &.right-rail {
+        width: 262px;
+        min-width: 262px;
+        max-width: 262px;
+      }
+    }
+
+    .center-column {
+      min-width: 390px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 6px;
     }
 
     .column-divider {
       align-self: stretch;
+      flex-shrink: 0;
     }
 
-    .right-column {
-      min-width: 620px;
-      box-sizing: border-box;
-      overflow: hidden;
+    // A deck cell wrapping one section — carries the transient focus flash
+    // driven by the signal-chain strip's (focusStage) output.
+    .deck-section {
+      border-radius: 8px;
+      transition: box-shadow .2s ease-out, background-color .2s ease-out;
+
+      &.focused {
+        box-shadow: 0 0 0 1px var(--eqm-accent, #4f8d71),
+          0 0 12px 0 var(--eqm-accent, #4f8d71);
+      }
     }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .deck .deck-section {
+      transition: none;
+    }
+  }
+
+  // Bottom status bar: sample-rate / transport readouts in a mono face.
+  .status-bar {
+    width: 100%;
+    flex-shrink: 0;
+    padding: 5px 8px;
+    box-sizing: border-box;
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+    font-size: 10px;
+    color: var(--eqm-gradient-start, #8b9298);
+    opacity: 0.8;
+
+    .status-sep { opacity: 0.5; }
   }
 
   .dropdown-section {

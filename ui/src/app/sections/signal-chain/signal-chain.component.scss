@@ -1,0 +1,187 @@
+// Signal-chain strip. Geometry mirrors the approved console mock; every colour
+// resolves from --eqm-* theme tokens (never hardcoded) so it recolours with the
+// active theme, in both dark and light.
+
+$mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+:host {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.chain {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  height: 100%;
+  padding: 8px 12px;
+  // The "well" behind the strip + a hairline separator from the deck below.
+  background-color: var(--eqm-band-strip-bg, #202225);
+  border-bottom: 1px solid var(--eqm-card-border, #34373b);
+  overflow-x: auto;
+  overflow-y: hidden;
+  // Entrance motion only — removed under reduced-motion below.
+  animation: eqm-signal-chain-in 0.3s ease-out both;
+}
+
+.node {
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 74px;
+  display: flex;
+  border: 1px solid var(--eqm-card-border, #34373b);
+  background-color: var(--eqm-card-surface, #26282b);
+  border-radius: 8px;
+
+  &.io {
+    background-color: transparent;
+    border-style: dashed;
+  }
+
+  &:hover,
+  &:focus-within {
+    border-color: var(--eqm-accent, #3fca87);
+  }
+}
+
+// Full-card button carrying the name + status; emits (focusStage) on activate.
+.node-body {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  // Horizontal padding >= the power dot's inset+size (6px + 7px) so a long
+  // centered name (e.g. CROSSFEED) never slides under the corner dot.
+  padding: 6px 14px 5px;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--eqm-accent, #3fca87);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+.name {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  color: var(--eqm-text-light, #c9cdd0);
+}
+
+.status {
+  // Caps a long AutoEQ preset name so one node can't balloon the strip; the
+  // full value stays reachable in the EQ module + node aria-label.
+  max-width: 112px;
+  font-family: $mono;
+  font-size: 9.5px;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  color: var(--eqm-text-light, #c9cdd0);
+  opacity: 0.55;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Bypassed / unavailable processing node reads dimmer than an active one.
+.node.bypassed {
+  .name {
+    opacity: 0.6;
+  }
+
+  .status {
+    opacity: 0.4;
+  }
+}
+
+// Power dot: accent + glow when enabled, muted grey when bypassed/unavailable.
+.power-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  // Fallback first, then a theme-derived translucent grey for capable engines.
+  background-color: var(--eqm-card-border, #5a6066);
+  background-color: color-mix(in srgb, var(--eqm-text-light, #c9cdd0) 30%, transparent);
+  transition: background-color 0.15s ease-out, box-shadow 0.15s ease-out;
+
+  &.on {
+    background-color: var(--eqm-accent, #3fca87);
+    box-shadow: 0 0 6px var(--eqm-accent, #3fca87);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--eqm-accent, #3fca87);
+    outline-offset: 2px;
+  }
+}
+
+.arrow {
+  flex: 0 0 auto;
+  align-self: center;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--eqm-text-light, #c9cdd0);
+  opacity: 0.4;
+}
+
+@keyframes eqm-signal-chain-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chain {
+    animation: none;
+  }
+
+  .power-dot {
+    transition: none;
+  }
+}

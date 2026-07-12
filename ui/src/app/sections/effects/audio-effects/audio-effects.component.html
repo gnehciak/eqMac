@@ -101,26 +101,24 @@
 
     <eqm-label [fontSize]="10">{{ 'common.leftShort' | translate }}</eqm-label>
     <eqm-value-screen fxFlex="48px" [enabled]="delayControlsEnabled">{{ delayLeftMs | fixFloat:1:false }} ms</eqm-value-screen>
-    <div fxFlex>
-      <eqm-flat-slider
-        [enabled]="delayControlsEnabled"
+    <div fxFlex class="delay-fader">
+      <eqm-fader
+        orientation="horizontal"
+        [disabled]="!delayControlsEnabled"
         [min]="delayMin" [max]="delayMax"
         [(value)]="delayLeftMs" (userChangedValue)="setDelayLeft($event.value)"
-        [stickToMiddle]="false" [showMiddleNotch]="false" [doubleClickToAnimateToMiddle]="false"
-        [thickness]="3" [thumbRadius]="4"
-      ></eqm-flat-slider>
+      ></eqm-fader>
     </div>
 
     <eqm-label [fontSize]="10">{{ 'common.rightShort' | translate }}</eqm-label>
     <eqm-value-screen fxFlex="48px" [enabled]="delayControlsEnabled">{{ delayRightMs | fixFloat:1:false }} ms</eqm-value-screen>
-    <div fxFlex>
-      <eqm-flat-slider
-        [enabled]="delayControlsEnabled"
+    <div fxFlex class="delay-fader">
+      <eqm-fader
+        orientation="horizontal"
+        [disabled]="!delayControlsEnabled"
         [min]="delayMin" [max]="delayMax"
         [(value)]="delayRightMs" (userChangedValue)="setDelayRight($event.value)"
-        [stickToMiddle]="false" [showMiddleNotch]="false" [doubleClickToAnimateToMiddle]="false"
-        [thickness]="3" [thumbRadius]="4"
-      ></eqm-flat-slider>
+      ></eqm-fader>
     </div>
   </div>
 

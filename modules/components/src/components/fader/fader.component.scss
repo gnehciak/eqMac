@@ -1,0 +1,212 @@
+// eqm-fader — a full-travel mixing-console fader.
+//
+// Geometry and spacing mirror the approved Console mock: a thin 4px rail well
+// with an inset border, evenly spaced tick marks, a colored fill from the min
+// end up to the thumb, and a rectangular grabbable thumb with a center groove
+// and a subtle top-light gradient + drop shadow.
+//
+// Colors come exclusively from --eqm-* theme tokens. The only literal colors
+// are neutral lighting overlays (rgba white/black) and the drop shadow, which
+// carry no palette and read correctly in every theme.
+
+:host {
+  display: block;
+  position: relative;
+  outline: none;
+  box-sizing: border-box;
+
+  // --eqm-fader-pad (thumb half-extent along the travel axis) and
+  // --eqm-fader-progress (0..1) are stamped by the component on the .fader.
+  --eqm-fader-rail-thickness: 4px;
+}
+
+:host(.vertical) {
+  width: 26px;
+  height: 100%;
+  min-height: 80px;
+}
+
+:host(.horizontal) {
+  width: 100%;
+  height: 24px;
+  min-width: 80px;
+}
+
+:host(.disabled) {
+  filter: grayscale(100%);
+  opacity: 0.55;
+  cursor: default;
+}
+
+:host(:focus-visible) {
+  outline: 2px solid var(--eqm-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.fader {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+
+  > * {
+    position: absolute;
+  }
+}
+
+// ----- rail well ----------------------------------------------------------
+.rail {
+  background: var(--eqm-band-strip-bg);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--eqm-card-border);
+}
+
+// ----- tick marks ---------------------------------------------------------
+.ticks {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+// ----- colored fill (min end -> thumb) ------------------------------------
+.fill {
+  background: var(--eqm-fader-fill, var(--eqm-accent));
+  border-radius: 2px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+// ----- thumb --------------------------------------------------------------
+.thumb {
+  // text-light is the theme's high-contrast neutral, so the cap always reads
+  // strongly against the rail well; the rgba overlay is the top-light sheen.
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.42),
+      rgba(255, 255, 255, 0.06) 45%,
+      rgba(0, 0, 0, 0.08)
+    ),
+    var(--eqm-text-light);
+  border: 1px solid var(--eqm-card-border);
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  cursor: grab;
+
+  .groove {
+    position: absolute;
+    background: var(--eqm-band-strip-bg);
+    opacity: 0.85;
+  }
+}
+
+.fader.dragging .thumb {
+  cursor: grabbing;
+}
+
+// ==========================================================================
+// Vertical geometry (bottom = min, top = max)
+// ==========================================================================
+:host(.vertical) {
+  .rail,
+  .ticks {
+    top: var(--eqm-fader-pad);
+    bottom: var(--eqm-fader-pad);
+  }
+
+  .rail {
+    left: 50%;
+    width: var(--eqm-fader-rail-thickness);
+    transform: translateX(-50%);
+  }
+
+  .ticks {
+    left: 0;
+    right: 0;
+  }
+
+  .fill {
+    left: 50%;
+    bottom: var(--eqm-fader-pad);
+    width: var(--eqm-fader-rail-thickness);
+    height: calc(var(--eqm-fader-progress) * (100% - var(--eqm-fader-pad) * 2));
+    transform: translateX(-50%);
+  }
+
+  .thumb {
+    left: 50%;
+    bottom: calc(var(--eqm-fader-pad) + var(--eqm-fader-progress) * (100% - var(--eqm-fader-pad) * 2));
+    width: 22px;
+    height: 12px;
+    transform: translate(-50%, 50%);
+
+    .groove {
+      left: 2px;
+      right: 2px;
+      top: 50%;
+      height: 1.5px;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+// ==========================================================================
+// Horizontal geometry (left = min, right = max)
+// ==========================================================================
+:host(.horizontal) {
+  .rail,
+  .ticks {
+    left: var(--eqm-fader-pad);
+    right: var(--eqm-fader-pad);
+  }
+
+  .rail {
+    top: 50%;
+    height: var(--eqm-fader-rail-thickness);
+    transform: translateY(-50%);
+  }
+
+  .ticks {
+    top: 0;
+    bottom: 0;
+  }
+
+  .fill {
+    top: 50%;
+    left: var(--eqm-fader-pad);
+    height: var(--eqm-fader-rail-thickness);
+    width: calc(var(--eqm-fader-progress) * (100% - var(--eqm-fader-pad) * 2));
+    transform: translateY(-50%);
+  }
+
+  .thumb {
+    top: 50%;
+    left: calc(var(--eqm-fader-pad) + var(--eqm-fader-progress) * (100% - var(--eqm-fader-pad) * 2));
+    width: 18px;
+    height: 12px;
+    transform: translate(-50%, -50%);
+
+    .groove {
+      top: 2px;
+      bottom: 2px;
+      left: 50%;
+      width: 1.5px;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+// ----- motion -------------------------------------------------------------
+// Smooth programmatic value changes, but never while the user is dragging
+// (that must feel instant), and honor reduced-motion.
+.fader:not(.dragging) {
+  .fill { transition: height 0.09s ease-out, width 0.09s ease-out; }
+  .thumb { transition: bottom 0.09s ease-out, left 0.09s ease-out; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fader .fill,
+  .fader .thumb {
+    transition: none;
+  }
+}

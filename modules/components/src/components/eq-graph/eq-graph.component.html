@@ -1,3 +1,7 @@
+<!-- Live-spectrum underlay: warning-red area + peak-hold line, layered behind
+     the SVG band curves. Inert (transparent) until [spectrumFrames] is bound. -->
+<canvas #spectrumCanvas class="spectrum-layer"></canvas>
+
 <svg
   class="eq-graph"
   [attr.viewBox]="viewBox"
@@ -6,28 +10,41 @@
   (dblclick)="onBackgroundDoubleClick($event)">
 
   <g *ngIf="showGrid" class="grid">
+    <!-- Vertical log-frequency gridlines (decade anchors brighter) -->
     <line *ngFor="let line of freqGridLines; trackBy: trackByIndex"
       [attr.x1]="line.position" [attr.x2]="line.position"
       [attr.y1]="0" [attr.y2]="height"
       [attr.stroke]="colors.light"
-      [attr.opacity]="line.emphasized ? 0.25 : 0.08"
+      [attr.opacity]="line.emphasized ? 0.22 : 0.1"
       stroke-width="1"></line>
+    <!-- Horizontal EQ-gain gridlines (right-hand axis; 0 dB emphasized) -->
     <line *ngFor="let line of gainGridLines; trackBy: trackByIndex"
       [attr.x1]="0" [attr.x2]="width"
       [attr.y1]="line.position" [attr.y2]="line.position"
       [attr.stroke]="colors.light"
-      [attr.opacity]="line.emphasized ? 0.25 : 0.08"
+      [attr.opacity]="line.emphasized ? 0.28 : 0.1"
       stroke-width="1"></line>
   </g>
 
   <g *ngIf="showLabels" class="labels">
+    <!-- Frequency labels along the bottom, centered on each gridline -->
     <text *ngFor="let line of freqGridLines; trackBy: trackByIndex"
-      [attr.x]="line.position + 2" [attr.y]="height - 3"
+      [attr.x]="line.position" [attr.y]="height - 3"
+      text-anchor="middle"
       [attr.fill]="colors.light"
-      opacity="0.4"
+      opacity="0.45"
       font-size="8">{{ line.label }}</text>
+    <!-- EQ gain scale on the RIGHT (+18 … -18) -->
     <text *ngFor="let line of gainGridLines; trackBy: trackByIndex"
-      [attr.x]="2" [attr.y]="line.position - 2"
+      [attr.x]="width - 3" [attr.y]="line.position - 2"
+      text-anchor="end"
+      [attr.fill]="colors.light"
+      opacity="0.45"
+      font-size="8">{{ line.label }}</text>
+    <!-- Spectrum dBFS scale on the LEFT (0, -24, -48, -72) -->
+    <text *ngFor="let line of spectrumScaleLines; trackBy: trackByIndex"
+      [attr.x]="3" [attr.y]="line.position - 2"
+      text-anchor="start"
       [attr.fill]="colors.light"
       opacity="0.4"
       font-size="8">{{ line.label }}</text>

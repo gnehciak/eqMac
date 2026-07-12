@@ -21,6 +21,8 @@ export interface UISettings {
   recorderFeatureEnabled?: boolean
   // Pro-look compact Super Preset bar in the left rail
   superPresetsBarFeatureEnabled?: boolean
+  // Console redesign: the always-visible signal-chain strip under the titlebar
+  signalChainFeatureEnabled?: boolean
 
   showEqualizers?: boolean
   showEffects?: boolean
@@ -114,6 +116,9 @@ export class UIService extends DataService {
     }
     if (typeof uiSettings.superPresetsBarFeatureEnabled !== 'boolean') {
       this.settings.superPresetsBarFeatureEnabled = true
+    }
+    if (typeof uiSettings.signalChainFeatureEnabled !== 'boolean') {
+      this.settings.signalChainFeatureEnabled = true
     }
     this.setSettings(this.settings)
 

@@ -56,58 +56,17 @@ import { AppMixerService, MixerApp } from '../app-mixer.service'
       width: 100%;
       min-height: 0;
     }
-    /* eqm-flat-slider (vertical) renders 12px wide + 2px host padding.
-       scaleY(-1) flips it so the thumb tracks the cursor AND the max end
-       sits at the top (the widget's vertical drag math is top=min). The
-       value binding is inverted in the template to match. */
+    /* eqm-fader renders bottom = min natively (no scaleY flip / inverted
+       value needed) and draws its own rail, ticks and accent fill. */
     .fader-slider {
-      width: 16px;
+      width: 26px;
       height: 100%;
+      min-height: 0;
       margin: 0 auto;
-      transform: scaleY(-1);
+      display: block;
     }
-    /* The widget's own filling would sit on the wrong side of the thumb
-       when flipped — hide it and draw our own accent fill from the
-       bottom of the groove up to the thumb. */
-    .fader ::ng-deep .groove-filling {
-      display: none;
-    }
-    /* Fine tick marks flanking the groove (7px = 2px slider host padding
-       + 5px thumb radius: the thumb travel region). */
-    .fader-ticks {
-      position: absolute;
-      top: 7px;
-      bottom: 7px;
-      left: calc(50% - 8px);
-      width: 16px;
-      background-image: repeating-linear-gradient(
-        to bottom,
-        var(--eqm-gradient-start, #5a5b5f) 0px,
-        var(--eqm-gradient-start, #5a5b5f) 1px,
-        transparent 1px,
-        transparent 12px
-      );
-      opacity: 0.35;
-      pointer-events: none;
-    }
-    /* Accent fill between the bottom of the groove and the thumb.
-       z-index lifts it above the groove; its height stops short of the
-       thumb center so it tucks under the thumb edge. */
-    .fader-fill {
-      position: absolute;
-      bottom: 7px;
-      left: calc(50% - 1.5px);
-      width: 3px;
-      border-radius: 1.5px;
-      background-color: var(--eqm-accent, #4f8d71);
-      z-index: 1;
-      pointer-events: none;
-    }
-    .app-strip.disabled .fader-fill {
-      background-color: var(--eqm-gradient-start, #5a5b5f);
-    }
-    .app-strip.muted-state .fader-fill {
-      opacity: 0.35;
+    .app-strip.muted-state .fader-slider {
+      opacity: 0.5;
     }
     .strip-value {
       flex-shrink: 0;

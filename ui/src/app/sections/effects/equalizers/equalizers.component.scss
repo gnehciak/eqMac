@@ -14,45 +14,47 @@
     padding: 0 5px;
     // clip-path: url(.active);
     box-shadow: 0 10px 10px 0px $bg;
-    .type {
-      padding: 5px 10px;
-      padding-bottom: 8px;
-      margin-top: 3px;
-      position: relative;
+    .eq-title {
       color: $gradient-start;
+      font-weight: 600;
+      letter-spacing: .02em;
     }
 
-    .active {
-      background-color: $bg;
-      $radius: 5px;
-      border-top-left-radius: $radius;
-      border-top-right-radius: $radius;
+    // Segmented density switch (Pro console look): a bordered pill of four
+    // equal segments; the active density fills with the accent.
+    .density-switch {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--eqm-card-border, #34373b);
+      border-radius: 7px;
+      overflow: hidden;
 
-      &:before,
-      &:after {
-        content: "";
-        position: absolute;
+      .seg {
+        padding: 4px 11px;
+        cursor: pointer;
+        color: $gradient-start;
+        font-weight: 600;
+        letter-spacing: .02em;
+        transition: background-color .12s ease-out, color .12s ease-out;
 
-        height: 10px;
-        width: 20px;
+        & + .seg {
+          border-left: 1px solid var(--eqm-card-border, #34373b);
+        }
 
-        bottom: 0;
+        &:hover:not(.active) {
+          color: var(--eqm-text-light, #c9cdd0);
+        }
+
+        &.active {
+          background-color: var(--eqm-accent, #4f8d71);
+          color: var(--eqm-gradient-end, #0b2417);
+        }
       }
-
-      &:before {
-        left: -20px;
-        border-radius: 0 0 $radius 0;
-        box-shadow: 10px 0 0 0 $bg;
-      }
-
-      &:after {
-        right: -20px;
-        border-radius: 0 0 0 $radius;
-        box-shadow: -10px 0 0 0 $bg;
-      }
-
-      
     }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .toolbar .density-switch .seg { transition: none; }
   }
   
   .presets {
