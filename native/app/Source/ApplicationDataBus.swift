@@ -106,6 +106,12 @@ class ApplicationDataBus: DataBus {
     self.add("/transition", TransitionDataBus.self)
     self.add("/ui", UIDataBus.self)
     self.add("/settings", SettingsDataBus.self)
+    self.add("/super-presets", SuperPresetsDataBus.self)
+    self.add("/hotkeys", HotkeysDataBus.self)
+    self.add("/midi", MIDIDataBus.self)
+    self.add("/recorder", RecorderDataBus.self)
+    self.add("/backup", BackupDataBus.self)
+    self.add("/hearing-test", HearingTestDataBus.self)
     
     errorListener = Application.error.on { error in
       self.send(to: "/error", data: [ "error": error ])

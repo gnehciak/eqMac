@@ -318,7 +318,14 @@ class UI: StoreSubscriber {
   }
   
   static func setupBridge () {
-    bridge = Bridge(webView: viewController.webView)
+    // Application.start() creates a headless Bridge (UI.bridge = Bridge())
+    // before the WebView exists; DataBus registrations are queued inside it
+    // (and mirrored into the HandlerRegistry for the HTTP/WebSocket API).
+    // Here we only attach the WebView, which replays the queued registrations.
+    if (bridge == nil) {
+      bridge = Bridge()
+    }
+    bridge.attach(webView: viewController.webView)
   }
   
   // MARK: - State

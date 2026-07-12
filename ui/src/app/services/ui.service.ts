@@ -14,8 +14,23 @@ export interface UISettings {
   balanceFeatureEnabled?: boolean
   equalizersFeatureEnabled?: boolean
   outputFeatureEnabled?: boolean
+  appMixerFeatureEnabled?: boolean
+  effectsFeatureEnabled?: boolean
+  spatialFeatureEnabled?: boolean
+  audioUnitsFeatureEnabled?: boolean
+  recorderFeatureEnabled?: boolean
 
   showEqualizers?: boolean
+  showEffects?: boolean
+
+  // Main-section rendering order, persisted by the Arrangement dialog
+  // (normalizeSectionOrder tolerates undefined / partial arrays)
+  sectionOrder?: string[]
+
+  // Theme + i18n (stamped by ThemeService / TranslateService)
+  theme?: string
+  customAccent?: string | null
+  locale?: string
 
   reverbsShownBefore?: boolean
 }
@@ -79,6 +94,21 @@ export class UIService extends DataService {
     }
     if (typeof uiSettings.outputFeatureEnabled !== 'boolean') {
       this.settings.outputFeatureEnabled = true
+    }
+    if (typeof uiSettings.appMixerFeatureEnabled !== 'boolean') {
+      this.settings.appMixerFeatureEnabled = true
+    }
+    if (typeof uiSettings.effectsFeatureEnabled !== 'boolean') {
+      this.settings.effectsFeatureEnabled = true
+    }
+    if (typeof uiSettings.spatialFeatureEnabled !== 'boolean') {
+      this.settings.spatialFeatureEnabled = true
+    }
+    if (typeof uiSettings.audioUnitsFeatureEnabled !== 'boolean') {
+      this.settings.audioUnitsFeatureEnabled = true
+    }
+    if (typeof uiSettings.recorderFeatureEnabled !== 'boolean') {
+      this.settings.recorderFeatureEnabled = true
     }
     this.setSettings(this.settings)
 

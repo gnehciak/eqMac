@@ -20,6 +20,14 @@ import { HeaderComponent } from './sections/header/header.component'
 import { VolumeBoosterBalanceComponent } from './sections/volume/booster-balance/volume-booster-balance.component'
 import { EqualizersComponent } from './sections/effects/equalizers/equalizers.component'
 import { OutputsComponent } from './sections/outputs/outputs.component'
+import { AppMixerComponent } from './sections/app-mixer/app-mixer.component'
+import { AudioEffectsComponent } from './sections/effects/audio-effects/audio-effects.component'
+import { SpatialComponent } from './sections/effects/spatial/spatial.component'
+import { AudioUnitsComponent } from './sections/effects/audio-units/audio-units.component'
+import { RecorderComponent } from './sections/recorder/recorder.component'
+import { normalizeSectionOrder } from './sections/settings/themes/arrangement-dialog.component'
+import { ThemeService } from './services/theme.service'
+import { TranslateService } from './services/translate.service'
 
 @Component({
   selector: 'app-root',
@@ -34,6 +42,23 @@ export class AppComponent implements OnInit, AfterContentInit {
   @ViewChild('volumeBoosterBalance', { static: false }) volumeBoosterBalance: VolumeBoosterBalanceComponent
   @ViewChild('equalizers', { static: false }) equalizers: EqualizersComponent
   @ViewChild('outputs', { static: false }) outputs: OutputsComponent
+  @ViewChild('appMixer', { static: false }) appMixer: AppMixerComponent
+  @ViewChild('audioEffects', { static: false }) audioEffects: AudioEffectsComponent
+  @ViewChild('spatial', { static: false }) spatial: SpatialComponent
+  @ViewChild('audioUnits', { static: false }) audioUnits: AudioUnitsComponent
+  @ViewChild('recorder', { static: false }) recorder: RecorderComponent
+
+  // Main-section rendering order (Arrangement dialog persists
+  // UISettings.sectionOrder; normalizeSectionOrder always returns all
+  // known section ids, appending missing ones in default order)
+  get sectionOrder (): string[] {
+    return normalizeSectionOrder(this.ui.settings.sectionOrder)
+  }
+
+  isLastSection (sectionId: string): boolean {
+    const order = this.sectionOrder
+    return order[order.length - 1] === sectionId
+  }
 
   loaded = false
   animationDuration = 500
@@ -68,23 +93,69 @@ export class AppComponent implements OnInit, AfterContentInit {
     public analytics: AnalyticsService,
     public app: ApplicationService,
     public settings: SettingsService,
-    public toast: ToastService
+    public toast: ToastService,
+    // Injected so they self-initialize on boot: ThemeService stamps the
+    // persisted theme tokens, TranslateService restores the saved locale
+    public theme: ThemeService,
+    public translate: TranslateService
   ) {
     this.app.ref = this
+  }
+
+  // Sums the heights of all enabled + rendered main sections. Every
+  // section except the last rendered one is followed by an eqm-divider.
+  // ViewChild refs are null-guarded: right after a visibility toggle a
+  // ref can be undefined for one CD cycle and the 1s dimensions poll
+  // must not throw.
+  private sectionsHeight ({ useEqualizersMaxHeight }: { useEqualizersMaxHeight: boolean }): number {
+    const divider = 3
+
+    const {
+      volumeFeatureEnabled, balanceFeatureEnabled,
+      appMixerFeatureEnabled,
+      equalizersFeatureEnabled,
+      effectsFeatureEnabled,
+      spatialFeatureEnabled,
+      audioUnitsFeatureEnabled,
+      recorderFeatureEnabled,
+      outputFeatureEnabled
+    } = this.ui.settings
+
+    const heights: number[] = []
+    if ((volumeFeatureEnabled || balanceFeatureEnabled) && this.volumeBoosterBalance) {
+      heights.push(this.volumeBoosterBalance.height)
+    }
+    if (appMixerFeatureEnabled && this.appMixer) {
+      heights.push(this.appMixer.height)
+    }
+    if (equalizersFeatureEnabled && this.equalizers) {
+      heights.push(useEqualizersMaxHeight ? this.equalizers.maxHeight : this.equalizers.height)
+    }
+    if (effectsFeatureEnabled && this.audioEffects) {
+      heights.push(this.audioEffects.height)
+    }
+    if (spatialFeatureEnabled && this.spatial) {
+      heights.push(this.spatial.height)
+    }
+    if (audioUnitsFeatureEnabled && this.audioUnits) {
+      heights.push(this.audioUnits.height)
+    }
+    if (recorderFeatureEnabled && this.recorder) {
+      heights.push(this.recorder.height)
+    }
+    if (outputFeatureEnabled && this.outputs) {
+      heights.push(this.outputs.height)
+    }
+
+    return heights.reduce((sum, height) => sum + height, 0) +
+      Math.max(heights.length - 1, 0) * divider
   }
 
   get minHeight () {
     const divider = 3
 
-    const {
-      volumeFeatureEnabled, balanceFeatureEnabled,
-      equalizersFeatureEnabled,
-      outputFeatureEnabled
-    } = this.ui.settings
     let minHeight = this.header.height + divider +
-      ((volumeFeatureEnabled || balanceFeatureEnabled) ? (this.volumeBoosterBalance.height + divider) : 0) +
-      (equalizersFeatureEnabled ? (this.equalizers.height + divider) : 0) +
-      (outputFeatureEnabled ? this.outputs.height : 0)
+      this.sectionsHeight({ useEqualizersMaxHeight: false })
 
     const dropdownSection = document.getElementById('dropdown-section')
     if (dropdownSection) {
@@ -104,15 +175,8 @@ export class AppComponent implements OnInit, AfterContentInit {
   get maxHeight () {
     const divider = 3
 
-    const {
-      volumeFeatureEnabled, balanceFeatureEnabled,
-      equalizersFeatureEnabled,
-      outputFeatureEnabled
-    } = this.ui.settings
     let maxHeight = this.header.height + divider +
-      ((volumeFeatureEnabled || balanceFeatureEnabled) ? (this.volumeBoosterBalance.height + divider) : 0) +
-      (equalizersFeatureEnabled ? (this.equalizers.maxHeight + divider) : 0) +
-      (outputFeatureEnabled ? this.outputs.height : 0)
+      this.sectionsHeight({ useEqualizersMaxHeight: true })
 
     const dropdownSection = document.getElementById('dropdown-section')
     if (dropdownSection) {

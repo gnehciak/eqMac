@@ -21,6 +21,8 @@ import { ApplicationService } from '../../../../services/app.service'
 import { ToastService } from '../../../../services/toast.service'
 import { TranslateService } from '../../../../services/translate.service'
 import { Subscription } from 'rxjs'
+import { MatDialog } from '@angular/material/dialog'
+import { AutoEQBrowserComponent } from './autoeq/autoeq-browser.component'
 
 @Component({
   selector: 'eqm-expert-equalizer',
@@ -66,9 +68,19 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
     }
   }
 
+  private readonly autoEQButton: ButtonOption = {
+    type: 'button',
+    label: '',  // set by applyTranslations()
+    action: () => {
+      if (this.settingsDialog) this.settingsDialog.close()
+      this.dialog.open(AutoEQBrowserComponent, { hasBackdrop: true, disableClose: false })
+    }
+  }
+
   settings: Options = [ [
     this.importPresetsButton,
-    this.exportPresetsButton
+    this.exportPresetsButton,
+    this.autoEQButton
   ], [
     this.ShowDefaultPresetsCheckbox
   ] ]
@@ -79,6 +91,7 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
     this.ShowDefaultPresetsCheckbox.label = this.translate.instant('equalizers.showDefaultPresets')
     this.importPresetsButton.label = this.translate.instant('equalizers.importPresets')
     this.exportPresetsButton.label = this.translate.instant('equalizers.exportPresets')
+    this.autoEQButton.label = this.translate.instant('autoeq.title')
   }
 
   public _presets: ExpertEqualizerPreset[]
@@ -126,7 +139,8 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
     public change: ChangeDetectorRef,
     public app: ApplicationService,
     public toast: ToastService,
-    private readonly translate: TranslateService
+    private readonly translate: TranslateService,
+    public dialog: MatDialog
   ) {
     super()
     this.applyTranslations()

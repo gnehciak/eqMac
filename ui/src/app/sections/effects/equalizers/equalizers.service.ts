@@ -2,9 +2,15 @@ import { Injectable } from '@angular/core'
 import { EffectService } from '../effect.service'
 import { EqualizersComponent } from './equalizers.component'
 
+// NOTE: these strings are protocol values passed to the native
+// EqualizerType enum ('Graphic31' — no space — matches the raw value the
+// on-disk SuperPresets/Hotkeys/MIDI native code dispatches with).
+// Visible tab labels are translated separately (equalizers.* keys).
 export const EqualizersTypes = [
   'Basic',
-  'Advanced'
+  'Advanced',
+  'Expert',
+  'Graphic31'
 ] as const
 export type EqualizerType = typeof EqualizersTypes[number]
 

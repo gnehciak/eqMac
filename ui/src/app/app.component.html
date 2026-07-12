@@ -21,13 +21,42 @@
     *ngIf="showDropdownSections.help"
   ></eqm-help>
 
-  <eqm-volume-booster-balance *ngIf="ui.settings.volumeFeatureEnabled || ui.settings.balanceFeatureEnabled" #volumeBoosterBalance></eqm-volume-booster-balance>
-  <eqm-divider *ngIf="ui.settings.volumeFeatureEnabled || ui.settings.balanceFeatureEnabled"></eqm-divider>
- 
-  <eqm-equalizers fxFlex *ngIf="ui.settings.equalizersFeatureEnabled" #equalizers></eqm-equalizers>
-  <eqm-divider *ngIf="ui.settings.equalizersFeatureEnabled"></eqm-divider>
-
-  <eqm-outputs *ngIf="ui.settings.outputFeatureEnabled" #outputs></eqm-outputs>
+  <ng-container *ngFor="let sectionId of sectionOrder">
+    <ng-container [ngSwitch]="sectionId">
+      <ng-container *ngSwitchCase="'volume'">
+        <eqm-volume-booster-balance *ngIf="ui.settings.volumeFeatureEnabled || ui.settings.balanceFeatureEnabled" #volumeBoosterBalance></eqm-volume-booster-balance>
+        <eqm-divider *ngIf="(ui.settings.volumeFeatureEnabled || ui.settings.balanceFeatureEnabled) && !isLastSection(sectionId)"></eqm-divider>
+      </ng-container>
+      <ng-container *ngSwitchCase="'app-mixer'">
+        <eqm-app-mixer *ngIf="ui.settings.appMixerFeatureEnabled" #appMixer></eqm-app-mixer>
+        <eqm-divider *ngIf="ui.settings.appMixerFeatureEnabled && !isLastSection(sectionId)"></eqm-divider>
+      </ng-container>
+      <ng-container *ngSwitchCase="'equalizers'">
+        <eqm-equalizers fxFlex *ngIf="ui.settings.equalizersFeatureEnabled" #equalizers></eqm-equalizers>
+        <eqm-divider *ngIf="ui.settings.equalizersFeatureEnabled && !isLastSection(sectionId)"></eqm-divider>
+      </ng-container>
+      <ng-container *ngSwitchCase="'effects'">
+        <eqm-audio-effects *ngIf="ui.settings.effectsFeatureEnabled" #audioEffects></eqm-audio-effects>
+        <eqm-divider *ngIf="ui.settings.effectsFeatureEnabled && !isLastSection(sectionId)"></eqm-divider>
+      </ng-container>
+      <ng-container *ngSwitchCase="'spatial'">
+        <eqm-spatial *ngIf="ui.settings.spatialFeatureEnabled" #spatial></eqm-spatial>
+        <eqm-divider *ngIf="ui.settings.spatialFeatureEnabled && !isLastSection(sectionId)"></eqm-divider>
+      </ng-container>
+      <ng-container *ngSwitchCase="'audio-units'">
+        <eqm-audio-units *ngIf="ui.settings.audioUnitsFeatureEnabled" #audioUnits></eqm-audio-units>
+        <eqm-divider *ngIf="ui.settings.audioUnitsFeatureEnabled && !isLastSection(sectionId)"></eqm-divider>
+      </ng-container>
+      <ng-container *ngSwitchCase="'recorder'">
+        <eqm-recorder *ngIf="ui.settings.recorderFeatureEnabled" #recorder></eqm-recorder>
+        <eqm-divider *ngIf="ui.settings.recorderFeatureEnabled && !isLastSection(sectionId)"></eqm-divider>
+      </ng-container>
+      <ng-container *ngSwitchCase="'outputs'">
+        <eqm-outputs *ngIf="ui.settings.outputFeatureEnabled" #outputs></eqm-outputs>
+        <eqm-divider *ngIf="ui.settings.outputFeatureEnabled && !isLastSection(sectionId)"></eqm-divider>
+      </ng-container>
+    </ng-container>
+  </ng-container>
 
 </div>
 <eqm-tooltip-container class="tooltip-container" [scale]="ui.scale" [ngStyle]="containerStyle"></eqm-tooltip-container>

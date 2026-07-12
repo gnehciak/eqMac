@@ -275,7 +275,7 @@ class HotkeyManager: StoreSubscriber {
           Application.dispatchAction(ExpertEqualizerAction.selectPreset(id, true))
         }
       )
-    case "Graphic31": // Raw value of the EqualizerType case the integration wiring adds
+    case "Graphic 31": // Raw value of the EqualizerType case the integration wiring adds
       return PresetCycle(
         ids: Graphic31Equalizer.presets.map { $0.id },
         selectedId: equalizers.graphic31.selectedPresetId,

@@ -7,6 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01491451B382377A50FAC2DD /* HotkeysDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF9D3ECB616CDED45C590E08 /* HotkeysDataBus.swift */; };
+		01BFA7D0CF3716C521E54842 /* Graphic31Equalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAA17E5DDC4157EAB3850BF /* Graphic31Equalizer.swift */; };
+		057C8DE6F6EA270E057C32F8 /* ChannelDelayDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55CCB4AD8866D934DEC0D37F /* ChannelDelayDataBus.swift */; };
+		0B59B9045EC4E0A9FC94B84F /* AppMixerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B8942FFEE06FCD371C84AB6 /* AppMixerState.swift */; };
+		0CBD273BB917CF67C2ECC8F3 /* HandlerRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421281CCAEB9BDDA79FCF6D1 /* HandlerRegistry.swift */; };
+		0E492B169A9DD0C8DF7A1B71 /* PreampState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E698282C8A6DDF521A4668A6 /* PreampState.swift */; };
+		1C7FEBEDC7F7BE913A61540E /* AudioUnitsHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A718866965459C133A5170 /* AudioUnitsHost.swift */; };
+		215D278D41295D2E243C2548 /* AudioUnitsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BDDA03A668708F8BFF72105 /* AudioUnitsState.swift */; };
+		296D0054D6FAD0935C63D618 /* AutoEQDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098D05386FE076CE2112E490 /* AutoEQDataBus.swift */; };
+		2CC6922CA9FAB4292626045F /* ExpertEqualizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67815FEB125524CEC630B510 /* ExpertEqualizer.swift */; };
+		3349630AA19BFC8AE3ABD307 /* ReverbState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E961249C6FA5AB46B4F5F1EB /* ReverbState.swift */; };
+		376B2DD572219DF9353C681C /* SuperPresetsDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11784E4065AF7B42E6AE268 /* SuperPresetsDataBus.swift */; };
+		395CE8E35FE62DA64324EA83 /* ChannelDelayKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C588029FFD1E5EB5449DEC5 /* ChannelDelayKernel.swift */; };
+		3B98E2BFED7984441D752F95 /* ExpertEqualizerDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56877500F8FD4D6F27226D47 /* ExpertEqualizerDataBus.swift */; };
+		3F47A060106E1F2B4F4B6C5D /* RoutingDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28C44F5AB04CCC77E6B8A3A /* RoutingDataBus.swift */; };
+		3FF9B99BF2E3D9F7B0F37423 /* ChannelDelayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1185FBD990236B570858F5 /* ChannelDelayState.swift */; };
+		40108E0FD2AE6E41611465DF /* WebSocketTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245DB3AFF95C4A0594325B02 /* WebSocketTransport.swift */; };
+		4436C107A3075E1DB3C0F32D /* ExpertEqualizerKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AB1E31258DBCC0DFF46D68B /* ExpertEqualizerKernel.swift */; };
+		499E583375010054C21E43A2 /* HearingTestDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41EA893C39D60D755BEC6C29 /* HearingTestDataBus.swift */; };
+		4FC0011DC6005550435D9870 /* AudioUnitsDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A92EF8F1A3304AB8C83D7C /* AudioUnitsDataBus.swift */; };
+		519FB7C2B76C1539FA36C484 /* ToneGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC7A3BD0BD5B5C80CD8D11 /* ToneGenerator.swift */; };
+		57965AC66BD8FCBAC100BC0A /* HotkeysState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE75F8A2CD86DD66BF23EF8 /* HotkeysState.swift */; };
+		57EF942DD806736C189AC06E /* EffectsChain.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B0315F79460D41FB2D8EB5 /* EffectsChain.swift */; };
+		5D076E5CF95CB31FBF7B649D /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6090AC6D64C02201D707627 /* HotkeyManager.swift */; };
+		66E19BC0B263338ED8C7678C /* RoutingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE0E49A3D6BD4DC1B212FFF1 /* RoutingState.swift */; };
+		673EEADE2EC05833956D21A5 /* ChannelDelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0F5DA6C8E8AA3A6F473958 /* ChannelDelay.swift */; };
+		6777B19B72DCFA31459FB16D /* Graphic31EqualizerPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0192D0FFF0E45EB19A4E2E /* Graphic31EqualizerPreset.swift */; };
+		67E60A6274E771A44541D835 /* AudioUnitWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4343A9DD111075CD68A4C398 /* AudioUnitWindow.swift */; };
+		69C7F80B4D9B69F155AA5C21 /* MIDIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B71BF73DC401B9DAD66C83 /* MIDIManager.swift */; };
+		6D073B20E5CB5B3CD8927874 /* SuperPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36A0EE606BE86D09D52C2072 /* SuperPresets.swift */; };
+		77A9B78AFDF4B7FEC30F4D23 /* CrossfeedKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8C601FABF1A43F86170408A /* CrossfeedKernel.swift */; };
 		78048A62265041600020AAD9 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78048A61265041600020AAD9 /* DateExtensions.swift */; };
 		7810723826112C2B005DB609 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7810723726112C2B005DB609 /* Security.framework */; };
 		78242E96261A8AEE00058ADE /* Connectivity in Frameworks */ = {isa = PBXBuildFile; productRef = 78242E95261A8AEE00058ADE /* Connectivity */; };
@@ -21,12 +52,35 @@
 		789F83CF250E20A8004F871D /* restart_coreaudio.sh in Resources */ = {isa = PBXBuildFile; fileRef = 789F83CE250E20A8004F871D /* restart_coreaudio.sh */; };
 		78AA48F4270362AA007CDE89 /* BetterCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 78AA48F3270362AA007CDE89 /* BetterCodable */; };
 		78AA48F727038093007CDE89 /* BetterCodableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78AA48F627038093007CDE89 /* BetterCodableExtensions.swift */; };
+		78D19219450DB6DD80BC4650 /* RecorderState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07D8E9FA7B225983A78B260D /* RecorderState.swift */; };
 		78D8C3322569B2910084739C /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 78D8C3312569B2910084739C /* LaunchAtLogin */; };
 		78D8C3332569B3000084739C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0370EB0200D68AB00DF4DBF /* AudioToolbox.framework */; };
 		78D8C3472569B7980084739C /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78D8C3462569B7980084739C /* AudioUnit.framework */; };
 		78E562F326139ACF00BF3F19 /* Data+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E562F226139ACF00BF3F19 /* Data+extensions.swift */; };
 		78F28AD5274D25580005474D /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 78F28AD4274D25580005474D /* Shared */; };
 		78F28AD6274D2A580005474D /* assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 785E4F86274D187D003D6DB0 /* assets.xcassets */; };
+		7FE69761D2257FD52492EF3B /* ReverbDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8F0B131F6A491E14EDEA4A /* ReverbDataBus.swift */; };
+		88ED25BA9221C2D559DD76CE /* Biquad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049ACDBA4F72D5FF53C1C46C /* Biquad.swift */; };
+		8AFCAD51BE67EBCDEC1918EE /* Preamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32CEE493D594B473AC41FDE /* Preamp.swift */; };
+		8CBFF58B42C2CB82F40B8214 /* RoutingKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4ACAB45D7DD404CA3005A6 /* RoutingKernel.swift */; };
+		8D7EA8DAA8694C261B6382CC /* AutoEQ.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97D862F19443696E0728D2E /* AutoEQ.swift */; };
+		8EEA48818BC112C11CFC8788 /* Crossfeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5B6CDD8BEB169E8D0B9239 /* Crossfeed.swift */; };
+		8F9704C5B7B6E3152EE8BD77 /* ExpertEqualizerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81473B493EBA0734E40E869A /* ExpertEqualizerState.swift */; };
+		915EBB2C01C295DA1D36B37F /* Recorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05829B4C15E5CC7B2FA49D8 /* Recorder.swift */; };
+		94527EB62BE534E3AB63A85F /* AppMixer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DECD052E8109D477E9D54F4 /* AppMixer.swift */; };
+		956662257EF9A67AB3070370 /* CrossfeedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0932644D9CB00D431F1106EB /* CrossfeedState.swift */; };
+		A597A51FE831BA838911D902 /* SuperPresetsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12D3F36B05A5B2A1391D54B /* SuperPresetsState.swift */; };
+		A69DF8DCB203CECC788DE998 /* SpectrumAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AEA3DCEF53F22A615C89FF /* SpectrumAnalyzer.swift */; };
+		A7C01736E2757118B56404D2 /* RawDSPKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B388C0674116D6188F7ED49A /* RawDSPKernel.swift */; };
+		AB3B73131FF54B09EF19A5D1 /* Graphic31EqualizerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2A3A94B4411E2075519259 /* Graphic31EqualizerState.swift */; };
+		B20CFF8146FEE245B57329A0 /* RawDSPChain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F879F056CDE558A83C67EE7 /* RawDSPChain.swift */; };
+		B28E4F488348ADA9EA7B9A65 /* MIDIDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403CA6E72A78463AC1CD8E15 /* MIDIDataBus.swift */; };
+		BAE21D1CCFE02CE47EB6BE49 /* ExpertEqualizerPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E2DA698507451F3ED96CF63 /* ExpertEqualizerPreset.swift */; };
+		BD28EBBE24B2E2AF88CED9E9 /* Reverb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 876F0BAD7DD21B8F8CC17009 /* Reverb.swift */; };
+		D1299562D2FF057EC5DC5FE1 /* CrossfeedDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2616C455EB423081858D7ACD /* CrossfeedDataBus.swift */; };
+		D178D48C44029CE373483863 /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B2224CABC24A173CAE9909 /* Server.swift */; };
+		D32B062071FA54F9B010D7EB /* APIAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = C256E5F3EF0FF7D9C3031103 /* APIAuth.swift */; };
+		DF2F70D99EAFAD0C33D13CCA /* StaticFileServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8194D21DF5D021E0359B8711 /* StaticFileServer.swift */; };
 		E00618E220F14C08003BA0B0 /* UIState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00618E120F14C08003BA0B0 /* UIState.swift */; };
 		E00618EB20F22BD1003BA0B0 /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00618EA20F22BD1003BA0B0 /* Effect.swift */; };
 		E00618ED20F292B9003BA0B0 /* Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00618EC20F292B9003BA0B0 /* Networking.swift */; };
@@ -97,10 +151,49 @@
 		E0F661861FDDED0C00252923 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F661851FDDED0C00252923 /* ViewController.swift */; };
 		E0FFB703200119060003EC9E /* StatusItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FFB702200119060003EC9E /* StatusItem.swift */; };
 		E0FFB705200679DD0003EC9E /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FFB704200679DD0003EC9E /* Engine.swift */; };
+		E2921FA4A8EE5B4B8C27F4D6 /* PreampDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111B1C4B798D0C1BB87B0947 /* PreampDataBus.swift */; };
+		EDCA6BAE6F1C38758464310D /* Graphic31EqualizerDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D49EFB1BA104335E7324E /* Graphic31EqualizerDataBus.swift */; };
+		F330AA094532CEC147CAF712 /* AppMixerDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFFB03D22A985FB97FCE92C /* AppMixerDataBus.swift */; };
+		F46D314ED1D3C90E024FC972 /* RecorderDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B4142EDF8B2A2861086FBF /* RecorderDataBus.swift */; };
+		F66C7D7B0E97C3EA6A691F20 /* MIDIState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F619FDAA73230437F9C6CECC /* MIDIState.swift */; };
+		F6F2321EF8A7475C6DCEB9CA /* BackupDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724AC27C64592831DA8E7768 /* BackupDataBus.swift */; };
+		F809940867D0EB266BDA07B4 /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E780C51A13AD0066710AF3F2 /* Routing.swift */; };
+		F80C6D445CB531E4473E0947 /* SpectrumDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0C4AD48EA7A5651EBB37D5 /* SpectrumDataBus.swift */; };
+		FA4165C5EC3AE43FE06EADA8 /* EngineTaps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DCF9882595430A83A9D6F28 /* EngineTaps.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		049ACDBA4F72D5FF53C1C46C /* Biquad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Biquad.swift; sourceTree = "<group>"; };
+		07D8E9FA7B225983A78B260D /* RecorderState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderState.swift; sourceTree = "<group>"; };
+		0932644D9CB00D431F1106EB /* CrossfeedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossfeedState.swift; sourceTree = "<group>"; };
+		098D05386FE076CE2112E490 /* AutoEQDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoEQDataBus.swift; sourceTree = "<group>"; };
+		111B1C4B798D0C1BB87B0947 /* PreampDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreampDataBus.swift; sourceTree = "<group>"; };
+		17AEA3DCEF53F22A615C89FF /* SpectrumAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzer.swift; sourceTree = "<group>"; };
+		17B71BF73DC401B9DAD66C83 /* MIDIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIManager.swift; sourceTree = "<group>"; };
+		1B8942FFEE06FCD371C84AB6 /* AppMixerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMixerState.swift; sourceTree = "<group>"; };
+		245DB3AFF95C4A0594325B02 /* WebSocketTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketTransport.swift; sourceTree = "<group>"; };
+		2616C455EB423081858D7ACD /* CrossfeedDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossfeedDataBus.swift; sourceTree = "<group>"; };
+		32A92EF8F1A3304AB8C83D7C /* AudioUnitsDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUnitsDataBus.swift; sourceTree = "<group>"; };
+		36A0EE606BE86D09D52C2072 /* SuperPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuperPresets.swift; sourceTree = "<group>"; };
+		3BDDA03A668708F8BFF72105 /* AudioUnitsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUnitsState.swift; sourceTree = "<group>"; };
+		3D8F0B131F6A491E14EDEA4A /* ReverbDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReverbDataBus.swift; sourceTree = "<group>"; };
+		403CA6E72A78463AC1CD8E15 /* MIDIDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIDataBus.swift; sourceTree = "<group>"; };
+		41EA893C39D60D755BEC6C29 /* HearingTestDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HearingTestDataBus.swift; sourceTree = "<group>"; };
+		421281CCAEB9BDDA79FCF6D1 /* HandlerRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandlerRegistry.swift; sourceTree = "<group>"; };
+		4343A9DD111075CD68A4C398 /* AudioUnitWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUnitWindow.swift; sourceTree = "<group>"; };
 		454077A0596E209B8ABF4043 /* Pods-eqMac.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-eqMac.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-eqMac/Pods-eqMac.debug.xcconfig"; sourceTree = "<group>"; };
+		4F879F056CDE558A83C67EE7 /* RawDSPChain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawDSPChain.swift; sourceTree = "<group>"; };
+		55B4142EDF8B2A2861086FBF /* RecorderDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderDataBus.swift; sourceTree = "<group>"; };
+		55CCB4AD8866D934DEC0D37F /* ChannelDelayDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelDelayDataBus.swift; sourceTree = "<group>"; };
+		56877500F8FD4D6F27226D47 /* ExpertEqualizerDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpertEqualizerDataBus.swift; sourceTree = "<group>"; };
+		5FAA17E5DDC4157EAB3850BF /* Graphic31Equalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graphic31Equalizer.swift; sourceTree = "<group>"; };
+		67815FEB125524CEC630B510 /* ExpertEqualizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpertEqualizer.swift; sourceTree = "<group>"; };
+		6AB1E31258DBCC0DFF46D68B /* ExpertEqualizerKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpertEqualizerKernel.swift; sourceTree = "<group>"; };
+		6C0192D0FFF0E45EB19A4E2E /* Graphic31EqualizerPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graphic31EqualizerPreset.swift; sourceTree = "<group>"; };
+		6C588029FFD1E5EB5449DEC5 /* ChannelDelayKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelDelayKernel.swift; sourceTree = "<group>"; };
+		6E0C4AD48EA7A5651EBB37D5 /* SpectrumDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumDataBus.swift; sourceTree = "<group>"; };
+		70B2224CABC24A173CAE9909 /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
+		724AC27C64592831DA8E7768 /* BackupDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupDataBus.swift; sourceTree = "<group>"; };
 		78048A61265041600020AAD9 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
 		7810723726112C2B005DB609 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		783A6F9F2670225C00A96B42 /* Benchmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Benchmark.swift; sourceTree = "<group>"; };
@@ -117,8 +210,32 @@
 		78C7BDB22687A8F800E0C161 /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
 		78D8C3462569B7980084739C /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		78E562F226139ACF00BF3F19 /* Data+extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+extensions.swift"; sourceTree = "<group>"; };
+		7A0F5DA6C8E8AA3A6F473958 /* ChannelDelay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelDelay.swift; sourceTree = "<group>"; };
+		7BE75F8A2CD86DD66BF23EF8 /* HotkeysState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeysState.swift; sourceTree = "<group>"; };
+		7DCF9882595430A83A9D6F28 /* EngineTaps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineTaps.swift; sourceTree = "<group>"; };
+		7DECD052E8109D477E9D54F4 /* AppMixer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMixer.swift; sourceTree = "<group>"; };
+		7E2DA698507451F3ED96CF63 /* ExpertEqualizerPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpertEqualizerPreset.swift; sourceTree = "<group>"; };
+		81473B493EBA0734E40E869A /* ExpertEqualizerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpertEqualizerState.swift; sourceTree = "<group>"; };
+		8194D21DF5D021E0359B8711 /* StaticFileServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticFileServer.swift; sourceTree = "<group>"; };
+		876F0BAD7DD21B8F8CC17009 /* Reverb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reverb.swift; sourceTree = "<group>"; };
+		92A718866965459C133A5170 /* AudioUnitsHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUnitsHost.swift; sourceTree = "<group>"; };
 		9C0FBD24DF0BA400D806B8AC /* Pods_eqMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_eqMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E9D49EFB1BA104335E7324E /* Graphic31EqualizerDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graphic31EqualizerDataBus.swift; sourceTree = "<group>"; };
+		A28C44F5AB04CCC77E6B8A3A /* RoutingDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingDataBus.swift; sourceTree = "<group>"; };
 		A3D606D740D37C93ABA157E7 /* Pods-eqMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-eqMac.release.xcconfig"; path = "../Pods/Target Support Files/Pods-eqMac/Pods-eqMac.release.xcconfig"; sourceTree = "<group>"; };
+		ABFFB03D22A985FB97FCE92C /* AppMixerDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMixerDataBus.swift; sourceTree = "<group>"; };
+		AC4ACAB45D7DD404CA3005A6 /* RoutingKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingKernel.swift; sourceTree = "<group>"; };
+		AD2A3A94B4411E2075519259 /* Graphic31EqualizerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graphic31EqualizerState.swift; sourceTree = "<group>"; };
+		AF9D3ECB616CDED45C590E08 /* HotkeysDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeysDataBus.swift; sourceTree = "<group>"; };
+		B11784E4065AF7B42E6AE268 /* SuperPresetsDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuperPresetsDataBus.swift; sourceTree = "<group>"; };
+		B32CEE493D594B473AC41FDE /* Preamp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preamp.swift; sourceTree = "<group>"; };
+		B388C0674116D6188F7ED49A /* RawDSPKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawDSPKernel.swift; sourceTree = "<group>"; };
+		BA5B6CDD8BEB169E8D0B9239 /* Crossfeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crossfeed.swift; sourceTree = "<group>"; };
+		C256E5F3EF0FF7D9C3031103 /* APIAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIAuth.swift; sourceTree = "<group>"; };
+		C5B0315F79460D41FB2D8EB5 /* EffectsChain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EffectsChain.swift; sourceTree = "<group>"; };
+		CD1185FBD990236B570858F5 /* ChannelDelayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelDelayState.swift; sourceTree = "<group>"; };
+		D12D3F36B05A5B2A1391D54B /* SuperPresetsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuperPresetsState.swift; sourceTree = "<group>"; };
+		D6090AC6D64C02201D707627 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		E00618E120F14C08003BA0B0 /* UIState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIState.swift; sourceTree = "<group>"; };
 		E00618EA20F22BD1003BA0B0 /* Effect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effect.swift; sourceTree = "<group>"; };
 		E00618EC20F292B9003BA0B0 /* Networking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Networking.swift; sourceTree = "<group>"; };
@@ -156,6 +273,7 @@
 		E057A64822710F2B0019D13C /* AdvancedEqualizerDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedEqualizerDataBus.swift; sourceTree = "<group>"; };
 		E057A64C2271A6DD0019D13C /* VolumeDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeDataBus.swift; sourceTree = "<group>"; };
 		E057A6502271A7DC0019D13C /* OutputsDataBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputsDataBus.swift; sourceTree = "<group>"; };
+		E05829B4C15E5CC7B2FA49D8 /* Recorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recorder.swift; sourceTree = "<group>"; };
 		E05901ED2221F21E006B93A5 /* Sandbox.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Sandbox.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E06E98CF21D17E230041DD9C /* UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI.swift; sourceTree = "<group>"; };
 		E072856A23F84A5500EDE8AC /* BoolExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoolExtensions.swift; sourceTree = "<group>"; };
@@ -197,6 +315,14 @@
 		E0F661851FDDED0C00252923 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		E0FFB702200119060003EC9E /* StatusItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItem.swift; sourceTree = "<group>"; };
 		E0FFB704200679DD0003EC9E /* Engine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
+		E698282C8A6DDF521A4668A6 /* PreampState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreampState.swift; sourceTree = "<group>"; };
+		E780C51A13AD0066710AF3F2 /* Routing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routing.swift; sourceTree = "<group>"; };
+		E8C601FABF1A43F86170408A /* CrossfeedKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossfeedKernel.swift; sourceTree = "<group>"; };
+		E961249C6FA5AB46B4F5F1EB /* ReverbState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReverbState.swift; sourceTree = "<group>"; };
+		E9EC7A3BD0BD5B5C80CD8D11 /* ToneGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToneGenerator.swift; sourceTree = "<group>"; };
+		F619FDAA73230437F9C6CECC /* MIDIState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIState.swift; sourceTree = "<group>"; };
+		F97D862F19443696E0728D2E /* AutoEQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoEQ.swift; sourceTree = "<group>"; };
+		FE0E49A3D6BD4DC1B212FFF1 /* RoutingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -221,9 +347,62 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0615D65CA26C24C095D45B2A /* AutoEQ */ = {
+			isa = PBXGroup;
+			children = (
+				F97D862F19443696E0728D2E /* AutoEQ.swift */,
+				098D05386FE076CE2112E490 /* AutoEQDataBus.swift */,
+			);
+			path = AutoEQ;
+			sourceTree = "<group>";
+		};
+		12A2F8B0CB1E35B4E7C60FC2 /* MIDI */ = {
+			isa = PBXGroup;
+			children = (
+				F619FDAA73230437F9C6CECC /* MIDIState.swift */,
+				17B71BF73DC401B9DAD66C83 /* MIDIManager.swift */,
+				403CA6E72A78463AC1CD8E15 /* MIDIDataBus.swift */,
+			);
+			path = MIDI;
+			sourceTree = "<group>";
+		};
+		2E7E710B20642EDA7AB02C53 /* Graphic31 */ = {
+			isa = PBXGroup;
+			children = (
+				AD2A3A94B4411E2075519259 /* Graphic31EqualizerState.swift */,
+				5FAA17E5DDC4157EAB3850BF /* Graphic31Equalizer.swift */,
+				6C0192D0FFF0E45EB19A4E2E /* Graphic31EqualizerPreset.swift */,
+				9E9D49EFB1BA104335E7324E /* Graphic31EqualizerDataBus.swift */,
+			);
+			path = Graphic31;
+			sourceTree = "<group>";
+		};
+		3CF22F9AD33810E3B21BBFC6 /* Server */ = {
+			isa = PBXGroup;
+			children = (
+				70B2224CABC24A173CAE9909 /* Server.swift */,
+				421281CCAEB9BDDA79FCF6D1 /* HandlerRegistry.swift */,
+				245DB3AFF95C4A0594325B02 /* WebSocketTransport.swift */,
+				C256E5F3EF0FF7D9C3031103 /* APIAuth.swift */,
+				8194D21DF5D021E0359B8711 /* StaticFileServer.swift */,
+			);
+			path = Server;
+			sourceTree = "<group>";
+		};
+		4629D277458A77256BCED2EE /* Preamp */ = {
+			isa = PBXGroup;
+			children = (
+				E698282C8A6DDF521A4668A6 /* PreampState.swift */,
+				B32CEE493D594B473AC41FDE /* Preamp.swift */,
+				111B1C4B798D0C1BB87B0947 /* PreampDataBus.swift */,
+			);
+			path = Preamp;
+			sourceTree = "<group>";
+		};
 		7811AEF6261A6B86005BDAE3 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				3CF22F9AD33810E3B21BBFC6 /* Server */,
 				E00618EC20F292B9003BA0B0 /* Networking.swift */,
 			);
 			path = Networking;
@@ -253,6 +432,25 @@
 			name = "Recovered References";
 			sourceTree = "<group>";
 		};
+		7A8362D2BAA986759FD8EF47 /* Reverb */ = {
+			isa = PBXGroup;
+			children = (
+				E961249C6FA5AB46B4F5F1EB /* ReverbState.swift */,
+				876F0BAD7DD21B8F8CC17009 /* Reverb.swift */,
+				3D8F0B131F6A491E14EDEA4A /* ReverbDataBus.swift */,
+			);
+			path = Reverb;
+			sourceTree = "<group>";
+		};
+		9F14E53951E1E924D9BA6780 /* HearingTest */ = {
+			isa = PBXGroup;
+			children = (
+				E9EC7A3BD0BD5B5C80CD8D11 /* ToneGenerator.swift */,
+				41EA893C39D60D755BEC6C29 /* HearingTestDataBus.swift */,
+			);
+			path = HearingTest;
+			sourceTree = "<group>";
+		};
 		A433E835860EBA2247574C67 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -260,6 +458,90 @@
 				A3D606D740D37C93ABA157E7 /* Pods-eqMac.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		A7FE0ED86082E645CD7FE66B /* SuperPresets */ = {
+			isa = PBXGroup;
+			children = (
+				D12D3F36B05A5B2A1391D54B /* SuperPresetsState.swift */,
+				36A0EE606BE86D09D52C2072 /* SuperPresets.swift */,
+				B11784E4065AF7B42E6AE268 /* SuperPresetsDataBus.swift */,
+			);
+			path = SuperPresets;
+			sourceTree = "<group>";
+		};
+		A80CF6844B709D31D0ED9A03 /* Routing */ = {
+			isa = PBXGroup;
+			children = (
+				FE0E49A3D6BD4DC1B212FFF1 /* RoutingState.swift */,
+				E780C51A13AD0066710AF3F2 /* Routing.swift */,
+				AC4ACAB45D7DD404CA3005A6 /* RoutingKernel.swift */,
+				A28C44F5AB04CCC77E6B8A3A /* RoutingDataBus.swift */,
+			);
+			path = Routing;
+			sourceTree = "<group>";
+		};
+		A97DA4228D51FC940DBC4B6E /* AppMixer */ = {
+			isa = PBXGroup;
+			children = (
+				1B8942FFEE06FCD371C84AB6 /* AppMixerState.swift */,
+				7DECD052E8109D477E9D54F4 /* AppMixer.swift */,
+				ABFFB03D22A985FB97FCE92C /* AppMixerDataBus.swift */,
+			);
+			path = AppMixer;
+			sourceTree = "<group>";
+		};
+		B16BFADD00996CFD97D2EDCC /* DSP */ = {
+			isa = PBXGroup;
+			children = (
+				4F879F056CDE558A83C67EE7 /* RawDSPChain.swift */,
+				B388C0674116D6188F7ED49A /* RawDSPKernel.swift */,
+				049ACDBA4F72D5FF53C1C46C /* Biquad.swift */,
+				7DCF9882595430A83A9D6F28 /* EngineTaps.swift */,
+			);
+			path = DSP;
+			sourceTree = "<group>";
+		};
+		B58068BBF264065A766F6FBE /* Crossfeed */ = {
+			isa = PBXGroup;
+			children = (
+				0932644D9CB00D431F1106EB /* CrossfeedState.swift */,
+				BA5B6CDD8BEB169E8D0B9239 /* Crossfeed.swift */,
+				E8C601FABF1A43F86170408A /* CrossfeedKernel.swift */,
+				2616C455EB423081858D7ACD /* CrossfeedDataBus.swift */,
+			);
+			path = Crossfeed;
+			sourceTree = "<group>";
+		};
+		BA3D11E57A315C9EE6DBA8EB /* Spectrum */ = {
+			isa = PBXGroup;
+			children = (
+				17AEA3DCEF53F22A615C89FF /* SpectrumAnalyzer.swift */,
+				6E0C4AD48EA7A5651EBB37D5 /* SpectrumDataBus.swift */,
+			);
+			path = Spectrum;
+			sourceTree = "<group>";
+		};
+		C9DDD5401B7D04F64FF99FDA /* ChannelDelay */ = {
+			isa = PBXGroup;
+			children = (
+				CD1185FBD990236B570858F5 /* ChannelDelayState.swift */,
+				7A0F5DA6C8E8AA3A6F473958 /* ChannelDelay.swift */,
+				6C588029FFD1E5EB5449DEC5 /* ChannelDelayKernel.swift */,
+				55CCB4AD8866D934DEC0D37F /* ChannelDelayDataBus.swift */,
+			);
+			path = ChannelDelay;
+			sourceTree = "<group>";
+		};
+		DB2BF616798AC0828A480BA3 /* AudioUnits */ = {
+			isa = PBXGroup;
+			children = (
+				3BDDA03A668708F8BFF72105 /* AudioUnitsState.swift */,
+				92A718866965459C133A5170 /* AudioUnitsHost.swift */,
+				4343A9DD111075CD68A4C398 /* AudioUnitWindow.swift */,
+				32A92EF8F1A3304AB8C83D7C /* AudioUnitsDataBus.swift */,
+			);
+			path = AudioUnits;
 			sourceTree = "<group>";
 		};
 		E004A8F3209D08AF00A878AA /* Extensions */ = {
@@ -355,9 +637,16 @@
 			isa = PBXGroup;
 			children = (
 				E0DD0A9920E7FF2D00B14020 /* Equalizers */,
+				B58068BBF264065A766F6FBE /* Crossfeed */,
+				C9DDD5401B7D04F64FF99FDA /* ChannelDelay */,
+				A80CF6844B709D31D0ED9A03 /* Routing */,
+				4629D277458A77256BCED2EE /* Preamp */,
+				7A8362D2BAA986759FD8EF47 /* Reverb */,
+				DB2BF616798AC0828A480BA3 /* AudioUnits */,
 				E00618EA20F22BD1003BA0B0 /* Effect.swift */,
 				E0E8B62420EEB6A900DE905C /* EffectsState.swift */,
 				E036BCEB235B2C12001F057B /* EffectsDataBus.swift */,
+				C5B0315F79460D41FB2D8EB5 /* EffectsChain.swift */,
 			);
 			path = Effects;
 			sourceTree = "<group>";
@@ -404,6 +693,11 @@
 				E0AD99DA225114C600D893F7 /* Volume */,
 				E090AD5B20A9F13E003BE5FF /* Effects */,
 				E0AD99DB2251151F00D893F7 /* Outputs */,
+				B16BFADD00996CFD97D2EDCC /* DSP */,
+				BA3D11E57A315C9EE6DBA8EB /* Spectrum */,
+				A97DA4228D51FC940DBC4B6E /* AppMixer */,
+				E97C456006C3F2B5FE5F3EA0 /* Recorder */,
+				9F14E53951E1E924D9BA6780 /* HearingTest */,
 				E02B922D219CBCD800AC130B /* AudioDeviceEvents.swift */,
 				E057A636227032EC0019D13C /* EngineDataBus.swift */,
 				E0FFB704200679DD0003EC9E /* Engine.swift */,
@@ -457,6 +751,7 @@
 			isa = PBXGroup;
 			children = (
 				E021BCE622313F1E004921FF /* SettingsDataBus.swift */,
+				724AC27C64592831DA8E7768 /* BackupDataBus.swift */,
 				E057A638227038B80019D13C /* Settings.swift */,
 				E0D5F88622DD20F800499250 /* SettingsState.swift */,
 			);
@@ -468,6 +763,8 @@
 			children = (
 				E0AD99D22251020400D893F7 /* Basic */,
 				E0AD99D32251021100D893F7 /* Advanced */,
+				FA0D725DAD696926D5510C81 /* Expert */,
+				2E7E710B20642EDA7AB02C53 /* Graphic31 */,
 				E044AB7521ED27E4000C41A1 /* Equalizer.swift */,
 				E0E8B62920EEB6A900DE905C /* EqualizersState.swift */,
 				E0E2CFF62104EA7A002DC989 /* Equalizers.swift */,
@@ -508,8 +805,11 @@
 				E036BCE8235B09CB001F057B /* DataBus */,
 				E004A8F3209D08AF00A878AA /* Extensions */,
 				E095BBC02014CDAD003473E9 /* Helpers */,
+				F87EFF46CDB085F8050E07DF /* Hotkeys */,
+				12A2F8B0CB1E35B4E7C60FC2 /* MIDI */,
 				7811AEF6261A6B86005BDAE3 /* Networking */,
 				E0D5F88522DD1BB800499250 /* Settings */,
+				A7FE0ED86082E645CD7FE66B /* SuperPresets */,
 				E0DDF3FB218901E700B37E77 /* Scripts */,
 				E01B5C862356E07600E1A675 /* Transition */,
 				7860D7DA2703C1F700D1347B /* User */,
@@ -530,6 +830,39 @@
 				9C0FBD24DF0BA400D806B8AC /* Pods_eqMac.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E97C456006C3F2B5FE5F3EA0 /* Recorder */ = {
+			isa = PBXGroup;
+			children = (
+				07D8E9FA7B225983A78B260D /* RecorderState.swift */,
+				E05829B4C15E5CC7B2FA49D8 /* Recorder.swift */,
+				55B4142EDF8B2A2861086FBF /* RecorderDataBus.swift */,
+			);
+			path = Recorder;
+			sourceTree = "<group>";
+		};
+		F87EFF46CDB085F8050E07DF /* Hotkeys */ = {
+			isa = PBXGroup;
+			children = (
+				7BE75F8A2CD86DD66BF23EF8 /* HotkeysState.swift */,
+				D6090AC6D64C02201D707627 /* HotkeyManager.swift */,
+				AF9D3ECB616CDED45C590E08 /* HotkeysDataBus.swift */,
+			);
+			path = Hotkeys;
+			sourceTree = "<group>";
+		};
+		FA0D725DAD696926D5510C81 /* Expert */ = {
+			isa = PBXGroup;
+			children = (
+				0615D65CA26C24C095D45B2A /* AutoEQ */,
+				81473B493EBA0734E40E869A /* ExpertEqualizerState.swift */,
+				67815FEB125524CEC630B510 /* ExpertEqualizer.swift */,
+				6AB1E31258DBCC0DFF46D68B /* ExpertEqualizerKernel.swift */,
+				7E2DA698507451F3ED96CF63 /* ExpertEqualizerPreset.swift */,
+				56877500F8FD4D6F27226D47 /* ExpertEqualizerDataBus.swift */,
+			);
+			path = Expert;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -854,6 +1187,69 @@
 				E00618E220F14C08003BA0B0 /* UIState.swift in Sources */,
 				E04E256221E23CD5002DFC2A /* AdvancedEqualizer.swift in Sources */,
 				E012A4702044C4DA0029C800 /* Sysctl.swift in Sources */,
+				B20CFF8146FEE245B57329A0 /* RawDSPChain.swift in Sources */,
+				A7C01736E2757118B56404D2 /* RawDSPKernel.swift in Sources */,
+				88ED25BA9221C2D559DD76CE /* Biquad.swift in Sources */,
+				FA4165C5EC3AE43FE06EADA8 /* EngineTaps.swift in Sources */,
+				A69DF8DCB203CECC788DE998 /* SpectrumAnalyzer.swift in Sources */,
+				F80C6D445CB531E4473E0947 /* SpectrumDataBus.swift in Sources */,
+				0B59B9045EC4E0A9FC94B84F /* AppMixerState.swift in Sources */,
+				94527EB62BE534E3AB63A85F /* AppMixer.swift in Sources */,
+				F330AA094532CEC147CAF712 /* AppMixerDataBus.swift in Sources */,
+				78D19219450DB6DD80BC4650 /* RecorderState.swift in Sources */,
+				915EBB2C01C295DA1D36B37F /* Recorder.swift in Sources */,
+				F46D314ED1D3C90E024FC972 /* RecorderDataBus.swift in Sources */,
+				519FB7C2B76C1539FA36C484 /* ToneGenerator.swift in Sources */,
+				499E583375010054C21E43A2 /* HearingTestDataBus.swift in Sources */,
+				57EF942DD806736C189AC06E /* EffectsChain.swift in Sources */,
+				956662257EF9A67AB3070370 /* CrossfeedState.swift in Sources */,
+				8EEA48818BC112C11CFC8788 /* Crossfeed.swift in Sources */,
+				77A9B78AFDF4B7FEC30F4D23 /* CrossfeedKernel.swift in Sources */,
+				D1299562D2FF057EC5DC5FE1 /* CrossfeedDataBus.swift in Sources */,
+				3FF9B99BF2E3D9F7B0F37423 /* ChannelDelayState.swift in Sources */,
+				673EEADE2EC05833956D21A5 /* ChannelDelay.swift in Sources */,
+				395CE8E35FE62DA64324EA83 /* ChannelDelayKernel.swift in Sources */,
+				057C8DE6F6EA270E057C32F8 /* ChannelDelayDataBus.swift in Sources */,
+				66E19BC0B263338ED8C7678C /* RoutingState.swift in Sources */,
+				F809940867D0EB266BDA07B4 /* Routing.swift in Sources */,
+				8CBFF58B42C2CB82F40B8214 /* RoutingKernel.swift in Sources */,
+				3F47A060106E1F2B4F4B6C5D /* RoutingDataBus.swift in Sources */,
+				0E492B169A9DD0C8DF7A1B71 /* PreampState.swift in Sources */,
+				8AFCAD51BE67EBCDEC1918EE /* Preamp.swift in Sources */,
+				E2921FA4A8EE5B4B8C27F4D6 /* PreampDataBus.swift in Sources */,
+				3349630AA19BFC8AE3ABD307 /* ReverbState.swift in Sources */,
+				BD28EBBE24B2E2AF88CED9E9 /* Reverb.swift in Sources */,
+				7FE69761D2257FD52492EF3B /* ReverbDataBus.swift in Sources */,
+				215D278D41295D2E243C2548 /* AudioUnitsState.swift in Sources */,
+				1C7FEBEDC7F7BE913A61540E /* AudioUnitsHost.swift in Sources */,
+				67E60A6274E771A44541D835 /* AudioUnitWindow.swift in Sources */,
+				4FC0011DC6005550435D9870 /* AudioUnitsDataBus.swift in Sources */,
+				8F9704C5B7B6E3152EE8BD77 /* ExpertEqualizerState.swift in Sources */,
+				2CC6922CA9FAB4292626045F /* ExpertEqualizer.swift in Sources */,
+				4436C107A3075E1DB3C0F32D /* ExpertEqualizerKernel.swift in Sources */,
+				BAE21D1CCFE02CE47EB6BE49 /* ExpertEqualizerPreset.swift in Sources */,
+				3B98E2BFED7984441D752F95 /* ExpertEqualizerDataBus.swift in Sources */,
+				8D7EA8DAA8694C261B6382CC /* AutoEQ.swift in Sources */,
+				296D0054D6FAD0935C63D618 /* AutoEQDataBus.swift in Sources */,
+				AB3B73131FF54B09EF19A5D1 /* Graphic31EqualizerState.swift in Sources */,
+				01BFA7D0CF3716C521E54842 /* Graphic31Equalizer.swift in Sources */,
+				6777B19B72DCFA31459FB16D /* Graphic31EqualizerPreset.swift in Sources */,
+				EDCA6BAE6F1C38758464310D /* Graphic31EqualizerDataBus.swift in Sources */,
+				D178D48C44029CE373483863 /* Server.swift in Sources */,
+				0CBD273BB917CF67C2ECC8F3 /* HandlerRegistry.swift in Sources */,
+				40108E0FD2AE6E41611465DF /* WebSocketTransport.swift in Sources */,
+				D32B062071FA54F9B010D7EB /* APIAuth.swift in Sources */,
+				DF2F70D99EAFAD0C33D13CCA /* StaticFileServer.swift in Sources */,
+				A597A51FE831BA838911D902 /* SuperPresetsState.swift in Sources */,
+				6D073B20E5CB5B3CD8927874 /* SuperPresets.swift in Sources */,
+				376B2DD572219DF9353C681C /* SuperPresetsDataBus.swift in Sources */,
+				57965AC66BD8FCBAC100BC0A /* HotkeysState.swift in Sources */,
+				5D076E5CF95CB31FBF7B649D /* HotkeyManager.swift in Sources */,
+				01491451B382377A50FAC2DD /* HotkeysDataBus.swift in Sources */,
+				F66C7D7B0E97C3EA6A691F20 /* MIDIState.swift in Sources */,
+				69C7F80B4D9B69F155AA5C21 /* MIDIManager.swift in Sources */,
+				B28E4F488348ADA9EA7B9A65 /* MIDIDataBus.swift in Sources */,
+				F6F2321EF8A7475C6DCEB9CA /* BackupDataBus.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

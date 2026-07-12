@@ -2,6 +2,8 @@ import { Component, OnInit, EventEmitter, Output, ViewChild, Input, ChangeDetect
 import { EqualizersService, EqualizersTypeChangedEventCallback, EqualizerType } from './equalizers.service'
 import { BasicEqualizerComponent } from './basic-equalizer/basic-equalizer.component'
 import { AdvancedEqualizerComponent } from './advanced-equalizer/advanced-equalizer.component'
+import { ExpertEqualizerComponent } from './expert-equalizer/expert-equalizer.component'
+import { Graphic31EqualizerComponent } from './graphic31-equalizer/graphic31-equalizer.component'
 import { EqualizerComponent } from './equalizer.component'
 import { ColorsService, FadeInOutAnimation, FromTopAnimation } from '@eqmac/components'
 import { MatDialog, MatDialogRef } from '@angular/material/dialog'
@@ -25,6 +27,8 @@ export class EqualizersComponent implements OnInit, OnDestroy {
   @Output() visibilityToggled = new EventEmitter()
   @ViewChild('basicEqualizer', { static: false }) basicEqualizer: BasicEqualizerComponent
   @ViewChild('advancedEqualizer', { static: false }) advancedEqualizer: AdvancedEqualizerComponent
+  @ViewChild('expertEqualizer', { static: false }) expertEqualizer: ExpertEqualizerComponent
+  @ViewChild('graphic31Equalizer', { static: false }) graphic31Equalizer: Graphic31EqualizerComponent
 
   toolbarHeight = 30
   presetsHeight = 46
@@ -139,6 +143,8 @@ export class EqualizersComponent implements OnInit, OnDestroy {
     switch (type) {
       case 'Basic': return this.basicEqualizer
       case 'Advanced': return this.advancedEqualizer
+      case 'Expert': return this.expertEqualizer
+      case 'Graphic31': return this.graphic31Equalizer
     }
   }
 

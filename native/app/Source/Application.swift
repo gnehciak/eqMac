@@ -47,8 +47,25 @@ class Application {
   private static var ignoreVolumeEvents = false
 
   static var settings: Settings!
-    
-    
+
+  // MARK: - Wave 2/3 feature singletons
+  // Raw-DSP effect owners (engine-independent; kernels registered with RawDSPChain)
+  static var routing: Routing?
+  static var crossfeed: Crossfeed?
+  static var channelDelay: ChannelDelay?
+  static var preamp: Preamp?
+  // Long-lived AVAudioUnit host (EffectsChain "audio-units" slot)
+  static var audioUnitsHost: AudioUnitsHost?
+  static var audioUnitsNeedsRebuildListener: EmitterKit.EventListener<Void>?
+  // Per-app volume mixer (driver custom properties)
+  static var appMixer: AppMixer?
+  // Recorder (EngineTaps "recorder" tap)
+  static var recorder: Recorder?
+  // Automatic preset switching
+  static var superPresets: SuperPresets?
+  // Global hotkeys
+  static var hotkeys: HotkeyManager?
+
   static var ui: UI!
     
     
@@ -83,11 +100,24 @@ class Application {
     
     self.settings = Settings()
 
+    createFeatureManagers()
+    registerAudioExtensions()
+
     Networking.startMonitor()
-    
+
+    // Headless Bridge: DataBus handlers register into the HandlerRegistry
+    // immediately and are replayed into WebViewJavascriptBridge once the
+    // WebView attaches (UI.setupBridge). This lets the HTTP / WebSocket API
+    // serve requests before (and independently of) the webview load.
+    UI.bridge = Bridge()
+    setupDataBus()
+    Server.start()
+
     Driver.check {
       Sources.getInputPermission {
         AudioDevice.register = true
+
+        setupAppMixer()
 
         if enabled {
           setupAudio()
@@ -103,6 +133,78 @@ class Application {
           }
         }
       }
+    }
+  }
+
+  // Creates the long-lived feature managers. Must run after the store exists
+  // (static let, initialized on first access) and BEFORE the first Engine is
+  // created so restored state lands in the first pipeline build.
+  private static func createFeatureManagers () {
+    // Raw-DSP owners - reconstruct kernel params from the store in init
+    routing = Routing()
+    crossfeed = Crossfeed()
+    channelDelay = ChannelDelay()
+    preamp = Preamp()
+
+    // AU host - restores persisted Audio Units, then emits needsRebuild
+    audioUnitsHost = AudioUnitsHost()
+
+    // Recorder must exist before ApplicationDataBus is constructed so
+    // RecorderDataBus can attach its status push handler
+    recorder = Recorder()
+
+    // Global hotkeys - work even while eqMac audio is disabled
+    hotkeys = HotkeyManager()
+
+    // MIDI - touch the lazy singleton so controllers work headlessly at launch
+    _ = MIDIManager.shared
+
+    // Super Presets - pure control plane (dispatches store actions only)
+    SuperPresets.getState = { Application.store.state.superPresets }
+    SuperPresets.getSelectedPresetId = { type in
+      let eq = Application.store.state.effects.equalizers
+      switch type {
+      case "Basic": return eq.basic.selectedPresetId
+      case "Advanced": return eq.advanced.selectedPresetId
+      case "Expert": return eq.expert.selectedPresetId
+      // SuperPresets rules store "Graphic31" while EqualizerType.graphic31's
+      // raw value is "Graphic 31" - both strings reach this closure
+      case "Graphic31", EqualizerType.graphic31.rawValue:
+        return eq.graphic31.selectedPresetId
+      default: return nil
+      }
+    }
+    superPresets = SuperPresets()
+  }
+
+  // Registers effect slots, raw DSP kernels and engine taps.
+  // MUST run before the first Engine is created.
+  // Registration order == signal flow / processing order.
+  private static func registerAudioExtensions () {
+    // AVAudioEngine node slots (signal flow: equalizers -> reverb -> audio-units;
+    // the "equalizers" slot is pre-registered by EffectsChain itself)
+    EffectsChain.registerSlot(id: "reverb") { Reverb() }
+    EffectsChain.registerSlot(id: "audio-units") { Application.audioUnitsHost }
+
+    // Raw DSP kernels (pre-CircularBuffer-write; registration order == processing order)
+    RawDSPChain.register(id: "routing") { Application.routing?.kernel }
+    RawDSPChain.register(id: "expert-equalizer") { ExpertEqualizer.kernel }
+    RawDSPChain.register(id: "crossfeed") { Application.crossfeed?.kernel }
+    RawDSPChain.register(id: "delay") { Application.channelDelay?.kernel }
+    RawDSPChain.register(id: "preamp") { Application.preamp?.kernel }
+
+    // Post-write engine taps
+    EngineTaps.register(id: "recorder") { Application.recorder?.tap }
+    EngineTaps.register(id: "spectrum") { SpectrumAnalyzer.tap }
+  }
+
+  // App Mixer needs the driver to be installed/alive; called from the
+  // Driver.check completion. Created ONCE per app lifetime (driver client
+  // lifecycle is independent of Engine/Output rebuilds).
+  private static func setupAppMixer () {
+    AppMixer.getState = { Application.store.state.appMixer }
+    if appMixer == nil {
+      appMixer = AppMixer()
     }
   }
 
@@ -122,7 +224,18 @@ class Application {
           setupAudio()
         }
       }
-      
+
+    }
+
+    // Structural Audio Unit chain changes (add/remove/reorder/launch-restore)
+    // rebuild the pipeline through the same path as an EQ type switch
+    audioUnitsNeedsRebuildListener = AudioUnitsHost.needsRebuild.on { _ in
+      if (enabled) {
+        stopSave {}
+        Async.delay(100) {
+          setupAudio()
+        }
+      }
     }
   }
   
@@ -409,11 +522,12 @@ class Application {
   private static func setupUI (_ completion: @escaping () -> Void) {
     Console.log("Setting up UI")
     ui = UI {
-      setupDataBus()
+      // DataBus is constructed in start() against the headless Bridge;
+      // UI.setupBridge attaches the WebView and replays registrations.
       completion()
     }
   }
-  
+
   private static func setupDataBus () {
     Console.log("Setting up Data Bus")
     dataBus = ApplicationDataBus(bridge: UI.bridge)

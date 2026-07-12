@@ -14,7 +14,10 @@ import {
 } from '@angular/flex-layout'
 
 import {
-  ComponentsModule
+  ComponentsModule,
+  EqGraphComponent,
+  SpectrumComponent,
+  VirtualDropdownComponent
 } from '@eqmac/components'
 
 import { PipesModule } from './modules/pipes/pipes.module'
@@ -75,6 +78,22 @@ import { PromptDialogComponent } from './components/prompt-dialog/prompt-dialog.
 import { OptionsDialogComponent } from './components/options-dialog/options-dialog.component'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { UIService } from './services/ui.service'
+import { TranslatePipe } from './pipes/translate.pipe'
+import { ExpertEqualizerComponent } from './sections/effects/equalizers/expert-equalizer/expert-equalizer.component'
+import { BandInspectorComponent } from './sections/effects/equalizers/expert-equalizer/band-inspector.component'
+import { AutoEQBrowserComponent } from './sections/effects/equalizers/expert-equalizer/autoeq/autoeq-browser.component'
+import { Graphic31EqualizerComponent } from './sections/effects/equalizers/graphic31-equalizer/graphic31-equalizer.component'
+import { AppMixerComponent } from './sections/app-mixer/app-mixer.component'
+import { AppRowComponent } from './sections/app-mixer/app-row/app-row.component'
+import { AudioEffectsComponent } from './sections/effects/audio-effects/audio-effects.component'
+import { SpatialComponent } from './sections/effects/spatial/spatial.component'
+import { AudioUnitsComponent } from './sections/effects/audio-units/audio-units.component'
+import { SuperPresetsDialogComponent } from './sections/settings/super-presets/super-presets-dialog.component'
+import { HotkeysDialogComponent } from './sections/settings/hotkeys/hotkeys-dialog.component'
+import { MIDIDialogComponent } from './sections/settings/midi/midi-dialog.component'
+import { ThemePickerDialogComponent } from './sections/settings/themes/theme-picker-dialog.component'
+import { ArrangementDialogComponent } from './sections/settings/themes/arrangement-dialog.component'
+import { HearingTestDialogComponent } from './sections/settings/hearing-test/hearing-test-dialog.component'
 
 @NgModule({
   imports: [
@@ -90,7 +109,14 @@ import { UIService } from './services/ui.service'
   entryComponents: [
     ConfirmDialogComponent,
     PromptDialogComponent,
-    OptionsDialogComponent
+    OptionsDialogComponent,
+    SuperPresetsDialogComponent,
+    HotkeysDialogComponent,
+    MIDIDialogComponent,
+    ThemePickerDialogComponent,
+    ArrangementDialogComponent,
+    AutoEQBrowserComponent,
+    HearingTestDialogComponent
   ],
   declarations: [
     AppComponent,
@@ -113,7 +139,30 @@ import { UIService } from './services/ui.service'
     ConfirmDialogComponent,
     EqualizerPresetsComponent,
     PromptDialogComponent,
-    OptionsDialogComponent
+    OptionsDialogComponent,
+    TranslatePipe,
+    // New library widgets (exported from @eqmac/components but not yet
+    // declared by ComponentsModule — declared here so AppModule templates
+    // can use them; move into ComponentsModule if it ever declares them)
+    EqGraphComponent,
+    SpectrumComponent,
+    VirtualDropdownComponent,
+    // Wave 2/3 sections and dialogs
+    ExpertEqualizerComponent,
+    BandInspectorComponent,
+    AutoEQBrowserComponent,
+    Graphic31EqualizerComponent,
+    AppMixerComponent,
+    AppRowComponent,
+    AudioEffectsComponent,
+    SpatialComponent,
+    AudioUnitsComponent,
+    SuperPresetsDialogComponent,
+    HotkeysDialogComponent,
+    MIDIDialogComponent,
+    ThemePickerDialogComponent,
+    ArrangementDialogComponent,
+    HearingTestDialogComponent
   ],
   providers: [
     {

@@ -16,5 +16,6 @@ class EngineDataBus: DataBus {
     self.add("/volume", VolumeDataBus.self)
     self.add("/effects", EffectsDataBus.self)
     self.add("/outputs", OutputsDataBus.self)
+    self.add("/app-mixer", AppMixerDataBus.self)
   }
 }

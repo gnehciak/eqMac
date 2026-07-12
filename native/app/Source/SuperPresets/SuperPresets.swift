@@ -284,7 +284,7 @@ class SuperPresets: StoreSubscriber {
       Application.dispatchAction(AdvancedEqualizerAction.selectPreset(presetId, true))
     case "Expert":
       Application.dispatchAction(ExpertEqualizerAction.selectPreset(presetId, true))
-    case "Graphic31":
+    case "Graphic 31":
       Application.dispatchAction(Graphic31EqualizerAction.selectPreset(presetId, true))
     default:
       break

@@ -9,6 +9,7 @@
 import Foundation
 import ReSwift
 import SwiftyUserDefaults
+import BetterCodable
 
 class EqualizersState: State {
   var enabled = true
@@ -16,6 +17,11 @@ class EqualizersState: State {
   var previousType: EqualizerType?
   var basic = BasicEqualizerState()
   var advanced = AdvancedEqualizerState()
+  // @DefaultCodable wrappers keep previously persisted state trees decoding
+  // (a bare new field would fail ApplicationState.load()'s try? decode and
+  // wipe all user settings)
+  @DefaultCodable<ExpertEqualizerStateDefault> var expert = ExpertEqualizerStateDefault.value
+  @DefaultCodable<Graphic31EqualizerStateDefault> var graphic31 = Graphic31EqualizerStateDefault.value
 }
 
 enum EqualizersAction: Action {
@@ -39,6 +45,8 @@ func EqualizersStateReducer(action: Action, state: EqualizersState?) -> Equalize
   
   state.basic = BasicEqualizerStateReducer(action: action, state: state.basic)
   state.advanced = AdvancedEqualizerStateReducer(action: action, state: state.advanced)
+  state.expert = ExpertEqualizerStateReducer(action: action, state: state.expert)
+  state.graphic31 = Graphic31EqualizerStateReducer(action: action, state: state.graphic31)
   
   return state
 }
