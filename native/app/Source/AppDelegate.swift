@@ -9,34 +9,23 @@
 import Cocoa
 import SwiftyJSON
 import ServiceManagement
-import Sparkle
 import EmitterKit
 import AMCoreAudio
 import Shared
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate {
 
-  var updateProcessed = EmitterKit.Event<Void>()
-  var willBeDownloadingUpdate = false
-  
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     for window in NSApplication.shared.windows {
       window.close()
     }
 
-    Application.updater.delegate = self
-    Application.updater.feedURL = Settings.updatesFeedUrl
-    
-    updateProcessed.once { _ in
-      Application.start()
-    }
-
-    // Fork: never gate startup on the Sparkle update check. Upstream's
-    // appcast points at the closed-source binaries (an "update" would
-    // replace this fork), and a hung/failed check used to leave the app
-    // idle forever with audio and the API server never initialized.
-    self.updateProcessed.emit()
+    // Fork: the Sparkle auto-updater is removed entirely - it pointed at the
+    // original vendor's appcast (an "update" would replace this fork with the
+    // closed-source build), so the app now just starts directly and never
+    // contacts any update server.
+    Application.start()
 
     NSWorkspace.shared.notificationCenter.addObserver(
         self, selector: #selector(didWakeUp(event:)),
@@ -72,42 +61,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
     }
   }
   
-  func updaterDidNotFindUpdate(_ updater: SUUpdater) {
-    updateProcessed.emit()
-  }
-  
-  func updater(_ updater: SUUpdater, userDidSkipThisVersion item: SUAppcastItem) {
-    updateProcessed.emit()
-  }
-  
-  func updater(_ updater: SUUpdater, didCancelInstallUpdateOnQuit item: SUAppcastItem) {
-    updateProcessed.emit()
-  }
-  
-  func updater(_ updater: SUUpdater, willDownloadUpdate item: SUAppcastItem, with request: NSMutableURLRequest) {
-    willBeDownloadingUpdate = true
-  }
-  
-  func updater(_ updater: SUUpdater, didDismissUpdateAlertPermanently permanently: Bool, for item: SUAppcastItem) {
-    Async.delay(500, completion: {
-      if !self.willBeDownloadingUpdate {
-        self.updateProcessed.emit()
-      }
-    })
-  }
-  
-  func userDidCancelDownload(_ updater: SUUpdater) {
-    updateProcessed.emit()
-  }
-  
-  func updater(_ updater: SUUpdater, didAbortWithError error: Error) {
-    updateProcessed.emit()
-  }
-  
-  func updater(_ updater: SUUpdater, failedToDownloadUpdate item: SUAppcastItem, error: Error) {
-    updateProcessed.emit()
-  }
-
   @objc func willSleep(event: NSNotification) {
     Application.handleSleep()
   }

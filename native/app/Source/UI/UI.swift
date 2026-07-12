@@ -437,18 +437,12 @@ class UI: StoreSubscriber {
       startUILoad(url)
     }
 
-    if (Application.store.state.settings.doOTAUpdates) {
-      remoteIsReachable() { reachable in
-        if reachable {
-          loadRemote()
-        } else {
-          loadLocal()
-        }
-      }
-    } else {
-      loadLocal()
-    }
-
+    // Fork: ALWAYS load the UI embedded in the app bundle. The original app
+    // could fetch a newer UI over the air from the vendor's server; that
+    // remote path (loadRemote / remoteIsReachable / getRemoteVersion) is
+    // intentionally never taken here so the app makes no network request to
+    // any vendor endpoint on launch.
+    loadLocal()
   }
   
   private static func getRemoteVersion (_ completion: @escaping (String?) -> Void) {

@@ -153,6 +153,7 @@
 		E0FFB705200679DD0003EC9E /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FFB704200679DD0003EC9E /* Engine.swift */; };
 		E2921FA4A8EE5B4B8C27F4D6 /* PreampDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111B1C4B798D0C1BB87B0947 /* PreampDataBus.swift */; };
 		EDCA6BAE6F1C38758464310D /* Graphic31EqualizerDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D49EFB1BA104335E7324E /* Graphic31EqualizerDataBus.swift */; };
+		EQ1D0000000000000002DRV0 /* install-driver.sh in Resources */ = {isa = PBXBuildFile; fileRef = EQ1D0000000000000001DRV0 /* install-driver.sh */; };
 		F330AA094532CEC147CAF712 /* AppMixerDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFFB03D22A985FB97FCE92C /* AppMixerDataBus.swift */; };
 		F46D314ED1D3C90E024FC972 /* RecorderDataBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B4142EDF8B2A2861086FBF /* RecorderDataBus.swift */; };
 		F66C7D7B0E97C3EA6A691F20 /* MIDIState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F619FDAA73230437F9C6CECC /* MIDIState.swift */; };
@@ -320,6 +321,7 @@
 		E8C601FABF1A43F86170408A /* CrossfeedKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossfeedKernel.swift; sourceTree = "<group>"; };
 		E961249C6FA5AB46B4F5F1EB /* ReverbState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReverbState.swift; sourceTree = "<group>"; };
 		E9EC7A3BD0BD5B5C80CD8D11 /* ToneGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToneGenerator.swift; sourceTree = "<group>"; };
+		EQ1D0000000000000001DRV0 /* install-driver.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-driver.sh"; sourceTree = "<group>"; };
 		F619FDAA73230437F9C6CECC /* MIDIState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIState.swift; sourceTree = "<group>"; };
 		F97D862F19443696E0728D2E /* AutoEQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoEQ.swift; sourceTree = "<group>"; };
 		FE0E49A3D6BD4DC1B212FFF1 /* RoutingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingState.swift; sourceTree = "<group>"; };
@@ -778,6 +780,7 @@
 			children = (
 				7858FBC124A9630800637941 /* restart_mac.scpt */,
 				789F83CE250E20A8004F871D /* restart_coreaudio.sh */,
+				EQ1D0000000000000001DRV0 /* install-driver.sh */,
 			);
 			path = Scripts;
 			sourceTree = "<group>";
@@ -965,6 +968,7 @@
 				E09C17201FEC1969008E65A4 /* Main.storyboard in Resources */,
 				785453AB269B75F100E8AB42 /* Assets in Resources */,
 				789F83CF250E20A8004F871D /* restart_coreaudio.sh in Resources */,
+				EQ1D0000000000000002DRV0 /* install-driver.sh in Resources */,
 				78F28AD6274D2A580005474D /* assets.xcassets in Resources */,
 				7858FBC224A9630800637941 /* restart_mac.scpt in Resources */,
 			);
@@ -987,7 +991,6 @@
 				"${BUILT_PRODUCTS_DIR}/KeychainSwift/KeychainSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/ReSwift/ReSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/STPrivilegedTask/STPrivilegedTask.framework",
-				"${PODS_ROOT}/Sparkle/Sparkle.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftHTTP/SwiftHTTP.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyUserDefaults/SwiftyUserDefaults.framework",
@@ -1004,7 +1007,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/STPrivilegedTask.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftHTTP.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyUserDefaults.framework",
@@ -1080,7 +1082,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ $CONFIGURATION == \"Debug\" ]]; then\nexit 0\nfi\n\n\nLOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\n\n# By default, use the configured code signing identity for the project/target\nIDENTITY=\"${CODE_SIGN_IDENTITY}\"\nif [ \"$IDENTITY\" == \"\" ]\nthen\n# If a code signing identity is not specified, use ad hoc signing\nIDENTITY=\"-\"\nfi\ncodesign --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A/Resources/AutoUpdate.app\"\ncodesign --verbose --force -o runtime --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"\n";
+			shellScript = "# Sparkle removed in this fork\nexit 0\n";
 		};
 		E0A48D6323C61CC200700C39 /* Run Script - Hardruntime + Sign LaunchAtLogin */ = {
 			isa = PBXShellScriptBuildPhase;

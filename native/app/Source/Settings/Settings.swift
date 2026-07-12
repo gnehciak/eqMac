@@ -50,21 +50,12 @@ class Settings: StoreSubscriber {
     }
   }
 
-  static var doAutoCheckUpdates = Application.store.state.settings.doAutoCheckUpdates {
-    didSet {
-      Application.updater.automaticallyChecksForUpdates = doAutoCheckUpdates
-    }
-  }
+  // Fork: automatic updates are removed. These settings are retained (so
+  // persisted state and the settings UI keep working) but no longer drive any
+  // updater - nothing contacts an update server.
+  static var doAutoCheckUpdates = Application.store.state.settings.doAutoCheckUpdates
 
-  static var doBetaUpdates = Application.store.state.settings.doBetaUpdates {
-    didSet {
-      Application.updater.feedURL = updatesFeedUrl
-    }
-  }
-
-  static var updatesFeedUrl: URL! {
-    return Application.store.state.settings.doBetaUpdates ? Constants.BETA_UPDATES_FEED : Constants.UPDATES_FEED
-  }
+  static var doBetaUpdates = Application.store.state.settings.doBetaUpdates
 
   init() {
     self.setupStateListener()

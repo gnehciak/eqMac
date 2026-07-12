@@ -12,22 +12,24 @@ import Version
 
 struct Constants {
   
+  // Fork: the UI is ALWAYS loaded from the copy embedded in the app bundle -
+  // there is no over-the-air fetch from any server (see UI.load()). This
+  // endpoint only remains for the DEBUG live-reload dev server on localhost.
   #if DEBUG
-//  static let UI_ENDPOINT_URL = URL(string: "http://www.eqmac.local:8080")!
-//  static let UI_ENDPOINT_URL = URL(string: "https://ui-v3.eqmac.app")!
   static let UI_ENDPOINT_URL = URL(string: "http://localhost:8080")!
-
   static let DEBUG = true
   #else
   static let DEBUG = false
-  static let UI_ENDPOINT_URL = URL(string: "https://ui-v3.eqmac.app")!
+  static let UI_ENDPOINT_URL = URL(string: "http://localhost:8080")!
   #endif
-  
-  static let SENTRY_ENDPOINT = "https://afd95e4c332b4b1da4bb23b9cc66782c@sentry.io/1243254"
-  static let DOMAIN = "eqmac.app"
-  static let WEBSITE_URL = URL(string: "https://\(Constants.DOMAIN)")!
-  static let FAQ_URL = URL(string: "https://\(Constants.DOMAIN)/faq")!
-  static let BUG_REPORT_URL = URL(string: "https://\(Constants.DOMAIN)/bug-report")!
+
+  // This is an open-source fork with no vendor backend: no crash reporting,
+  // no analytics, no update feed, no remote UI. All of the below point at the
+  // fork's own repository rather than the original vendor's services.
+  static let DOMAIN = "github.com/gnehciak/eqMac"
+  static let WEBSITE_URL = URL(string: "https://github.com/gnehciak/eqMac")!
+  static let FAQ_URL = URL(string: "https://github.com/gnehciak/eqMac#readme")!
+  static let BUG_REPORT_URL = URL(string: "https://github.com/gnehciak/eqMac/issues")!
   static let DRIVER_DEVICE_UID = "EQMDevice"
   static let DRIVER_MINIMUM_VERSION = Version(tolerant: "1.3")!
   static let LEGACY_DRIVER_UIDS = ["EQMAC2.1_DRIVER_ENGINE", "EQMAC2_DRIVER_ENGINE"]
@@ -45,13 +47,10 @@ struct Constants {
   static let TRANSITION_FRAME_DURATION: Double = 1000 / TRANSITION_FPS
   static let TRANSITION_FRAME_COUNT = UInt(round(TRANSITION_FPS * (Double(TRANSITION_DURATION) / 1000)))
   static let OPEN_SOURCE = true
-  static let UPDATES_FEED = URL(string: "https://update.eqmac.app/update.xml")!
-  static let BETA_UPDATES_FEED = URL(string: "https://update.eqmac.app/beta-update.xml")!
-  static let OPEN_URL_TRUSTED_DOMAINS: [String] = ["eqmac.app", "github.com"]
+  // Fork: automatic updates are removed entirely; there is no update feed.
+  static let OPEN_URL_TRUSTED_DOMAINS: [String] = ["github.com"]
   static let TRUSTED_URL_PREFIXES: [String] = [
-    "https://eqmac.app",
-    "https://github.com/bitgapp/",
-    "https://github.com/bitgapp/",
+    "https://github.com/gnehciak/eqMac",
     "https://github.com/jaakkopasanen/AutoEq"
   ]
 }

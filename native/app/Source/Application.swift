@@ -16,7 +16,6 @@ import SwiftyUserDefaults
 import SwiftyJSON
 import ServiceManagement
 import ReSwift
-import Sparkle
 import Shared
 
 enum VolumeChangeDirection: String {
@@ -71,9 +70,6 @@ class Application {
 
   static var dataBus: ApplicationDataBus!
   static let error = EmitterKit.Event<String>()
-  
-  static var updater = SUUpdater(for: Bundle.main)!
-  
   static let store: Store = Store(
     reducer: ApplicationStateReducer,
     state: ApplicationState.load(),
@@ -725,10 +721,11 @@ class Application {
     Script.apple("restart_mac")
   }
   
-  static func checkForUpdates () {
-    updater.checkForUpdates(nil)
-  }
-  
+  // Fork: automatic updates are removed. Kept as a no-op so the /update
+  // DataBus route and any UI "check for updates" affordance stay wired
+  // without contacting any update server.
+  static func checkForUpdates () {}
+
   static func uninstall () {
     // TODO: Implement uninstaller
     Console.log("// TODO: Download Uninstaller")

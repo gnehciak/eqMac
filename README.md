@@ -59,14 +59,17 @@ Everything here is free and open source. No subscriptions, no license keys.
 npm install --legacy-peer-deps
 cd ui && NODE_OPTIONS=--openssl-legacy-provider npm run build
 
-# Native app (requires full Xcode + CocoaPods)
+# Native app + self-installing bundle (requires full Xcode + CocoaPods)
 cd native && pod install
-open eqMac.xcworkspace   # build the eqMac scheme
+./package-app.sh            # builds app + driver, bundles the driver, ad-hoc signs
 ```
+
+`package-app.sh` produces `build/eqMac.app` — a **self-contained, self-installing** bundle. Copy it to a fresh Mac, double-click, and on first launch it prompts once for your admin password and installs its audio driver itself (no separate installer, no download). To iterate in Xcode instead, `open eqMac.xcworkspace` and build the `eqMac` scheme.
 
 Notes:
 * `pod install` is required once — the fork adds the [Telegraph](https://github.com/Building42/Telegraph) pod for the HTTP/WebSocket server.
-* Driver changes (App Mixer per-client gain) require reinstalling the driver to `/Library/Audio/Plug-Ins/HAL` and restarting `coreaudiod` (see `native/app/Source/Scripts/`).
+* The audio driver ships **inside** the app (`Contents/Resources/eqMac.driver`) and is installed on demand via `install-driver.sh`; you no longer copy it to `/Library/Audio/Plug-Ins/HAL` by hand.
+* **No phone-home.** This fork removes Sparkle auto-updates, Google Analytics telemetry, Sentry crash reporting, and the over-the-air remote-UI fetch — the UI is always loaded from the copy embedded in the app. It contacts no vendor server; the only network listeners are the local/LAN control API (ports 37624/37628/37629).
 * The AutoEQ database (`native/app/Assets/Embedded/autoeq-db.json.gz`) is generated from AutoEq's parametric EQ results and ships with the app.
 
 ## Technology

@@ -15,29 +15,74 @@ import Shared
 
 class Driver {
   static func check (_ completion: @escaping() -> Void) {
-    if !Driver.isInstalled || !Driver.isCompatible {
-      let isIncompatable = Driver.isInstalled && !Driver.isCompatible
-      let message = isIncompatable ?
-        "For unknown reason the version of Audio Driver needed for eqMac to work currently is not compatable. Try restarting your computer and run eqMac again. In that doesn't work, try re-installing eqMac from our website."
-        : "For unknown reason the Audio Driver needed for eqMac to work currently is not installed. Try restarting your computer and run eqMac again. In that doesn't work, try re-installing eqMac from our website."
-      let title = isIncompatable ? "The eqMac Audio Driver is Incompatable" : "The eqMac Audio Driver is not installed"
-      Alert.withButtons(
-        title: title,
-        message: message,
-        buttons: ["Restart Mac", "Re-install eqMac", "Quit"]
-      ) { buttonPressed in
-        switch NSApplication.ModalResponse(buttonPressed) {
-          case .alertFirstButtonReturn:
-            Application.restartMac()
-            break
-          case .alertSecondButtonReturn:
-            NSWorkspace.shared.open(Constants.WEBSITE_URL)
-          default: break
-        }
-        return Application.quit()
+    if Driver.isInstalled && Driver.isCompatible {
+      return completion()
+    }
+
+    // Fork: the audio driver ships inside the app bundle and is installed on
+    // demand (with an admin prompt) instead of via a separate signed installer
+    // or a "download from our website" link. This makes a fresh-Mac first run
+    // self-contained: grant permission once and the virtual device appears.
+    let isIncompatible = Driver.isInstalled && !Driver.isCompatible
+    let title = isIncompatible
+      ? "Update the eqMac Audio Driver"
+      : "Install the eqMac Audio Driver"
+    let message = isIncompatible
+      ? "eqMac needs to update its audio driver. This replaces the driver in your system audio plug-ins folder and briefly restarts Core Audio. You'll be asked for your administrator password."
+      : "eqMac needs to install its audio driver so it can process your system audio. This adds a driver to your system audio plug-ins folder and briefly restarts Core Audio. You'll be asked for your administrator password."
+
+    Alert.withButtons(
+      title: title,
+      message: message,
+      buttons: [ isIncompatible ? "Update Driver" : "Install Driver", "Quit" ]
+    ) { buttonPressed in
+      switch NSApplication.ModalResponse(buttonPressed) {
+        case .alertFirstButtonReturn:
+          Driver.install(completion)
+        default:
+          Application.quit()
       }
-    } else {
-      completion()
+    }
+  }
+
+  // Installs the bundled driver via the privileged install-driver.sh script
+  // (STPrivilegedTask → admin prompt), then waits for CoreAudio to publish the
+  // virtual device before continuing startup.
+  private static func install (_ completion: @escaping () -> Void) {
+    Script.sudo("install-driver") { success in
+      DispatchQueue.main.async {
+        if !success {
+          return Alert.confirm(
+            title: "Driver installation failed",
+            message: "eqMac couldn't install its audio driver. You can try again, or quit and install it manually.",
+            okText: "Try Again",
+            cancelText: "Quit"
+          ) { retry in
+            if retry { Driver.install(completion) } else { Application.quit() }
+          }
+        }
+        // CoreAudio needs a moment to load the freshly-installed plug-in.
+        Driver.waitForInstall(attempts: 0, completion)
+      }
+    }
+  }
+
+  private static func waitForInstall (attempts: Int, _ completion: @escaping () -> Void) {
+    if Driver.isInstalled && Driver.isCompatible {
+      return completion()
+    }
+    if attempts >= 20 {
+      return Alert.confirm(
+        title: "Driver didn't activate",
+        message: "The audio driver was installed but Core Audio hasn't picked it up yet. Restarting your Mac usually resolves this.",
+        okText: "Restart eqMac",
+        cancelText: "Quit"
+      ) { restart in
+        if restart { Application.restart() } else { Application.quit() }
+      }
+    }
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+      Driver.waitForInstall(attempts: attempts + 1, completion)
     }
   }
 
@@ -155,8 +200,13 @@ class Driver {
   }
   
   static var isCompatible: Bool {
-    let compatibleRange = Constants.DRIVER_MINIMUM_VERSION ..< Version(2, 0, 0)
-    return compatibleRange.contains(installedVersion)
+    // Fork: the original hard-capped compatibility at < 2.0.0, which excluded
+    // this fork's own bumped driver. Any installed driver at or above the
+    // minimum supported version is compatible; a transient .null (device not
+    // yet enumerated) reads as not-yet-compatible and the caller retries.
+    let version = installedVersion
+    if version == .null { return false }
+    return version >= Constants.DRIVER_MINIMUM_VERSION
   }
   
   static var hidden: Bool {

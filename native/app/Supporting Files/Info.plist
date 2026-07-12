@@ -47,9 +47,5 @@
 	<string>Microphone permission is used to capture Input Device and/or System Audio streams.</string>
 	<key>NSPrincipalClass</key>
 	<string>EventInterceptor</string>
-	<key>SUFeedURL</key>
-	<string>https://update.eqmac.app/update.xml</string>
-	<key>SUPublicEDKey</key>
-	<string>hpYxDspWiys38uAkwQl1oxaH4bICfYMofUXN18mMguM=</string>
 </dict>
 </plist>
