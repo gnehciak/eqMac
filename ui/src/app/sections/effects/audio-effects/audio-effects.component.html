@@ -20,178 +20,195 @@
   <eqm-label [fontSize]="11">{{ 'effects.requiresNewerVersion' | translate }}</eqm-label>
 </div>
 
+<!-- Each effect is a self-contained module: a full-width title header (bypass
+     toggle + name) above its controls. Stacking the header frees the whole
+     rail width for the controls so nothing clips, and gives every module the
+     same calm anatomy. -->
 <div *ngIf="show && loaded && available"
   class="content"
   [style.height.px]="contentHeight"
-  fxLayout="column" fxLayoutAlign="space-around stretch"
+  fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="6px"
 >
 
   <!-- Crossfeed -->
-  <div class="effect-row" [style.height.px]="knobRowHeight"
-    fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+  <div class="effect-block" [style.height.px]="crossfeedBlockHeight"
+    fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="4px"
   >
-    <div class="row-header" fxFlex="82px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="6px">
+    <div class="block-header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="6px">
       <eqm-checkbox
         [enabled]="app.enabled"
         [checked]="crossfeedEnabled" (checkedChange)="setCrossfeedEnabled($event)"
         [eqmTooltip]="(crossfeedEnabled ? 'effects.crossfeed.disable' : 'effects.crossfeed.enable') | translate"
       ></eqm-checkbox>
-      <eqm-label [fontSize]="11">{{ 'effects.crossfeed.title' | translate }}</eqm-label>
+      <eqm-label class="title" [fontSize]="11">{{ 'effects.crossfeed.title' | translate }}</eqm-label>
     </div>
 
-    <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
-      <eqm-label [fontSize]="10">{{ 'effects.crossfeed.cutoff' | translate }}</eqm-label>
-      <eqm-value-screen [enabled]="crossfeedControlsEnabled">{{ crossfeedCutoff | fixFloat:0:false }} Hz</eqm-value-screen>
-    </div>
+    <div class="block-controls" [style.height.px]="knobControlHeight" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="12px">
+      <div class="knob-cell" fxFlex fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="6px">
+        <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
+          <eqm-label [fontSize]="10">{{ 'effects.crossfeed.cutoff' | translate }}</eqm-label>
+          <eqm-value-screen [enabled]="crossfeedControlsEnabled">{{ crossfeedCutoff | fixFloat:0:false }} Hz</eqm-value-screen>
+        </div>
+        <eqm-knob *ngIf="!replaceKnobsWithSliders"
+          [enabled]="crossfeedControlsEnabled" size="small"
+          [min]="cutoffMin" [max]="cutoffMax"
+          [(value)]="crossfeedCutoff" (userChangedValue)="setCrossfeedCutoff($event.value)"
+          [stickToMiddle]="false" [doubleClickToAnimateToMiddle]="false"
+          [controlStyle]="ui.settings.knobControlStyle"
+        ></eqm-knob>
+        <div *ngIf="replaceKnobsWithSliders" fxFlex class="cell-slider">
+          <eqm-flat-slider
+            [enabled]="crossfeedControlsEnabled"
+            [min]="cutoffMin" [max]="cutoffMax" scale="logarithmic"
+            [(value)]="crossfeedCutoff" (userChangedValue)="setCrossfeedCutoff($event.value)"
+            [stickToMiddle]="false" [showMiddleNotch]="false" [doubleClickToAnimateToMiddle]="false"
+            [thickness]="3" [thumbRadius]="4"
+          ></eqm-flat-slider>
+        </div>
+      </div>
 
-    <!-- Knob controls -->
-    <eqm-knob *ngIf="!replaceKnobsWithSliders"
-      [enabled]="crossfeedControlsEnabled" size="small"
-      [min]="cutoffMin" [max]="cutoffMax"
-      [(value)]="crossfeedCutoff" (userChangedValue)="setCrossfeedCutoff($event.value)"
-      [stickToMiddle]="false" [doubleClickToAnimateToMiddle]="false"
-      [controlStyle]="ui.settings.knobControlStyle"
-    ></eqm-knob>
-    <!-- Slider controls -->
-    <div *ngIf="replaceKnobsWithSliders" fxFlex>
-      <eqm-flat-slider
-        [enabled]="crossfeedControlsEnabled"
-        [min]="cutoffMin" [max]="cutoffMax" scale="logarithmic"
-        [(value)]="crossfeedCutoff" (userChangedValue)="setCrossfeedCutoff($event.value)"
-        [stickToMiddle]="false" [showMiddleNotch]="false" [doubleClickToAnimateToMiddle]="false"
-        [thickness]="3" [thumbRadius]="4"
-      ></eqm-flat-slider>
-    </div>
-
-    <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
-      <eqm-label [fontSize]="10">{{ 'effects.crossfeed.level' | translate }}</eqm-label>
-      <eqm-value-screen [enabled]="crossfeedControlsEnabled">{{ crossfeedLevel | fixFloat:1:false }} dB</eqm-value-screen>
-    </div>
-
-    <eqm-knob *ngIf="!replaceKnobsWithSliders"
-      [enabled]="crossfeedControlsEnabled" size="small"
-      [min]="levelMin" [max]="levelMax"
-      [(value)]="crossfeedLevel" (userChangedValue)="setCrossfeedLevel($event.value)"
-      [stickToMiddle]="false" [doubleClickToAnimateToMiddle]="false"
-      [controlStyle]="ui.settings.knobControlStyle"
-    ></eqm-knob>
-    <div *ngIf="replaceKnobsWithSliders" fxFlex>
-      <eqm-flat-slider
-        [enabled]="crossfeedControlsEnabled"
-        [min]="levelMin" [max]="levelMax"
-        [(value)]="crossfeedLevel" (userChangedValue)="setCrossfeedLevel($event.value)"
-        [stickToMiddle]="false" [showMiddleNotch]="false" [doubleClickToAnimateToMiddle]="false"
-        [thickness]="3" [thumbRadius]="4"
-      ></eqm-flat-slider>
+      <div class="knob-cell" fxFlex fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="6px">
+        <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
+          <eqm-label [fontSize]="10">{{ 'effects.crossfeed.level' | translate }}</eqm-label>
+          <eqm-value-screen [enabled]="crossfeedControlsEnabled">{{ crossfeedLevel | fixFloat:1:false }} dB</eqm-value-screen>
+        </div>
+        <eqm-knob *ngIf="!replaceKnobsWithSliders"
+          [enabled]="crossfeedControlsEnabled" size="small"
+          [min]="levelMin" [max]="levelMax"
+          [(value)]="crossfeedLevel" (userChangedValue)="setCrossfeedLevel($event.value)"
+          [stickToMiddle]="false" [doubleClickToAnimateToMiddle]="false"
+          [controlStyle]="ui.settings.knobControlStyle"
+        ></eqm-knob>
+        <div *ngIf="replaceKnobsWithSliders" fxFlex class="cell-slider">
+          <eqm-flat-slider
+            [enabled]="crossfeedControlsEnabled"
+            [min]="levelMin" [max]="levelMax"
+            [(value)]="crossfeedLevel" (userChangedValue)="setCrossfeedLevel($event.value)"
+            [stickToMiddle]="false" [showMiddleNotch]="false" [doubleClickToAnimateToMiddle]="false"
+            [thickness]="3" [thumbRadius]="4"
+          ></eqm-flat-slider>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Channel Delay -->
-  <div class="effect-row" [style.height.px]="compactRowHeight"
-    fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+  <div class="effect-block" [style.height.px]="delayBlockHeight"
+    fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="4px"
   >
-    <div class="row-header" fxFlex="82px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="6px">
+    <div class="block-header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="6px">
       <eqm-checkbox
         [enabled]="app.enabled"
         [checked]="delayEnabled" (checkedChange)="setDelayEnabled($event)"
         [eqmTooltip]="(delayEnabled ? 'effects.delay.disable' : 'effects.delay.enable') | translate"
       ></eqm-checkbox>
-      <eqm-label [fontSize]="11">{{ 'effects.delay.title' | translate }}</eqm-label>
+      <eqm-label class="title" [fontSize]="11">{{ 'effects.delay.title' | translate }}</eqm-label>
     </div>
 
-    <eqm-label [fontSize]="10">{{ 'common.leftShort' | translate }}</eqm-label>
-    <eqm-value-screen fxFlex="48px" [enabled]="delayControlsEnabled">{{ delayLeftMs | fixFloat:1:false }} ms</eqm-value-screen>
-    <div fxFlex class="delay-fader">
-      <eqm-fader
-        orientation="horizontal"
-        [disabled]="!delayControlsEnabled"
-        [min]="delayMin" [max]="delayMax"
-        [(value)]="delayLeftMs" (userChangedValue)="setDelayLeft($event.value)"
-      ></eqm-fader>
+    <div class="fader-row" [style.height.px]="faderRowHeight" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+      <eqm-label [fontSize]="10">{{ 'common.leftShort' | translate }}</eqm-label>
+      <eqm-value-screen fxFlex="46px" [enabled]="delayControlsEnabled">{{ delayLeftMs | fixFloat:1:false }} ms</eqm-value-screen>
+      <div fxFlex class="delay-fader">
+        <eqm-fader
+          orientation="horizontal"
+          [disabled]="!delayControlsEnabled"
+          [min]="delayMin" [max]="delayMax"
+          [(value)]="delayLeftMs" (userChangedValue)="setDelayLeft($event.value)"
+        ></eqm-fader>
+      </div>
     </div>
 
-    <eqm-label [fontSize]="10">{{ 'common.rightShort' | translate }}</eqm-label>
-    <eqm-value-screen fxFlex="48px" [enabled]="delayControlsEnabled">{{ delayRightMs | fixFloat:1:false }} ms</eqm-value-screen>
-    <div fxFlex class="delay-fader">
-      <eqm-fader
-        orientation="horizontal"
-        [disabled]="!delayControlsEnabled"
-        [min]="delayMin" [max]="delayMax"
-        [(value)]="delayRightMs" (userChangedValue)="setDelayRight($event.value)"
-      ></eqm-fader>
+    <div class="fader-row" [style.height.px]="faderRowHeight" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+      <eqm-label [fontSize]="10">{{ 'common.rightShort' | translate }}</eqm-label>
+      <eqm-value-screen fxFlex="46px" [enabled]="delayControlsEnabled">{{ delayRightMs | fixFloat:1:false }} ms</eqm-value-screen>
+      <div fxFlex class="delay-fader">
+        <eqm-fader
+          orientation="horizontal"
+          [disabled]="!delayControlsEnabled"
+          [min]="delayMin" [max]="delayMax"
+          [(value)]="delayRightMs" (userChangedValue)="setDelayRight($event.value)"
+        ></eqm-fader>
+      </div>
     </div>
   </div>
 
   <!-- Routing -->
-  <div class="effect-row" [style.height.px]="compactRowHeight"
-    fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+  <div class="effect-block" [style.height.px]="inlineBlockHeight"
+    fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="4px"
   >
-    <div class="row-header" fxFlex="82px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="6px">
+    <div class="block-header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="6px">
       <eqm-checkbox
         [enabled]="app.enabled"
         [checked]="routingEnabled" (checkedChange)="setRoutingEnabled($event)"
         [eqmTooltip]="(routingEnabled ? 'effects.routing.disable' : 'effects.routing.enable') | translate"
       ></eqm-checkbox>
-      <eqm-label [fontSize]="11">{{ 'effects.routing.title' | translate }}</eqm-label>
+      <eqm-label class="title" [fontSize]="11">{{ 'effects.routing.title' | translate }}</eqm-label>
     </div>
 
-    <eqm-dropdown fxFlex
-      [enabled]="routingControlsEnabled"
-      [items]="routingModes" labelParam="name"
-      [selectedItem]="selectedRoutingMode" (itemSelected)="setRoutingMode($event)"
-      [searchable]="false" [numberOfVisibleItems]="5"
-      [placeholder]="'effects.routing.selectMode' | translate" [noItemsPlaceholder]="'effects.routing.noModes' | translate"
-    ></eqm-dropdown>
+    <div class="block-controls" [style.height.px]="rowControlHeight" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+      <eqm-dropdown fxFlex
+        [enabled]="routingControlsEnabled"
+        [items]="routingModes" labelParam="name"
+        [selectedItem]="selectedRoutingMode" (itemSelected)="setRoutingMode($event)"
+        [searchable]="false" [numberOfVisibleItems]="5"
+        [placeholder]="'effects.routing.selectMode' | translate" [noItemsPlaceholder]="'effects.routing.noModes' | translate"
+      ></eqm-dropdown>
 
-    <!-- Peace-style per-channel polarity (phase) inversion -->
-    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
-      [eqmTooltip]="'effects.routing.polarityTooltip' | translate"
-    >
-      <eqm-label [fontSize]="11">Ø</eqm-label>
-      <eqm-checkbox
-        [enabled]="routingControlsEnabled"
-        [checked]="invertLeft" (checkedChange)="setInvertLeft($event)"
-      ></eqm-checkbox>
-      <eqm-label [fontSize]="10">{{ 'effects.routing.polarityLeft' | translate }}</eqm-label>
-      <eqm-checkbox
-        [enabled]="routingControlsEnabled"
-        [checked]="invertRight" (checkedChange)="setInvertRight($event)"
-      ></eqm-checkbox>
-      <eqm-label [fontSize]="10">{{ 'effects.routing.polarityRight' | translate }}</eqm-label>
+      <!-- Peace-style per-channel polarity (phase) inversion -->
+      <div class="polarity" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="4px"
+        [eqmTooltip]="'effects.routing.polarityTooltip' | translate"
+      >
+        <eqm-label [fontSize]="11">Ø</eqm-label>
+        <eqm-checkbox
+          [enabled]="routingControlsEnabled"
+          [checked]="invertLeft" (checkedChange)="setInvertLeft($event)"
+        ></eqm-checkbox>
+        <eqm-label [fontSize]="10">{{ 'effects.routing.polarityLeft' | translate }}</eqm-label>
+        <eqm-checkbox
+          [enabled]="routingControlsEnabled"
+          [checked]="invertRight" (checkedChange)="setInvertRight($event)"
+        ></eqm-checkbox>
+        <eqm-label [fontSize]="10">{{ 'effects.routing.polarityRight' | translate }}</eqm-label>
+      </div>
     </div>
   </div>
 
   <!-- Preamp -->
-  <div class="effect-row" [style.height.px]="compactRowHeight"
-    fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+  <div class="effect-block" [style.height.px]="inlineBlockHeight"
+    fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="4px"
   >
-    <div class="row-header" fxFlex="82px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="6px">
-      <eqm-checkbox
-        [enabled]="app.enabled"
-        [checked]="preampEnabled" (checkedChange)="setPreampEnabled($event)"
-        [eqmTooltip]="(preampEnabled ? 'effects.preamp.disable' : 'effects.preamp.enable') | translate"
-      ></eqm-checkbox>
-      <eqm-label [fontSize]="11">{{ 'effects.preamp.title' | translate }}</eqm-label>
+    <div class="block-header" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="8px">
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="6px">
+        <eqm-checkbox
+          [enabled]="app.enabled"
+          [checked]="preampEnabled" (checkedChange)="setPreampEnabled($event)"
+          [eqmTooltip]="(preampEnabled ? 'effects.preamp.disable' : 'effects.preamp.enable') | translate"
+        ></eqm-checkbox>
+        <eqm-label class="title" [fontSize]="11">{{ 'effects.preamp.title' | translate }}</eqm-label>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="4px">
+        <eqm-checkbox
+          [enabled]="preampControlsEnabled"
+          [checked]="autoGain" (checkedChange)="setAutoGain($event)"
+          [eqmTooltip]="'effects.preamp.autoGainTooltip' | translate"
+        ></eqm-checkbox>
+        <eqm-label [fontSize]="10">{{ 'effects.preamp.autoGain' | translate }}</eqm-label>
+      </div>
     </div>
 
-    <eqm-value-screen fxFlex="52px" [enabled]="preampControlsEnabled">{{ preampGain > 0 ? '+' : '' }}{{ preampGain | fixFloat:1:false }} dB</eqm-value-screen>
-    <div fxFlex>
-      <eqm-flat-slider
-        [enabled]="preampControlsEnabled"
-        [min]="gainMin" [max]="gainMax" [middle]="0"
-        [(value)]="preampGain" (userChangedValue)="setPreampGain($event.value)"
-        [stickToMiddle]="true" [showMiddleNotch]="true"
-        (stickedToMiddle)="performHapticFeedback($event)"
-        [thickness]="3" [thumbRadius]="4"
-      ></eqm-flat-slider>
+    <div class="block-controls" [style.height.px]="rowControlHeight" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+      <eqm-value-screen fxFlex="52px" [enabled]="preampControlsEnabled">{{ preampGain > 0 ? '+' : '' }}{{ preampGain | fixFloat:1:false }} dB</eqm-value-screen>
+      <div fxFlex>
+        <eqm-flat-slider
+          [enabled]="preampControlsEnabled"
+          [min]="gainMin" [max]="gainMax" [middle]="0"
+          [(value)]="preampGain" (userChangedValue)="setPreampGain($event.value)"
+          [stickToMiddle]="true" [showMiddleNotch]="true"
+          (stickedToMiddle)="performHapticFeedback($event)"
+          [thickness]="3" [thumbRadius]="4"
+        ></eqm-flat-slider>
+      </div>
     </div>
-
-    <eqm-checkbox
-      [enabled]="preampControlsEnabled"
-      [checked]="autoGain" (checkedChange)="setAutoGain($event)"
-      [eqmTooltip]="'effects.preamp.autoGainTooltip' | translate"
-    ></eqm-checkbox>
-    <eqm-label [fontSize]="10">{{ 'effects.preamp.autoGain' | translate }}</eqm-label>
   </div>
 
 </div>

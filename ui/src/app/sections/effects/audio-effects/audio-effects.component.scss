@@ -15,18 +15,50 @@
 
   .content {
     box-sizing: border-box;
-    padding: 4px 10px;
+    padding: 4px 8px;
 
     &.placeholder {
       width: 100%;
     }
 
-    .effect-row {
+    // One effect module: full-width title header over its controls.
+    .effect-block {
       width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
 
-      .row-header {
+      // Title header — clip (never wrap/overflow) an over-long localized name.
+      // Fixed 22px so the block's rendered height matches blockHeaderHeight
+      // in the component (the window-height poll sums these).
+      .block-header {
+        height: 22px;
+        flex-shrink: 0;
+        min-width: 0;
         overflow: hidden;
         white-space: nowrap;
+
+        .title {
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      // Control rows fill the freed rail width; min-width:0 lets flex
+      // children (dropdown, sliders, faders) shrink instead of overflowing.
+      .block-controls,
+      .fader-row {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .knob-cell,
+      .cell-slider {
+        min-width: 0;
+      }
+
+      .polarity {
+        flex-shrink: 0;
       }
     }
 
@@ -36,11 +68,12 @@
     .delay-fader {
       display: flex;
       align-items: center;
+      min-width: 0;
 
       eqm-fader {
         display: block;
         width: 100%;
-        height: 22px;
+        height: 18px;
       }
     }
   }

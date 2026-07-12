@@ -111,22 +111,27 @@ $noise: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyA
     box-sizing: border-box;
     min-height: 0;
 
+    // Rails are FIXED width (min = max = width) so they never squeeze their
+    // components below the room those components need. The flexible EQ center
+    // absorbs the remaining window width. Widths + the 8px vertical padding
+    // are mirrored by AppComponent.leftRailWidth / rightRailWidth /
+    // columnVerticalPadding (which drive the native window min-width/height).
     .rail {
       box-sizing: border-box;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 6px;
+      padding: 8px 10px;
 
       &.left-rail {
-        width: 210px;
-        min-width: 210px;
-        max-width: 210px;
+        width: 250px;
+        min-width: 250px;
+        max-width: 250px;
       }
 
       &.right-rail {
-        width: 262px;
-        min-width: 262px;
-        max-width: 262px;
+        width: 320px;
+        min-width: 320px;
+        max-width: 320px;
       }
     }
 
@@ -135,7 +140,7 @@ $noise: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyA
       box-sizing: border-box;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 6px;
+      padding: 8px;
     }
 
     .column-divider {

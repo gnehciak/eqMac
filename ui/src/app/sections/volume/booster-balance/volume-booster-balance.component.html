@@ -1,7 +1,9 @@
-<!-- Knob controls: two side-by-side Pro-style cards (Volume | Balance) -->
-<div *ngIf="!replaceKnobsWithSliders" class="cards" fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap="8px">
-  <eqm-booster *ngIf="ui.settings.volumeFeatureEnabled" fxFlex class="card knob-card" [hide]="hide"></eqm-booster>
-  <eqm-balance *ngIf="ui.settings.balanceFeatureEnabled" fxFlex class="card knob-card" [hide]="hide"></eqm-balance>
+<!-- Knob controls: Volume above Balance. Each card holds a knob flanked by
+     two value-screens (~154px), which would overflow the narrow left rail if
+     placed side-by-side, so they are stacked full-width instead. -->
+<div *ngIf="!replaceKnobsWithSliders" class="cards" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="8px">
+  <eqm-booster *ngIf="ui.settings.volumeFeatureEnabled" class="card knob-card" [hide]="hide"></eqm-booster>
+  <eqm-balance *ngIf="ui.settings.balanceFeatureEnabled" class="card knob-card" [hide]="hide"></eqm-balance>
 </div>
 
 <!-- Slider fallback (replaceKnobsWithSliders UI setting): stacked cards -->

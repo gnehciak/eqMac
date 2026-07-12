@@ -6,12 +6,16 @@
 
 .app-mixer {
   height: 100%;
+  width: 100%;
   padding: 8px 10px;
   box-sizing: border-box;
 }
 
 .strip-list {
   height: 100%;
+  // Even spacing between channel strips; the row scrolls horizontally when
+  // there are more strips than fit the rail.
+  gap: 6px;
   overflow-x: auto;
   overflow-y: hidden;
 

@@ -15,10 +15,18 @@ export class VolumeBoosterBalanceComponent implements OnInit {
   ) { }
 
   get height () {
-    // Matches the fixed card heights in the stylesheet + the .cards padding:
-    // knob mode:       88px card row + 16px vertical padding            = 104
-    // slider fallback: 80px * 2 stacked cards + 8px gap + 16px padding  = 184
-    return this.replaceKnobsWithSliders ? 184 : 104
+    // Cards are stacked vertically (Volume above Balance) in both modes now,
+    // so height scales with how many features are enabled. Matches the fixed
+    // card heights in the stylesheet + the 8px gap between cards + the
+    // .cards 8px top/bottom padding (16).
+    const cards =
+      (this.ui.settings.volumeFeatureEnabled ? 1 : 0) +
+      (this.ui.settings.balanceFeatureEnabled ? 1 : 0)
+    if (cards === 0) return 0
+    const cardHeight = this.replaceKnobsWithSliders ? 80 : 88
+    const gap = 8
+    const verticalPadding = 16
+    return cards * cardHeight + Math.max(cards - 1, 0) * gap + verticalPadding
   }
 
   async ngOnInit () {

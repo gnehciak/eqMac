@@ -133,13 +133,40 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
   // Stable height participation: the section is toolbar-only when collapsed
   // and toolbar + a fixed-size content block when expanded. Never varies
   // with data, so the 1s window-dimensions poll in AppComponent stays calm.
+  //
+  // Each effect is a module: a title header (blockHeaderHeight) over its
+  // controls, separated by blockHeaderGap. Crossfeed's controls are a knob
+  // row; Delay stacks two fader rows; Routing/Preamp are a single control
+  // row. Keep these in sync with the [style.height.px] bindings + the gaps
+  // in audio-effects.component.html.
   readonly toolbarHeight = 30
-  readonly knobRowHeight = 54
-  readonly compactRowHeight = 28
+  readonly blockHeaderHeight = 22
+  readonly blockHeaderGap = 4
+  readonly knobControlHeight = 54
+  readonly faderRowHeight = 22
+  readonly rowControlHeight = 26
+  readonly interBlockGap = 6
   readonly contentPadding = 8
 
+  // Crossfeed: header + a row of two knob/value cells
+  get crossfeedBlockHeight () {
+    return this.blockHeaderHeight + this.blockHeaderGap + this.knobControlHeight
+  }
+
+  // Delay: header + two stacked full-width fader rows (with a gap between them)
+  get delayBlockHeight () {
+    return this.blockHeaderHeight + this.blockHeaderGap +
+      this.faderRowHeight + this.blockHeaderGap + this.faderRowHeight
+  }
+
+  // Routing / Preamp: header + a single control row
+  get inlineBlockHeight () {
+    return this.blockHeaderHeight + this.blockHeaderGap + this.rowControlHeight
+  }
+
   get contentHeight () {
-    return this.knobRowHeight + 3 * this.compactRowHeight + this.contentPadding
+    return this.crossfeedBlockHeight + this.delayBlockHeight +
+      2 * this.inlineBlockHeight + 3 * this.interBlockGap + this.contentPadding
   }
 
   @HostBinding('style.height.px') get height () {

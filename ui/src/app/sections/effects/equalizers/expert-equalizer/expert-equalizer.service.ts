@@ -121,10 +121,13 @@ export class ExpertEqualizerService extends EqualizersService {
   public readonly spectrum = new Subject<number[]>()
 
   private readonly onSpectrumFrameEventCallback = (data: any) => {
-    // Native pushes either a bare array of magnitudes or { magnitudes: [...] }
+    // Native SpectrumDataBus pushes { sampleRate, bins: [dBFS…] }. Accept a bare
+    // array or a { magnitudes } shape too for forward-compatibility, but `bins`
+    // is the actual field the running native build emits.
     const frame: number[] | null = Array.isArray(data)
       ? data
-      : (data && Array.isArray(data.magnitudes) ? data.magnitudes : null)
+      : (data && Array.isArray(data.bins) ? data.bins
+        : (data && Array.isArray(data.magnitudes) ? data.magnitudes : null))
     if (frame && frame.length) {
       this.spectrum.next(frame)
     }

@@ -27,9 +27,11 @@ export class AppMixerComponent implements OnInit, OnDestroy {
   synced = false
 
   // Pro-style vertical channel strips (icon on top, vertical fader,
-  // percentage box at the bottom). Strips lay out horizontally and the
-  // list scrolls sideways when there are more than fit (~4-7 visible).
-  readonly stripWidth = 72
+  // percentage box at the bottom). Strips lay out horizontally with an even
+  // gap (see .strip-list in the stylesheet) and the list scrolls sideways
+  // when there are more than fit. At 64px + 6px gap exactly three strips sit
+  // whole inside the 250px left rail; the rest scroll into view.
+  readonly stripWidth = 64
   readonly stripHeight = 240
   readonly verticalPadding = 16
   // Room under the strips for the horizontal scrollbar so it never

@@ -205,9 +205,15 @@ export class AppComponent implements OnInit, AfterContentInit {
   // the signal-chain strip (fixed 54) + its divider, and the status bar.
   private readonly signalChainHeight = 54
   private readonly statusBarHeight = 26
+  // Each of the three deck columns carries 8px top + 8px bottom padding
+  // (.rail / .center-column in app.component.scss). That padding lives
+  // OUTSIDE the per-section height getters, and all columns share it, so
+  // add it once here alongside the other fixed console chrome.
+  private readonly columnVerticalPadding = 8
   private consoleChromeHeight (): number {
     const divider = 3
-    let chrome = divider + this.statusBarHeight // status bar + its top divider
+    // status bar + its top divider + the shared column vertical padding
+    let chrome = divider + this.statusBarHeight + (this.columnVerticalPadding * 2)
     if (this.ui.settings.signalChainFeatureEnabled) {
       chrome += this.signalChainHeight + divider
     }
@@ -241,20 +247,23 @@ export class AppComponent implements OnInit, AfterContentInit {
   }
 
   // Keep in sync with app.component.scss (.left-rail / .right-rail widths
-  // + the two 3px vertical eqm-dividers between the three columns).
-  private readonly leftRailWidth = 210
-  private readonly rightRailWidth = 262
+  // + the two 3px vertical eqm-dividers between the three columns). The
+  // rails were widened (210 -> 250, 262 -> 320) so their components stop
+  // clipping; the flexible EQ center absorbs the rest of the window.
+  private readonly leftRailWidth = 250
+  private readonly rightRailWidth = 320
   private readonly columnDividerWidth = 3
   private readonly centerMinWidth = 390
 
-  // Fixed three-column console width (~1080). Left rail + right rail +
-  // two column dividers + a flexible EQ center that never drops below
-  // centerMinWidth.
+  // Three-column console width: left rail + right rail + two column dividers
+  // + a flexible EQ center that never drops below centerMinWidth. The floor
+  // opens the window wide enough (~1220) that the EQ starts out roomy rather
+  // than pinned at its minimum.
   get minWidth () {
     return Math.max(
       this.leftRailWidth + this.rightRailWidth +
         (this.columnDividerWidth * 2) + this.centerMinWidth,
-      1080
+      1220
     )
   }
 

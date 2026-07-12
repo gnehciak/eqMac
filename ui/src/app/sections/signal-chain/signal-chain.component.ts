@@ -178,8 +178,25 @@ export class SignalChainComponent implements OnInit, OnDestroy {
 
   async ngOnInit () {
     this.rebuild()
-    await this.sync()
+    await this.syncWithRetry()
     this.setupEvents()
+  }
+
+  // The strip is the first component to mount, so its initial sync can fire
+  // before the native bridge finishes connecting — every request would reject
+  // and leave every stage 'unknown' forever (push events only cover changes).
+  // Retry until the stages actually answer.
+  private async syncWithRetry (attempts = 6, delayMs = 700) {
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      await this.sync()
+      // system + output are the only io stages; if any processing stage came
+      // back available the bridge is up and we're done.
+      const anyAvailable = this.nodes.some(n => !n.io && this.nodeAvailable(n.id))
+      if (anyAvailable) return
+      if (attempt < attempts - 1 && !this.destroyed) {
+        await new Promise(resolve => setTimeout(resolve, delayMs))
+      }
+    }
   }
 
   // ----- Initial sync (parallel, each stage isolated so one failure can't
