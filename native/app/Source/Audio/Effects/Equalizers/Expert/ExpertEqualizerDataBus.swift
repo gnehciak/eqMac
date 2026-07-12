@@ -157,6 +157,7 @@ class ExpertEqualizerDataBus: DataBus {
     }
 
     self.add("/spectrum", SpectrumDataBus.self)
+    self.add("/autoeq", AutoEQDataBus.self)
 
     presetsChangedListener = ExpertEqualizer.presetsChanged.on { _ in
       self.send(to: "/presets", data: JSON(ExpertEqualizer.presets.map { $0.dictionary }))

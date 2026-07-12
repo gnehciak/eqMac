@@ -112,7 +112,13 @@ class UI: StoreSubscriber {
     } else {
       if !fs.fileExists(atPath: localZipPath.path) {
         Console.log("\(localZipPath.path) doesnt exist")
-        let bundleUIZipPath = Bundle.main.url(forResource: "ui", withExtension: "zip", subdirectory: "Embedded")!
+        // The zip ships inside the Assets folder reference (Resources/Assets/
+        // Embedded/); older layouts used Resources/Embedded/ - accept both.
+        let bundleUIZipPath = (
+          Bundle.main.url(forResource: "ui", withExtension: "zip", subdirectory: "Assets/Embedded")
+          ?? Bundle.main.url(forResource: "ui", withExtension: "zip", subdirectory: "Embedded")
+          ?? Bundle.main.url(forResource: "ui", withExtension: "zip")
+        )!
         try! fs.copyItem(at: bundleUIZipPath, to: localZipPath)
       }
       try! Zip.unzipFile(localZipPath, destination: localPath, overwrite: true, password: nil) // Unzip

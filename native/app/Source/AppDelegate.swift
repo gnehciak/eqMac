@@ -32,25 +32,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
       Application.start()
     }
 
-    if (Application.store.state.settings.doAutoCheckUpdates) {
-      var stillCheckingConnection = true
-      Networking.checkConnected { connected in
-        stillCheckingConnection = false
-        if (connected) {
-          Application.updater.checkForUpdatesInBackground()
-        } else {
-          self.updateProcessed.emit()
-        }
-      }
-
-      Async.delay(2000) {
-        if (stillCheckingConnection) {
-          self.updateProcessed.emit()
-        }
-      }
-    } else {
-      self.updateProcessed.emit()
-    }
+    // Fork: never gate startup on the Sparkle update check. Upstream's
+    // appcast points at the closed-source binaries (an "update" would
+    // replace this fork), and a hung/failed check used to leave the app
+    // idle forever with audio and the API server never initialized.
+    self.updateProcessed.emit()
 
     NSWorkspace.shared.notificationCenter.addObserver(
         self, selector: #selector(didWakeUp(event:)),
