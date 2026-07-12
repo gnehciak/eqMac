@@ -28,10 +28,17 @@ export class DataService {
     try {
       resp = await Bridge.call(...args)
     } catch (err) {
-      this.toast.show({
-        message: err,
-        type: 'warning'
-      })
+      // toast is an optional dependency - subclasses that declare their own
+      // constructors don't always provide it, and the error path must never
+      // crash harder than the request it is reporting on
+      if (this.toast) {
+        this.toast.show({
+          message: typeof err === 'string' ? err : ((err && err.message) || 'Request failed'),
+          type: 'warning'
+        })
+      } else {
+        console.error(`eqMac request failed: ${args[0]}`, err)
+      }
       throw err
     }
     return resp

@@ -56,7 +56,7 @@ export class RemoteTransport {
     if (RemoteTransport.connectPromise) {
       return RemoteTransport.connectPromise
     }
-    RemoteTransport.connectPromise = RemoteTransport.establishConnection()
+    RemoteTransport.connectPromise = RemoteTransport.establishConnectionWithRetries()
     try {
       await RemoteTransport.connectPromise
       RemoteTransport.shouldReconnect = true
@@ -65,6 +65,22 @@ export class RemoteTransport {
       RemoteTransport.connectPromise = null
       throw err
     }
+  }
+
+  // Page load races the native app's server startup (and macOS may pause
+  // background tabs) - retry the initial connection instead of failing every
+  // caller that arrived during the race.
+  private static async establishConnectionWithRetries (attempts = 4, delayMs = 1000): Promise<void> {
+    let lastError: any
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      try {
+        return await RemoteTransport.establishConnection()
+      } catch (err) {
+        lastError = err
+        await new Promise(resolve => setTimeout(resolve, delayMs))
+      }
+    }
+    throw lastError
   }
 
   static async call (handler: string, data?: JSONData): Promise<any> {
