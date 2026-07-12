@@ -43,8 +43,22 @@ echo "▸ Bundling the driver inside the app (for on-launch install)…"
 rm -rf "$APP/Contents/Resources/eqMac.driver"
 cp -R "$DRV" "$APP/Contents/Resources/eqMac.driver"
 
-echo "▸ Ad-hoc signing (app + nested driver)…"
+echo "▸ Ad-hoc signing driver, then app (inside-out)…"
+# The driver lives in Contents/Resources, which `codesign --deep` does NOT
+# traverse — so without this it ships UNSIGNED, and unsigned arm64 code cannot
+# be loaded by coreaudiod on Apple Silicon. The result on a fresh Mac: the
+# driver copies into place but the virtual device never appears ("installed but
+# Core Audio hasn't picked it up"). Sign the nested driver bundle explicitly
+# first, then deep-sign the app (re-seals Resources around the signed driver and
+# signs the Frameworks).
+codesign --force --sign - "$DRV"
+codesign --force --sign - "$APP/Contents/Resources/eqMac.driver"
 codesign --force --deep --sign - "$APP"
+
+# Guard against a silent re-regression: the shipped driver MUST be signed.
+codesign --verify --verbose=1 "$APP/Contents/Resources/eqMac.driver" \
+  || { echo "✗ nested driver failed signature verification"; exit 1; }
+echo "  driver signature: $(codesign -dv "$APP/Contents/Resources/eqMac.driver" 2>&1 | grep -i '^Signature')"
 
 mkdir -p "$OUT_DIR"
 rm -rf "$OUT_DIR/eqMac.app" "$OUT_DIR/eqMac.driver"

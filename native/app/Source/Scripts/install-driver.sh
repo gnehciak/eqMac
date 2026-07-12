@@ -31,6 +31,11 @@ cp -R "$DRIVER_SRC" "$HAL_DIR/"
 chown -R root:wheel "$DRIVER_DEST"
 chmod -R 755 "$DRIVER_DEST"
 
+# If the app was downloaded or transferred to this Mac, the bundled driver can
+# inherit a quarantine flag; coreaudiod refuses to load quarantined system
+# plug-ins, so strip it. (Harmless if it was never quarantined.)
+xattr -dr com.apple.quarantine "$DRIVER_DEST" 2>/dev/null || true
+
 # Restart CoreAudio so it rescans the HAL directory and loads the new driver.
 # kickstart is the supported path; fall back to a plain signal if SIP or an
 # OS variant refuses it.

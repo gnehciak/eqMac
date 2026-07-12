@@ -10,3 +10,6 @@ dist
 **/yarn.lock
 
 native/app/Sandbox.playground/Resources/track.mp3
+
+# Build output from package-app.sh (compiled .app + .driver bundles, logs)
+/build/

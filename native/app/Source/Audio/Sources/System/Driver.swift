@@ -71,10 +71,10 @@ class Driver {
     if Driver.isInstalled && Driver.isCompatible {
       return completion()
     }
-    if attempts >= 20 {
+    if attempts >= 40 {
       return Alert.confirm(
         title: "Driver didn't activate",
-        message: "The audio driver was installed but Core Audio hasn't picked it up yet. Restarting your Mac usually resolves this.",
+        message: "The audio driver was installed but Core Audio hasn't picked it up yet. Restarting eqMac usually resolves this; if it keeps happening, restart your Mac.",
         okText: "Restart eqMac",
         cancelText: "Quit"
       ) { restart in

@@ -66,6 +66,15 @@ cd native && pod install
 
 `package-app.sh` produces `build/eqMac.app` — a **self-contained, self-installing** bundle. Copy it to a fresh Mac, double-click, and on first launch it prompts once for your admin password and installs its audio driver itself (no separate installer, no download). To iterate in Xcode instead, `open eqMac.xcworkspace` and build the `eqMac` scheme.
 
+### Installing on another Mac
+
+The bundle is **ad-hoc signed** (no paid Apple Developer ID), so Gatekeeper will not let it open on first launch by the usual double-click — this is expected for open-source apps distributed outside the App Store. Move `eqMac.app` to `/Applications`, then either:
+
+* **right-click the app → Open** → *Open* in the dialog (only needed once), or
+* clear the quarantine flag from a terminal: `xattr -cr /Applications/eqMac.app`
+
+After that, launch normally. On first run it will ask for your admin password to install the audio driver, then the eqMac output device appears — no reboot needed. (The driver itself is ad-hoc signed and de-quarantined by the installer, which is what lets Core Audio load it on a clean machine.)
+
 Notes:
 * `pod install` is required once — the fork adds the [Telegraph](https://github.com/Building42/Telegraph) pod for the HTTP/WebSocket server.
 * The audio driver ships **inside** the app (`Contents/Resources/eqMac.driver`) and is installed on demand via `install-driver.sh`; you no longer copy it to `/Library/Audio/Plug-Ins/HAL` by hand.
