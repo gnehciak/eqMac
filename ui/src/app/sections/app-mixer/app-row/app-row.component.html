@@ -1,31 +1,39 @@
-<div class="app-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
-  <img *ngIf="iconSrc" class="app-icon" [src]="iconSrc" [alt]="name" draggable="false" />
-  <eqm-icon *ngIf="!iconSrc" class="app-icon" name="cog" [size]="16"></eqm-icon>
+<div
+  class="app-strip"
+  fxLayout="column"
+  fxLayoutAlign="start center"
+  fxLayoutGap="6px"
+  [class.muted-state]="muted"
+  [class.disabled]="!enabled"
+>
+  <div
+    class="icon-wrap"
+    (click)="toggleMute()"
+    [eqmTooltip]="name + ' — ' + ((muted ? 'appMixer.unmute' : 'appMixer.mute') | translate)"
+  >
+    <img *ngIf="iconSrc && !isSystem" class="app-icon" [src]="iconSrc" [alt]="name" draggable="false" />
+    <eqm-icon *ngIf="!iconSrc || isSystem" class="app-icon" name="speaker" [size]="20" [color]="colors.light"></eqm-icon>
+  </div>
 
-  <div class="app-name" [eqmTooltip]="name">{{ name }}</div>
-
-  <div fxFlex class="slider-container">
+  <div class="fader" fxFlex>
+    <div class="fader-ticks"></div>
+    <div class="fader-fill" [style.height]="fillHeight"></div>
     <eqm-flat-slider
+      class="fader-slider"
+      orientation="vertical"
       [min]="0"
       [max]="1"
       [enabled]="enabled"
-      [value]="volume"
-      (userChangedValue)="setVolume($event.value)"
+      [value]="1 - volume"
+      (userChangedValue)="setVolume(1 - $event.value)"
       [stickToMiddle]="false"
       [showMiddleNotch]="false"
       [doubleClickToAnimateToMiddle]="false"
-      [scrollOnlyWithOrientation]="true"
+      [scrollEnabled]="false"
       [thickness]="3"
-      [thumbRadius]="4"
+      [thumbRadius]="5"
     ></eqm-flat-slider>
   </div>
 
-  <eqm-icon
-    class="mute-button"
-    name="volume"
-    [size]="16"
-    [color]="muted ? colors.warning : colors.accent"
-    [eqmTooltip]="(muted ? 'appMixer.unmute' : 'appMixer.mute') | translate"
-    (click)="toggleMute()"
-  ></eqm-icon>
+  <eqm-value-screen class="strip-value" [fontSize]="10" [enabled]="enabled && !muted">{{ volumePercent }}%</eqm-value-screen>
 </div>

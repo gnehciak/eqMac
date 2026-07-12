@@ -25,20 +25,25 @@ export interface ThemeUISettings extends UISettings {
 
 // Classic Dark — the original hardcoded eqMac palette. Must stay in sync with
 // modules/components/src/styles/theme-tokens.scss
+// Keep in sync with the defaults in modules/components/src/styles/theme-tokens.scss
+// - this map is stamped onto :root at startup and wins over the stylesheet.
 export const DEFAULT_THEME_TOKENS: ThemeTokens = {
-  '--eqm-accent': '#4f8d71',
-  '--eqm-accent-light': '#4DAD82',
+  '--eqm-accent': '#3fca87',
+  '--eqm-accent-light': '#5fd39b',
   '--eqm-warning': '#eb3f42',
   '--eqm-caution': '#FFD500',
-  '--eqm-gradient-start': '#5a5b5f',
-  '--eqm-gradient-end': '#2c2c2e',
+  '--eqm-gradient-start': '#4a4c50',
+  '--eqm-gradient-end': '#1c1e20',
   '--eqm-icon-gradient-start': '#05FF71',
   '--eqm-icon-gradient-middle': '#03F193',
   '--eqm-icon-gradient-end': '#04E2B5',
   '--eqm-text-light': '#c9cdd0',
   '--eqm-text-medium': '#1e1e1e',
   '--eqm-text-dark': '#16191c',
-  '--eqm-surface': '#16191c'
+  '--eqm-surface': '#16191c',
+  '--eqm-card-surface': '#26282b',
+  '--eqm-card-border': '#34373b',
+  '--eqm-band-strip-bg': '#202225'
 }
 
 @Injectable({
@@ -66,7 +71,10 @@ export class ThemeService {
         '--eqm-text-light': '#26292d',
         '--eqm-text-medium': '#dfe1e4',
         '--eqm-text-dark': '#eef0f2',
-        '--eqm-surface': '#ffffff'
+        '--eqm-surface': '#ffffff',
+        '--eqm-card-surface': '#e9ebee',
+        '--eqm-card-border': '#c8ccd1',
+        '--eqm-band-strip-bg': '#dfe2e6'
       }
     },
     {

@@ -1,13 +1,29 @@
+// Pro-reference "Extra Effects" rail card: title header, per-unit rows
+// (toggle + name + reorder / edit / remove), full-width "Add Effect"
+// dropdown at the bottom. All colors come from the shared theme tokens.
 :host {
   display: block;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
+  padding: 6px 10px;
 }
 
-.audio-units {
+.card {
+  box-sizing: border-box;
   height: 100%;
   padding: 8px 10px;
-  box-sizing: border-box;
+  background: var(--eqm-card-surface, #26282b);
+  border: 1px solid var(--eqm-card-border, #34373b);
+  border-radius: 8px;
+}
+
+.header {
+  flex-shrink: 0;
+
+  .title {
+    white-space: nowrap;
+  }
 }
 
 .chain-list {
@@ -47,4 +63,11 @@
 
 .placeholder {
   height: 100%;
+
+  // The unsupported placeholder sits directly in the card column (below
+  // the header) and is sized by fxFlex instead
+  &.unsupported {
+    height: auto;
+    min-height: 0;
+  }
 }

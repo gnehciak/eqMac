@@ -95,6 +95,31 @@ $noise: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyA
     z-index: 3;
   }
 
+  // Pro-look two-column layout: fixed left rail + flexible EQ column.
+  // Widths are kept in sync with AppComponent.leftColumnWidth / minWidth.
+  .columns {
+    width: 100%;
+    align-items: stretch;
+    box-sizing: border-box;
+
+    .left-column {
+      width: 420px;
+      min-width: 420px;
+      max-width: 420px;
+      box-sizing: border-box;
+    }
+
+    .column-divider {
+      align-self: stretch;
+    }
+
+    .right-column {
+      min-width: 620px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+  }
+
   .dropdown-section {
     width: 100%;
     background-color: $gradient-end;

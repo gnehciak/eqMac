@@ -15,7 +15,10 @@ export class VolumeBoosterBalanceComponent implements OnInit {
   ) { }
 
   get height () {
-    return this.replaceKnobsWithSliders ? 125 : 78
+    // Matches the fixed card heights in the stylesheet + the .cards padding:
+    // knob mode:       88px card row + 16px vertical padding            = 104
+    // slider fallback: 80px * 2 stacked cards + 8px gap + 16px padding  = 184
+    return this.replaceKnobsWithSliders ? 184 : 104
   }
 
   async ngOnInit () {

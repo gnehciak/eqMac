@@ -10,10 +10,29 @@
   box-sizing: border-box;
 }
 
-.app-list {
+.strip-list {
   height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  // Thin Pro-style scrollbar under the strips (space reserved by the
+  // host height's scroll gutter).
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--eqm-gradient-end, #2c2c2e);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
+
+.strip {
+  flex-shrink: 0;
 }
 
 .placeholder {

@@ -1,8 +1,9 @@
 // eqMac theme tokens
 // ------------------
 // Single source of truth for the themeable color palette, expressed as CSS
-// custom properties. The values below are the "Classic Dark" skeuomorph theme
-// (the original hardcoded eqMac palette) and act as the default when no theme
+// custom properties. The values below are the "Classic Dark" theme, tuned
+// toward the eqMac Pro reference look (deeper flat panels, #26282b card
+// surfaces, #3fca87 accent green), and act as the default when no theme
 // has been applied yet.
 //
 // At runtime ui/src/app/services/theme.service.ts (ThemeService) re-stamps
@@ -24,12 +25,12 @@
 
 :root {
   // Base palette
-  --eqm-accent: #4f8d71;
-  --eqm-accent-light: #4DAD82;
+  --eqm-accent: #3fca87; // Pro reference knob/slider green
+  --eqm-accent-light: #5fd39b; // lighten(#3fca87, 8)
   --eqm-warning: #eb3f42;
   --eqm-caution: #FFD500;
-  --eqm-gradient-start: #5a5b5f;
-  --eqm-gradient-end: #2c2c2e;
+  --eqm-gradient-start: #4a4c50; // flatter, deeper panel top
+  --eqm-gradient-end: #1c1e20; // Pro reference window background
   --eqm-icon-gradient-start: #05FF71;
   --eqm-icon-gradient-middle: #03F193;
   --eqm-icon-gradient-end: #04E2B5;
@@ -38,9 +39,15 @@
   --eqm-text-dark: #16191c;
   --eqm-surface: #16191c;
 
+  // Pro-layout surfaces (new tokens — additive, safe for older themes since
+  // ThemeService leaves unknown tokens at these defaults)
+  --eqm-card-surface: #26282b; // raised card background (Volume / App Mixer / EQ cards)
+  --eqm-card-border: #34373b; // crisp thin card outline / divider color
+  --eqm-band-strip-bg: #202225; // vertical band-strip / channel-strip well background
+
   // Derived tokens (kept in sync with the base palette by ThemeService)
-  --eqm-accent-darken-20: #2a4c3d; // darken(#4f8d71, 20)
-  --eqm-accent-rgba-50: rgba(79, 141, 113, 0.5); // rgba(#4f8d71, .5)
-  --eqm-gradient-start-darken-6: #4b4c4f; // darken(#5a5b5f, 6)
-  --eqm-gradient-end-lighten-3: #333336; // lighten(#2c2c2e, 3)
+  --eqm-accent-darken-20: #238053; // darken(#3fca87, 20)
+  --eqm-accent-rgba-50: rgba(63, 202, 135, 0.5); // rgba(#3fca87, .5)
+  --eqm-gradient-start-darken-6: #3b3d40; // darken(#4a4c50, 6)
+  --eqm-gradient-end-lighten-3: #232628; // lighten(#1c1e20, 3)
 }

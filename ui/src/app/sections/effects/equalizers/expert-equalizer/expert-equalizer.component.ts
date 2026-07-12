@@ -23,6 +23,12 @@ import { TranslateService } from '../../../../services/translate.service'
 import { Subscription } from 'rxjs'
 import { MatDialog } from '@angular/material/dialog'
 import { AutoEQBrowserComponent } from './autoeq/autoeq-browser.component'
+import { AdditionalPresetOption } from '../presets/equalizer-presets.component'
+import { FlatSliderValueChangedEvent } from '@eqmac/components'
+import {
+  PreampService,
+  PreampAutoGainChangedEventCallback
+} from '../../audio-effects/preamp.service'
 
 @Component({
   selector: 'eqm-expert-equalizer',
@@ -32,10 +38,33 @@ import { AutoEQBrowserComponent } from './autoeq/autoeq-browser.component'
 export class ExpertEqualizerComponent extends EqualizerComponent implements OnInit, OnDestroy {
   @Input() enabled = true
 
-  @HostBinding('style.height.px') height = 280
+  // Pro-style layout: graph, band strips, global gain row, add-band bar.
+  // These constants both drive the template ([style.height.px]) and the
+  // host height binding below, which feeds the native window sizing.
+  readonly graphHeight = 260
+  readonly stripsHeight = 176
+  readonly globalRowHeight = 30
+  readonly addBandBarHeight = 24
+  readonly layoutGap = 6
+
+  @HostBinding('style.height.px') get height () {
+    return this.graphHeight +
+      this.stripsHeight +
+      this.globalRowHeight +
+      this.addBandBarHeight +
+      this.layoutGap * 3
+  }
 
   /** Native validates against this as well — keep in sync with the band schema */
   readonly maxBands = 64
+
+  /** Pro-style headphones button in the preset row — opens the AutoEQ browser */
+  additionalPresetOptionRight: AdditionalPresetOption = {
+    tooltip: '', // set by applyTranslations()
+    icon: 'headphones',
+    iconSize: 14,
+    action: () => this.openAutoEQBrowser()
+  }
 
   public ShowDefaultPresetsCheckbox: CheckboxOption = {
     type: 'checkbox',
@@ -71,10 +100,12 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
   private readonly autoEQButton: ButtonOption = {
     type: 'button',
     label: '',  // set by applyTranslations()
-    action: () => {
-      if (this.settingsDialog) this.settingsDialog.close()
-      this.dialog.open(AutoEQBrowserComponent, { hasBackdrop: true, disableClose: false })
-    }
+    action: () => this.openAutoEQBrowser()
+  }
+
+  private openAutoEQBrowser () {
+    if (this.settingsDialog) this.settingsDialog.close()
+    this.dialog.open(AutoEQBrowserComponent, { hasBackdrop: true, disableClose: false })
   }
 
   settings: Options = [ [
@@ -92,6 +123,7 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
     this.importPresetsButton.label = this.translate.instant('equalizers.importPresets')
     this.exportPresetsButton.label = this.translate.instant('equalizers.exportPresets')
     this.autoEQButton.label = this.translate.instant('autoeq.title')
+    this.additionalPresetOptionRight.tooltip = this.translate.instant('autoeq.title')
   }
 
   public _presets: ExpertEqualizerPreset[]
@@ -126,6 +158,12 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
   globalGain = 0
   selectedBandId: string | null = null
 
+  /** Band inspector popover — opened via a strip's pencil button */
+  inspectorVisible = false
+
+  /** Preamp auto-gain state, surfaced as the 'Auto' checkbox in the Global row */
+  autoGainOn = false
+
   get selectedBand (): ExpertEqualizerBand | null {
     return this.bands.find(band => band.id === this.selectedBandId) || null
   }
@@ -134,13 +172,18 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
     return this.bands.length < this.maxBands
   }
 
+  get globalGainScreenValue () {
+    return `${this.globalGain > 0 ? '+' : ''}${this.globalGain.toFixed(1)}dB`
+  }
+
   constructor (
     public service: ExpertEqualizerService,
     public change: ChangeDetectorRef,
     public app: ApplicationService,
     public toast: ToastService,
     private readonly translate: TranslateService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    public preamp: PreampService
   ) {
     super()
     this.applyTranslations()
@@ -182,8 +225,17 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
 
   public async syncSettings () {
     return Promise.all([
-      this.syncShowDefaultPresets()
+      this.syncShowDefaultPresets(),
+      this.syncAutoGain()
     ])
+  }
+
+  public async syncAutoGain () {
+    try {
+      this.autoGainOn = await this.preamp.getAutoGain()
+    } catch (err) {
+      // Auto-gain state is non-critical — the editor works without it
+    }
   }
 
   public async syncShowDefaultPresets () {
@@ -196,11 +248,13 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
     this.globalGain = (preset && typeof preset.globalGain === 'number') ? preset.globalGain : 0
     if (this.selectedBandId && !this.bands.some(band => band.id === this.selectedBandId)) {
       this.selectedBandId = null
+      this.inspectorVisible = false
     }
   }
 
   private onPresetsChangedEventCallback: ExpertEqualizerPresetsChangedEventCallback
   private onSelectedPresetChangedEventCallback: ExpertEqualizerSelectedPresetChangedEventCallback
+  private onAutoGainChangedEventCallback: PreampAutoGainChangedEventCallback
   protected setupEvents () {
     this.onPresetsChangedEventCallback = presets => {
       if (!presets) return
@@ -216,11 +270,18 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
       this.change.detectChanges()
     }
     this.service.onSelectedPresetChanged(this.onSelectedPresetChangedEventCallback)
+
+    this.onAutoGainChangedEventCallback = data => {
+      this.autoGainOn = typeof data.autoGain === 'boolean' ? data.autoGain : !!data.enabled
+      this.change.detectChanges()
+    }
+    this.preamp.onAutoGainChanged(this.onAutoGainChangedEventCallback)
   }
 
   private destroyEvents () {
     this.service.offPresetsChanged(this.onPresetsChangedEventCallback)
     this.service.offSelectedPresetChanged(this.onSelectedPresetChangedEventCallback)
+    this.preamp.offAutoGainChanged(this.onAutoGainChangedEventCallback)
   }
 
   // MARK: - Graph / Inspector gestures
@@ -247,12 +308,28 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
     this.bands = this.bands.filter(b => b.id !== band.id)
     if (this.selectedBandId === band.id) {
       this.selectedBandId = null
+      this.inspectorVisible = false
     }
     this.applyBandsToManualPreset()
   }
 
   onBandSelected (band: ExpertEqualizerBand | null) {
     this.selectedBandId = band ? band.id : null
+    if (!band) {
+      this.inspectorVisible = false
+    }
+    this.change.detectChanges()
+  }
+
+  /** Strip pencil button — select the band and open the inspector popover */
+  onBandEdit (band: ExpertEqualizerBand) {
+    this.selectedBandId = band.id
+    this.inspectorVisible = true
+    this.change.detectChanges()
+  }
+
+  closeInspector () {
+    this.inspectorVisible = false
     this.change.detectChanges()
   }
 
@@ -268,6 +345,18 @@ export class ExpertEqualizerComponent extends EqualizerComponent implements OnIn
       enabled: true
     }
     this.onBandAdded(band)
+  }
+
+  // MARK: - Global row (global gain + preamp auto-gain)
+
+  setGlobalGain (event: FlatSliderValueChangedEvent) {
+    this.globalGain = Math.round(event.value * 10) / 10
+    this.applyBandsToManualPreset()
+  }
+
+  setAutoGain (on: boolean) {
+    this.autoGainOn = on
+    this.preamp.setAutoGain(on).catch(() => {})
   }
 
   /**

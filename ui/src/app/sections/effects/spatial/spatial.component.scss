@@ -1,9 +1,37 @@
+// Pro-reference "Spatial Audio" rail card: header row (enable + title),
+// then Environment dropdown beside the Dry/Wet Mix value + knob cluster.
+// All colors come from the shared theme tokens.
 :host {
   display: block;
+  box-sizing: border-box;
+  padding: 6px 10px;
+}
 
-  .spatial {
-    box-sizing: border-box;
-    height: 100%;
-    padding: 5px 10px;
+.card {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 8px 10px;
+  background: var(--eqm-card-surface, #26282b);
+  border: 1px solid var(--eqm-card-border, #34373b);
+  border-radius: 8px;
+
+  .header {
+    flex-shrink: 0;
+
+    .title {
+      white-space: nowrap;
+    }
+  }
+
+  .content {
+    min-height: 0;
+
+    .environment {
+      min-width: 0;
+    }
+
+    .mix-cluster {
+      flex-shrink: 0;
+    }
   }
 }

@@ -34,19 +34,27 @@
   </g>
 
   <path *ngFor="let curve of bandCurves; trackBy: trackByBandId"
+    class="band-fill"
+    [attr.d]="curve.fillPath"
+    [attr.fill]="curve.color"
+    [attr.fill-opacity]="curve.enabled ? (curve.selected ? 0.45 : 0.35) : 0.08"
+    stroke="none"></path>
+
+  <path *ngFor="let curve of bandCurves; trackBy: trackByBandId"
     class="band-curve"
     [attr.d]="curve.path"
     fill="none"
     [attr.stroke]="curve.color"
-    [attr.opacity]="curve.enabled ? (curve.selected ? 0.8 : 0.35) : 0.12"
-    stroke-width="1"></path>
+    [attr.opacity]="curve.enabled ? (curve.selected ? 1 : 0.75) : 0.15"
+    [attr.stroke-width]="curve.selected ? 1.5 : 1"></path>
 
   <path *ngFor="let composite of composites; trackBy: trackByIndex"
     class="composite-curve"
     [attr.d]="composite.path"
     fill="none"
     [attr.stroke]="composite.color"
-    stroke-width="2"></path>
+    stroke-opacity="0.95"
+    stroke-width="2.5"></path>
 
   <g *ngFor="let handle of handles; trackBy: trackByHandle"
     class="handle"

@@ -32,7 +32,6 @@
   "common.bothShort": "LR",
   "common.presetNames.manual": "Manual",
   "common.presetNames.flat": "Flat",
-
   "header.title": "eqMac",
   "header.windowMode": "Window mode",
   "header.popoverMode": "Popover mode",
@@ -43,17 +42,14 @@
   "header.quit": "Quit",
   "header.quitConfirmation": "Are you sure you want to quit eqMac?",
   "header.yesQuit": "Yes, quit",
-
   "volume.title": "Volume",
   "volume.boost": "Boost",
   "volume.enableBoost": "Enable Boost",
   "volume.disableBoost": "Disable Boost",
   "volume.boostUnavailable": "Enable/Disable Boost\nOnly available after v1.0.0",
-
   "balance.title": "Balance",
   "balance.left": "Left",
   "balance.right": "Right",
-
   "source.title": "Audio Source",
   "source.file": "FILE",
   "source.device": "DEVICE",
@@ -62,7 +58,6 @@
   "source.openAudioFile": "Please open an Audio File.",
   "source.selectInputDevice": "Select Input Device",
   "source.noInputDevices": "No Input Devices",
-
   "equalizers.title": "Equalizer:",
   "equalizers.basic": "Basic",
   "equalizers.advanced": "Advanced",
@@ -89,7 +84,6 @@
   "equalizers.filterTypes.bandPass": "Band Pass",
   "equalizers.filterTypes.notch": "Notch",
   "equalizers.filterTypes.allPass": "All Pass",
-
   "expertEq.addBand": "Add Band",
   "expertEq.removeBand": "Remove Band",
   "expertEq.filterType": "Filter Type",
@@ -100,7 +94,11 @@
   "expertEq.selectBandHint": "Select a band on the graph or add one to edit its parameters",
   "expertEq.freq": "Freq",
   "expertEq.q": "Q",
-
+  "expertEq.autoGain": "Auto",
+  "expertEq.autoGainTooltip": "Automatically compensate Preamp gain for EQ boost",
+  "expertEq.editBand": "Edit Band parameters",
+  "expertEq.closeInspector": "Close Band editor",
+  "expertEq.noBands": "No bands — double-click the graph or press Add Band",
   "autoeq.title": "AutoEQ Headphone Presets",
   "autoeq.searchPlaceholder": "Search headphones",
   "autoeq.unavailable": "AutoEQ database is not available",
@@ -112,7 +110,6 @@
   "autoeq.applied": "Applied '{name}'",
   "autoeq.savedAsPreset": "Saved '{name}' as a Preset",
   "autoeq.saveAsPreset": "Save as Preset",
-
   "presets.selectPreset": "Select Preset",
   "presets.noPresets": "No Presets",
   "presets.savePreset": "Save Preset",
@@ -128,11 +125,9 @@
   "presets.defaultNameExists": "A Default preset with this name already exists. Would you like to use this name anyway? You might see Duplicate names in the Preset list.",
   "presets.nameExists": "A preset with this name already exists. Would you like to overwrite it?",
   "presets.removeConfirmation": "Are you sure you want to remove this Preset?",
-
   "outputs.selectOutput": "Select Output",
   "outputs.noOutputs": "No Outputs",
   "outputs.resetPlayback": "Reset playback",
-
   "recorder.record": "Record",
   "recorder.recording": "Recording",
   "recorder.exportFile": "Export File",
@@ -143,12 +138,10 @@
   "recorder.changeFolder": "Change the recordings folder",
   "recorder.savingTo": "Saving to: {folder}",
   "recorder.resetFolder": "Reset to the default recordings folder",
-
   "appMixer.noApps": "No apps are playing audio",
   "appMixer.requiresNewerVersion": "App Mixer requires a newer version of eqMac",
   "appMixer.mute": "Mute",
   "appMixer.unmute": "Unmute",
-
   "effects.title": "Effects",
   "effects.requiresNewerVersion": "Effects require a newer version of eqMac",
   "effects.crossfeed.title": "Crossfeed",
@@ -174,7 +167,6 @@
   "effects.preamp.disable": "Disable Preamp",
   "effects.preamp.autoGain": "Auto Gain",
   "effects.preamp.autoGainTooltip": "Automatically compensate for Equalizer gain",
-
   "spatial.title": "Spatial",
   "spatial.enable": "Enable Spatial audio",
   "spatial.disable": "Disable Spatial audio",
@@ -183,6 +175,7 @@
   "spatial.selectEnvironment": "Select Environment",
   "spatial.noEnvironments": "No Environments",
   "spatial.mix": "Mix",
+  "spatial.dryWetMix": "Dry/Wet Mix",
   "spatial.environments.smallRoom": "Small Room",
   "spatial.environments.mediumRoom": "Medium Room",
   "spatial.environments.largeRoom": "Large Room",
@@ -196,7 +189,6 @@
   "spatial.environments.mediumHall2": "Medium Hall 2",
   "spatial.environments.mediumHall3": "Medium Hall 3",
   "spatial.environments.largeHall2": "Large Hall 2",
-
   "audioUnits.enableDisable": "Enable / Disable",
   "audioUnits.openEditor": "Open Editor",
   "audioUnits.emptyChain": "No Audio Units in the chain",
@@ -206,7 +198,8 @@
   "audioUnits.requiresNewerVersion": "Audio Units require a newer version of eqMac",
   "audioUnits.unitLoading": "{name} (loading...)",
   "audioUnits.unitFailed": "{name} (failed to load)",
-
+  "audioUnits.extraEffects": "Extra Effects",
+  "audioUnits.addEffect": "Add Effect",
   "hearingTest.title": "Hearing Test",
   "hearingTest.requiresNewerVersion": "The Hearing Test requires eqMac version {version} or newer. Please update eqMac.",
   "hearingTest.intro": "This test estimates the quietest tone you can hear at {count} frequencies per ear, then builds a personalized Equalizer preset that compensates for the differences.",
@@ -234,7 +227,6 @@
   "hearingTest.defaultPresetName": "Hearing Test {date}",
   "hearingTest.savedExpert": "Saved. Switch the Equalizer to Expert mode and select the preset to use it.",
   "hearingTest.savedAdvanced": "Saved. Switch the Equalizer to Advanced mode and select the preset to use it.",
-
   "hotkeys.title": "Global Hotkeys",
   "hotkeys.requiresNewerVersion": "Global Hotkeys require eqMac version {version} or newer. Please update eqMac.",
   "hotkeys.notSet": "Not set",
@@ -249,7 +241,6 @@
   "hotkeys.actions.previousPreset": "Previous Preset",
   "hotkeys.actions.eqMacEnabledToggle": "Enable / Disable eqMac",
   "hotkeys.actions.showHideWindow": "Show / Hide Window",
-
   "midi.title": "MIDI Controls",
   "midi.requiresNewerVersion": "MIDI Control requires a newer version of eqMac",
   "midi.respond": "Respond to MIDI controllers",
@@ -278,7 +269,6 @@
   "midi.targets.presetPrevious": "Previous Preset",
   "midi.targets.muteToggle": "Mute On/Off",
   "midi.targets.enabledToggle": "eqMac On/Off",
-
   "superPresets.title": "Super Presets",
   "superPresets.requiresNewerVersion": "Super Presets require a newer version of the eqMac app. Please update eqMac to use this feature.",
   "superPresets.autoSwitch": "Automatically switch Presets",
@@ -297,11 +287,11 @@
   "superPresets.kinds.app": "App",
   "superPresets.disconnected": "{id} (Disconnected)",
   "superPresets.notRunning": "{id} (Not running)",
-
+  "superPresets.barTitle": "Super Preset",
+  "superPresets.editRules": "Edit Super Preset rules",
   "arrangement.reorderHint": "Reorder the main window sections and choose which ones are visible.",
   "arrangement.hiddenHint": "Hidden sections keep their settings and continue to process audio.",
   "arrangement.showHide": "Show / Hide",
-
   "sections.volume": "Volume",
   "sections.appMixer": "App Mixer",
   "sections.equalizers": "Equalizers",
@@ -310,7 +300,6 @@
   "sections.audioUnits": "Audio Units",
   "sections.recorder": "Recorder",
   "sections.output": "Output",
-
   "settings.launchOnLogin": "Launch on login",
   "settings.knobsToSliders": "Knobs → Sliders",
   "settings.knobControl": "Knob Control",
@@ -346,7 +335,6 @@
   "settings.language": "Language",
   "settings.theme": "Theme",
   "settings.arrangeFeatures": "Arrange Features",
-
   "themes.classicDark": "Classic Dark",
   "themes.light": "Light",
   "themes.oceanBlue": "Ocean Blue",
@@ -357,7 +345,6 @@
   "themes.customAccent": "Custom Accent",
   "themes.removeCustomAccent": "Remove the custom accent",
   "themes.pickerHint": "Click a theme to apply it instantly, or drag the hue slider to override the accent color.",
-
   "help.faq": "FAQ",
   "help.reportBug": "Report a Bug",
   "help.appVersion": "App Version: {version}",
@@ -365,7 +352,6 @@
   "help.uiVersion": "UI Version: {version}",
   "help.local": "Local",
   "help.remote": "Remote",
-
   "privacy.title": "Privacy",
   "privacy.intro": "eqMac respects its user's privacy \nand is giving you a choice what data you wish to share with the developer.\nThis data would help us improve and grow the product.",
   "privacy.sendAnalytics": "Send Anonymous Analytics data",

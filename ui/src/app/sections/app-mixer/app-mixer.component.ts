@@ -26,9 +26,16 @@ export class AppMixerComponent implements OnInit, OnDestroy {
   available = false
   synced = false
 
-  readonly rowHeight = 28
-  readonly maxVisibleRows = 4
+  // Pro-style vertical channel strips (icon on top, vertical fader,
+  // percentage box at the bottom). Strips lay out horizontally and the
+  // list scrolls sideways when there are more than fit (~4-7 visible).
+  readonly stripWidth = 72
+  readonly stripHeight = 240
   readonly verticalPadding = 16
+  // Room under the strips for the horizontal scrollbar so it never
+  // overlaps the percentage boxes.
+  readonly scrollGutter = 24
+  readonly emptyHeight = 44
 
   constructor (
     public mixer: AppMixerService,
@@ -36,11 +43,14 @@ export class AppMixerComponent implements OnInit, OnDestroy {
     public changeRef: ChangeDetectorRef
   ) {}
 
-  // Stable window-height participation: only changes when the number of rows
-  // changes (clamped to maxVisibleRows — beyond that the list scrolls internally).
+  // Stable window-height participation: two states only — populated
+  // (fixed strip height, list scrolls horizontally beyond that) or
+  // empty/unavailable placeholder.
   @HostBinding('style.height.px') get height () {
-    const rows = this.available ? Math.max(this.apps.length, 1) : 1
-    return Math.min(rows, this.maxVisibleRows) * this.rowHeight + this.verticalPadding
+    if (this.available && this.apps.length > 0) {
+      return this.stripHeight + this.scrollGutter + this.verticalPadding
+    }
+    return this.emptyHeight
   }
 
   ngOnInit () {

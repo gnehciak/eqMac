@@ -66,8 +66,16 @@ export class SpatialComponent implements OnInit, OnDestroy {
 
   // Stable window-height participation - AppComponent polls and sums
   // section heights every second, so this must not jitter.
+  // Pro-reference card layout: header row + environment/mix content row.
   @HostBinding('style.height.px') get height () {
-    return 90
+    return 110
+  }
+
+  // Proposed 'spatial.dryWetMix' key falls back to the existing
+  // 'spatial.mix' entry until the integration pass lands it in the i18n
+  // catalogs, so no raw dot-key ever hits the screen.
+  get dryWetMixLabelKey (): string {
+    return this.translate.has('spatial.dryWetMix') ? 'spatial.dryWetMix' : 'spatial.mix'
   }
 
   constructor (

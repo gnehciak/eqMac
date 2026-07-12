@@ -214,6 +214,50 @@ export function compositeResponseDb (
   return sum
 }
 
+// MARK: - Band colors (Pro-style rainbow ramp)
+
+/**
+ * Fixed rainbow ramp assigned to bands by index (orange, amber, yellow,
+ * lime, green, teal, cyan, blue, indigo, violet — repeating), matching the
+ * eqMac Pro reference design. These are the fallback values; a theme can
+ * override any entry by stamping an `--eqm-eq-band-color-<index>` CSS custom
+ * property (0-9) on :root, the same token-first pattern ColorsService uses.
+ */
+export const EQ_BAND_COLOR_RAMP: readonly string[] = [
+  '#ff7a2f', // orange
+  '#ffb02e', // amber
+  '#ffe14d', // yellow
+  '#a8e04a', // lime
+  '#4cd964', // green
+  '#2fd8b4', // teal
+  '#35c8e8', // cyan
+  '#4a90ff', // blue
+  '#7a6bff', // indigo
+  '#b05cff' // violet
+]
+
+/**
+ * Color for the band at `index` (wraps around the ramp). Reads the optional
+ * `--eqm-eq-band-color-<i>` theme token first, falling back to the fixed
+ * ramp — safe to call outside the browser (tests / SSR).
+ */
+export function eqBandColor (index: number): string {
+  const length = EQ_BAND_COLOR_RAMP.length
+  const i = ((Math.round(index) % length) + length) % length
+  const fallback = EQ_BAND_COLOR_RAMP[i]
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return fallback
+  }
+  try {
+    const value = window.getComputedStyle(document.documentElement)
+      .getPropertyValue(`--eqm-eq-band-color-${i}`)
+    const trimmed = typeof value === 'string' ? value.trim() : ''
+    return trimmed.length > 0 ? trimmed : fallback
+  } catch (err) {
+    return fallback
+  }
+}
+
 /** `count` logarithmically spaced frequencies from `min` to `max` Hz (inclusive) */
 export function logSpacedFrequencies (count: number, min = 20, max = 20000): number[] {
   const n = Math.max(count, 2)

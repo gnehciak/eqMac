@@ -25,6 +25,7 @@ import { AudioEffectsComponent } from './sections/effects/audio-effects/audio-ef
 import { SpatialComponent } from './sections/effects/spatial/spatial.component'
 import { AudioUnitsComponent } from './sections/effects/audio-units/audio-units.component'
 import { RecorderComponent } from './sections/recorder/recorder.component'
+import { SuperPresetBarComponent } from './sections/super-preset-bar/super-preset-bar.component'
 import { normalizeSectionOrder } from './sections/settings/themes/arrangement-dialog.component'
 import { ThemeService } from './services/theme.service'
 import { TranslateService } from './services/translate.service'
@@ -47,6 +48,7 @@ export class AppComponent implements OnInit, AfterContentInit {
   @ViewChild('spatial', { static: false }) spatial: SpatialComponent
   @ViewChild('audioUnits', { static: false }) audioUnits: AudioUnitsComponent
   @ViewChild('recorder', { static: false }) recorder: RecorderComponent
+  @ViewChild('superPresetBar', { static: false }) superPresetBar: SuperPresetBarComponent
 
   // Main-section rendering order (Arrangement dialog persists
   // UISettings.sectionOrder; normalizeSectionOrder always returns all
@@ -55,8 +57,15 @@ export class AppComponent implements OnInit, AfterContentInit {
     return normalizeSectionOrder(this.ui.settings.sectionOrder)
   }
 
-  isLastSection (sectionId: string): boolean {
-    const order = this.sectionOrder
+  // Pro-look two-column layout: everything except the Equalizers lives in
+  // the fixed-width left rail (in the user's arranged order); the
+  // Equalizers section fills the flexible right column.
+  get leftSectionOrder (): string[] {
+    return this.sectionOrder.filter(sectionId => sectionId !== 'equalizers')
+  }
+
+  isLastLeftSection (sectionId: string): boolean {
+    const order = this.leftSectionOrder
     return order[order.length - 1] === sectionId
   }
 
@@ -102,60 +111,92 @@ export class AppComponent implements OnInit, AfterContentInit {
     this.app.ref = this
   }
 
-  // Sums the heights of all enabled + rendered main sections. Every
-  // section except the last rendered one is followed by an eqm-divider.
-  // ViewChild refs are null-guarded: right after a visibility toggle a
-  // ref can be undefined for one CD cycle and the 1s dimensions poll
-  // must not throw.
-  private sectionsHeight ({ useEqualizersMaxHeight }: { useEqualizersMaxHeight: boolean }): number {
+  // Sums the heights of the enabled + rendered LEFT rail sections, in
+  // rendered order. Every rendered element except the last one is
+  // followed by an eqm-divider (the Super Preset bar renders right after
+  // the App Mixer, matching the template). ViewChild refs are
+  // null-guarded: right after a visibility toggle a ref can be undefined
+  // for one CD cycle and the 1s dimensions poll must not throw.
+  private leftColumnHeight (): number {
     const divider = 3
 
     const {
       volumeFeatureEnabled, balanceFeatureEnabled,
       appMixerFeatureEnabled,
-      equalizersFeatureEnabled,
       effectsFeatureEnabled,
       spatialFeatureEnabled,
       audioUnitsFeatureEnabled,
       recorderFeatureEnabled,
-      outputFeatureEnabled
+      outputFeatureEnabled,
+      superPresetsBarFeatureEnabled
     } = this.ui.settings
 
     const heights: number[] = []
-    if ((volumeFeatureEnabled || balanceFeatureEnabled) && this.volumeBoosterBalance) {
-      heights.push(this.volumeBoosterBalance.height)
-    }
-    if (appMixerFeatureEnabled && this.appMixer) {
-      heights.push(this.appMixer.height)
-    }
-    if (equalizersFeatureEnabled && this.equalizers) {
-      heights.push(useEqualizersMaxHeight ? this.equalizers.maxHeight : this.equalizers.height)
-    }
-    if (effectsFeatureEnabled && this.audioEffects) {
-      heights.push(this.audioEffects.height)
-    }
-    if (spatialFeatureEnabled && this.spatial) {
-      heights.push(this.spatial.height)
-    }
-    if (audioUnitsFeatureEnabled && this.audioUnits) {
-      heights.push(this.audioUnits.height)
-    }
-    if (recorderFeatureEnabled && this.recorder) {
-      heights.push(this.recorder.height)
-    }
-    if (outputFeatureEnabled && this.outputs) {
-      heights.push(this.outputs.height)
+    for (const sectionId of this.leftSectionOrder) {
+      switch (sectionId) {
+        case 'volume':
+          if ((volumeFeatureEnabled || balanceFeatureEnabled) && this.volumeBoosterBalance) {
+            heights.push(this.volumeBoosterBalance.height)
+          }
+          break
+        case 'app-mixer':
+          if (appMixerFeatureEnabled && this.appMixer) {
+            heights.push(this.appMixer.height)
+          }
+          if (superPresetsBarFeatureEnabled && this.superPresetBar) {
+            heights.push(this.superPresetBar.height)
+          }
+          break
+        case 'effects':
+          if (effectsFeatureEnabled && this.audioEffects) {
+            heights.push(this.audioEffects.height)
+          }
+          break
+        case 'spatial':
+          if (spatialFeatureEnabled && this.spatial) {
+            heights.push(this.spatial.height)
+          }
+          break
+        case 'audio-units':
+          if (audioUnitsFeatureEnabled && this.audioUnits) {
+            heights.push(this.audioUnits.height)
+          }
+          break
+        case 'recorder':
+          if (recorderFeatureEnabled && this.recorder) {
+            heights.push(this.recorder.height)
+          }
+          break
+        case 'outputs':
+          if (outputFeatureEnabled && this.outputs) {
+            heights.push(this.outputs.height)
+          }
+          break
+      }
     }
 
     return heights.reduce((sum, height) => sum + height, 0) +
       Math.max(heights.length - 1, 0) * divider
   }
 
+  private rightColumnHeight ({ useEqualizersMaxHeight }: { useEqualizersMaxHeight: boolean }): number {
+    if (!this.ui.settings.equalizersFeatureEnabled || !this.equalizers) return 0
+    return useEqualizersMaxHeight ? this.equalizers.maxHeight : this.equalizers.height
+  }
+
+  // Two-column window height: header chrome + the taller of the two columns
+  private columnsHeight ({ useEqualizersMaxHeight }: { useEqualizersMaxHeight: boolean }): number {
+    return Math.max(
+      this.leftColumnHeight(),
+      this.rightColumnHeight({ useEqualizersMaxHeight })
+    )
+  }
+
   get minHeight () {
     const divider = 3
 
     let minHeight = this.header.height + divider +
-      this.sectionsHeight({ useEqualizersMaxHeight: false })
+      this.columnsHeight({ useEqualizersMaxHeight: false })
 
     const dropdownSection = document.getElementById('dropdown-section')
     if (dropdownSection) {
@@ -168,15 +209,30 @@ export class AppComponent implements OnInit, AfterContentInit {
     return minHeight
   }
 
+  // Keep in sync with app.component.scss (.left-column / .right-column
+  // widths + the 3px vertical eqm-divider between the columns)
+  private readonly leftColumnWidth = 420
+  private readonly columnDividerWidth = 3
+  private readonly rightColumnMinWidth = 620
+
   get minWidth () {
-    return 400
+    // Right EQ column only renders when the Equalizers feature is on;
+    // without it the window collapses back to the single left rail.
+    if (!this.ui.settings.equalizersFeatureEnabled) {
+      return this.leftColumnWidth
+    }
+    // 420 + 3 + 620 = 1043 -> pad the EQ column up to the ~1080 Pro default
+    return Math.max(
+      this.leftColumnWidth + this.columnDividerWidth + this.rightColumnMinWidth,
+      1080
+    )
   }
 
   get maxHeight () {
     const divider = 3
 
     let maxHeight = this.header.height + divider +
-      this.sectionsHeight({ useEqualizersMaxHeight: true })
+      this.columnsHeight({ useEqualizersMaxHeight: true })
 
     const dropdownSection = document.getElementById('dropdown-section')
     if (dropdownSection) {
@@ -317,7 +373,30 @@ This data would help us improve and grow the product.`
     setInterval(() => {
       this.syncMinHeight()
       this.syncMaxHeight()
+      this.syncMinWidth()
     }, 1000)
+  }
+
+  // The two-column Pro layout needs a wider window than the old
+  // single-column flow (native persisted 400px). Push the new minWidth to
+  // the native side and grow the window if it is currently narrower.
+  private previousMinWidth: number
+  private syncingMinWidth = false
+  async syncMinWidth () {
+    if (this.syncingMinWidth) return
+    const minWidth = this.minWidth
+    if (this.previousMinWidth === minWidth) return
+    this.syncingMinWidth = true
+    try {
+      this.previousMinWidth = minWidth
+      await this.ui.setMinWidth({ minWidth })
+      const width = await this.ui.getWidth()
+      if (width < minWidth) {
+        await this.ui.setWidth(minWidth)
+      }
+    } finally {
+      this.syncingMinWidth = false
+    }
   }
 
   private previousMinHeight: number

@@ -81,6 +81,7 @@ import { UIService } from './services/ui.service'
 import { TranslatePipe } from './pipes/translate.pipe'
 import { ExpertEqualizerComponent } from './sections/effects/equalizers/expert-equalizer/expert-equalizer.component'
 import { BandInspectorComponent } from './sections/effects/equalizers/expert-equalizer/band-inspector.component'
+import { BandStripComponent } from './sections/effects/equalizers/expert-equalizer/band-strip.component'
 import { AutoEQBrowserComponent } from './sections/effects/equalizers/expert-equalizer/autoeq/autoeq-browser.component'
 import { Graphic31EqualizerComponent } from './sections/effects/equalizers/graphic31-equalizer/graphic31-equalizer.component'
 import { AppMixerComponent } from './sections/app-mixer/app-mixer.component'
@@ -94,6 +95,7 @@ import { MIDIDialogComponent } from './sections/settings/midi/midi-dialog.compon
 import { ThemePickerDialogComponent } from './sections/settings/themes/theme-picker-dialog.component'
 import { ArrangementDialogComponent } from './sections/settings/themes/arrangement-dialog.component'
 import { HearingTestDialogComponent } from './sections/settings/hearing-test/hearing-test-dialog.component'
+import { SuperPresetBarComponent } from './sections/super-preset-bar/super-preset-bar.component'
 
 @NgModule({
   imports: [
@@ -150,10 +152,12 @@ import { HearingTestDialogComponent } from './sections/settings/hearing-test/hea
     // Wave 2/3 sections and dialogs
     ExpertEqualizerComponent,
     BandInspectorComponent,
+    BandStripComponent,
     AutoEQBrowserComponent,
     Graphic31EqualizerComponent,
     AppMixerComponent,
     AppRowComponent,
+    SuperPresetBarComponent,
     AudioEffectsComponent,
     SpatialComponent,
     AudioUnitsComponent,

@@ -11,12 +11,14 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef
 } from '@angular/core'
+import { Subscription } from 'rxjs'
 import { UtilitiesService } from '../../services/utilities.service'
 import { ColorsService } from '../../services/colors.service'
 import {
   EqGraphBand,
   bandResponseDb,
   compositeResponseDb,
+  eqBandColor,
   logSpacedFrequencies
 } from './biquad-response'
 
@@ -30,6 +32,8 @@ export interface EqGraphBandContextEvent {
 interface EqGraphCurve {
   id: string
   path: string
+  /** Closed path from the curve down to the 0dB baseline (translucent fill) */
+  fillPath: string
   color: string
   selected: boolean
   enabled: boolean
@@ -168,7 +172,11 @@ export class EqGraphComponent implements OnInit, OnDestroy {
     return this.bands.find(band => band.id === this.hoveredBandId) ?? null
   }
 
+  private themeChangedSubscription?: Subscription
+
   async ngOnInit () {
+    // Re-render on theme swaps so curve / composite colors pick up the new tokens
+    this.themeChangedSubscription = this.colors.themeChanged.subscribe(() => this.render())
     this.measure()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const _ of [ ...Array(3) ]) {
@@ -228,19 +236,24 @@ export class EqGraphComponent implements OnInit, OnDestroy {
   private render () {
     const frequencies = logSpacedFrequencies(this.curvePoints, this.minFrequency, this.maxFrequency)
 
-    this.bandCurves = this.bands.map(band => ({
-      id: band.id,
-      path: this.buildPath(bandResponseDb(band, frequencies, this.sampleRate), frequencies),
-      color: this.bandColor(band),
-      selected: band.id === this._selectedBandId,
-      enabled: band.enabled
-    }))
+    this.bandCurves = this.bands.map((band, index) => {
+      const response = bandResponseDb(band, frequencies, this.sampleRate)
+      return {
+        id: band.id,
+        path: this.buildPath(response, frequencies),
+        fillPath: this.buildFillPath(response, frequencies),
+        color: this.bandColor(index),
+        selected: band.id === this._selectedBandId,
+        enabled: band.enabled
+      }
+    })
 
+    // Bold near-white composite drawn over the colored per-band hills
     const stereo = this.bands.some(band => band.enabled && band.channel !== 'both')
     const leftResponse = compositeResponseDb(this.bands, frequencies, this.sampleRate, 'left')
     this.composites = [ {
       path: this.buildPath(leftResponse, frequencies),
-      color: this.colors.accent
+      color: this.colors.light
     } ]
     if (stereo) {
       const rightResponse = compositeResponseDb(this.bands, frequencies, this.sampleRate, 'right')
@@ -250,11 +263,11 @@ export class EqGraphComponent implements OnInit, OnDestroy {
       })
     }
 
-    this.handles = this.bands.map(band => ({
+    this.handles = this.bands.map((band, index) => ({
       band,
       x: this.freqToX(this.clamp(band.frequency, this.minFrequency, this.maxFrequency)),
       y: this.gainToY(this.clamp(band.gain, this.minGain, this.maxGain)),
-      color: this.bandColor(band),
+      color: this.bandColor(index),
       selected: band.id === this._selectedBandId
     }))
 
@@ -262,12 +275,13 @@ export class EqGraphComponent implements OnInit, OnDestroy {
     this.changeRef.detectChanges()
   }
 
-  private bandColor (band: EqGraphBand) {
-    switch (band.channel) {
-      case 'right': return this.colors.warning
-      case 'left': return this.colors.accentLight
-      default: return this.colors.accent
-    }
+  /**
+   * Pro-style fixed rainbow ramp by band index (wraps after 10) — public so
+   * hosts (e.g. the Expert EQ band strips) can match their chrome to the
+   * curve colors. Delegates to the exported `eqBandColor` helper.
+   */
+  bandColor (index: number): string {
+    return eqBandColor(index)
   }
 
   private buildPath (dbValues: number[], frequencies: number[]) {
@@ -279,6 +293,16 @@ export class EqGraphComponent implements OnInit, OnDestroy {
       segments.push(`${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`)
     }
     return segments.join(' ')
+  }
+
+  /** Same polyline closed down to the 0dB baseline for the translucent hill fill */
+  private buildFillPath (dbValues: number[], frequencies: number[]) {
+    const path = this.buildPath(dbValues, frequencies)
+    if (!path) return ''
+    const baseline = this.clamp(this.gainToY(0), 0, this.height)
+    const firstX = this.freqToX(frequencies[0])
+    const lastX = this.freqToX(frequencies[frequencies.length - 1])
+    return `${path} L ${lastX.toFixed(2)} ${baseline.toFixed(2)} L ${firstX.toFixed(2)} ${baseline.toFixed(2)} Z`
   }
 
   private buildGrid () {
@@ -531,6 +555,10 @@ export class EqGraphComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy () {
+    if (this.themeChangedSubscription) {
+      this.themeChangedSubscription.unsubscribe()
+      this.themeChangedSubscription = undefined
+    }
     this.dettachWindowEvents()
   }
 }

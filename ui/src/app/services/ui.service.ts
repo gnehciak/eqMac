@@ -19,6 +19,8 @@ export interface UISettings {
   spatialFeatureEnabled?: boolean
   audioUnitsFeatureEnabled?: boolean
   recorderFeatureEnabled?: boolean
+  // Pro-look compact Super Preset bar in the left rail
+  superPresetsBarFeatureEnabled?: boolean
 
   showEqualizers?: boolean
   showEffects?: boolean
@@ -109,6 +111,9 @@ export class UIService extends DataService {
     }
     if (typeof uiSettings.recorderFeatureEnabled !== 'boolean') {
       this.settings.recorderFeatureEnabled = true
+    }
+    if (typeof uiSettings.superPresetsBarFeatureEnabled !== 'boolean') {
+      this.settings.superPresetsBarFeatureEnabled = true
     }
     this.setSettings(this.settings)
 

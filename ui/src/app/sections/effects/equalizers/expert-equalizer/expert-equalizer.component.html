@@ -1,7 +1,8 @@
 <eqm-loading *ngIf="!selectedPreset || !presets"></eqm-loading>
-<div *ngIf="selectedPreset && presets" fxLayout="column" class="w-100 h-100">
+<div *ngIf="selectedPreset && presets" fxLayout="column" [fxLayoutGap]="layoutGap + 'px'" class="w-100 h-100">
 
-  <div class="graph-area" fxFlex>
+  <!-- Graph: live spectrum underlay + colored per-band curves + composite -->
+  <div class="graph-area" [style.height.px]="graphHeight" [style.min-height.px]="graphHeight">
     <eqm-spectrum class="spectrum" [frames]="service.spectrum"></eqm-spectrum>
     <eqm-eq-graph class="graph"
       [bands]="bands"
@@ -17,13 +18,70 @@
     </eqm-eq-graph>
   </div>
 
-  <eqm-expert-band-inspector
-    [band]="selectedBand"
-    [enabled]="enabled"
-    [canAddBand]="canAddBand"
-    (bandChange)="onInspectorBandChanged($event)"
-    (bandRemove)="onBandRemoved($event)"
-    (addBand)="addBand()">
-  </eqm-expert-band-inspector>
+  <!-- Pro-style per-band strips (scroll horizontally when many bands) -->
+  <div class="strips-area" [style.height.px]="stripsHeight" [style.min-height.px]="stripsHeight">
+    <eqm-expert-band-strips
+      [bands]="bands"
+      [selectedBandId]="selectedBandId"
+      [enabled]="enabled"
+      [minGain]="-24" [maxGain]="24"
+      [minQ]="0.1" [maxQ]="10"
+      (bandChange)="onInspectorBandChanged($event)"
+      (bandSelect)="onBandSelected($event)"
+      (bandRemove)="onBandRemoved($event)"
+      (bandEdit)="onBandEdit($event)">
+    </eqm-expert-band-strips>
+
+    <!-- Band inspector popover — opened via a strip's pencil button -->
+    <div class="inspector-popover" *ngIf="inspectorVisible && selectedBand">
+      <eqm-expert-band-inspector
+        [band]="selectedBand"
+        [enabled]="enabled"
+        [showClose]="true"
+        (bandChange)="onInspectorBandChanged($event)"
+        (bandRemove)="onBandRemoved($event)"
+        (closed)="closeInspector()">
+      </eqm-expert-band-inspector>
+    </div>
+  </div>
+
+  <!-- Global gain row -->
+  <div class="global-row" [style.height.px]="globalRowHeight" [style.min-height.px]="globalRowHeight"
+    fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+    <eqm-label [fontSize]="10" class="global-label">{{ 'equalizers.global' | translate }}</eqm-label>
+    <div fxFlex class="global-slider">
+      <eqm-flat-slider
+        [enabled]="enabled"
+        [min]="-24" [max]="24"
+        [middle]="0"
+        [stickToMiddle]="true"
+        [scrollEnabled]="false"
+        orientation="horizontal"
+        [value]="globalGain"
+        (userChangedValue)="setGlobalGain($event)">
+      </eqm-flat-slider>
+    </div>
+    <eqm-value-screen [enabled]="enabled" [fontSize]="9" class="global-screen">{{ globalGainScreenValue }}</eqm-value-screen>
+    <eqm-checkbox labelSide="right"
+      [enabled]="enabled"
+      [checked]="autoGainOn"
+      (checkedChange)="setAutoGain($event)"
+      [eqmTooltip]="'expertEq.autoGainTooltip' | translate" eqmTooltipPositionSide="top">
+      {{ 'expertEq.autoGain' | translate }}
+    </eqm-checkbox>
+  </div>
+
+  <!-- Full-width add band bar -->
+  <div class="add-band-bar" [style.height.px]="addBandBarHeight" [style.min-height.px]="addBandBarHeight">
+    <eqm-button type="narrow"
+      [enabled]="enabled && canAddBand"
+      (pressed)="addBand()"
+      [eqmTooltip]="'expertEq.addBand' | translate" eqmTooltipPositionSide="top">
+      <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="5px">
+        <eqm-icon name="cross" [width]="9" [height]="9" [stroke]="5" [rotate]="45"></eqm-icon>
+        <eqm-label [fontSize]="10">{{ 'expertEq.addBand' | translate }}</eqm-label>
+      </div>
+    </eqm-button>
+  </div>
 
 </div>

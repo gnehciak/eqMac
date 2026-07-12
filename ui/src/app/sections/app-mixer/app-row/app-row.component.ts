@@ -15,38 +15,102 @@ import { AppMixerService, MixerApp } from '../app-mixer.service'
   selector: 'eqm-app-row',
   templateUrl: './app-row.component.html',
   // No separate .scss file for this sub-component — styles are scoped inline.
-  // Colors come from theme CSS custom properties (w1-theme-i18n-core tokens).
+  // Colors come from theme CSS custom properties (--eqm-* tokens).
+  //
+  // Pro-style vertical channel strip: app icon on top (click to mute),
+  // tall vertical fader with tick marks and an accent fill below the
+  // thumb, percentage box at the bottom.
   styles: [ `
     :host {
       display: block;
     }
-    .app-row {
+    .app-strip {
       height: 100%;
-      padding: 0 4px;
+      padding: 6px 4px;
       box-sizing: border-box;
     }
-    .app-icon {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-    }
-    .app-name {
-      width: 90px;
-      flex-shrink: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-family: 'SF Pro Text';
-      font-size: 12px;
-      color: var(--eqm-text-light, #c9cdd0);
-      cursor: default;
-    }
-    .slider-container {
-      min-width: 0;
-    }
-    .mute-button {
+    .icon-wrap {
+      width: 24px;
+      height: 24px;
       flex-shrink: 0;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .app-strip.disabled .icon-wrap {
+      cursor: default;
+    }
+    img.app-icon {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+    /* Dim the icon when the app is muted */
+    .app-strip.muted-state .app-icon {
+      opacity: 0.35;
+      filter: grayscale(100%);
+    }
+    .fader {
+      position: relative;
+      width: 100%;
+      min-height: 0;
+    }
+    /* eqm-flat-slider (vertical) renders 12px wide + 2px host padding.
+       scaleY(-1) flips it so the thumb tracks the cursor AND the max end
+       sits at the top (the widget's vertical drag math is top=min). The
+       value binding is inverted in the template to match. */
+    .fader-slider {
+      width: 16px;
+      height: 100%;
+      margin: 0 auto;
+      transform: scaleY(-1);
+    }
+    /* The widget's own filling would sit on the wrong side of the thumb
+       when flipped — hide it and draw our own accent fill from the
+       bottom of the groove up to the thumb. */
+    .fader ::ng-deep .groove-filling {
+      display: none;
+    }
+    /* Fine tick marks flanking the groove (7px = 2px slider host padding
+       + 5px thumb radius: the thumb travel region). */
+    .fader-ticks {
+      position: absolute;
+      top: 7px;
+      bottom: 7px;
+      left: calc(50% - 8px);
+      width: 16px;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        var(--eqm-gradient-start, #5a5b5f) 0px,
+        var(--eqm-gradient-start, #5a5b5f) 1px,
+        transparent 1px,
+        transparent 12px
+      );
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    /* Accent fill between the bottom of the groove and the thumb.
+       z-index lifts it above the groove; its height stops short of the
+       thumb center so it tucks under the thumb edge. */
+    .fader-fill {
+      position: absolute;
+      bottom: 7px;
+      left: calc(50% - 1.5px);
+      width: 3px;
+      border-radius: 1.5px;
+      background-color: var(--eqm-accent, #4f8d71);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .app-strip.disabled .fader-fill {
+      background-color: var(--eqm-gradient-start, #5a5b5f);
+    }
+    .app-strip.muted-state .fader-fill {
+      opacity: 0.35;
+    }
+    .strip-value {
+      flex-shrink: 0;
     }
   ` ]
 })
@@ -68,6 +132,32 @@ export class AppRowComponent implements OnChanges, OnDestroy {
 
   get name () {
     return (this.app && (this.app.name || this.app.bundleId)) || ''
+  }
+
+  get volumePercent () {
+    return Math.round(this.clampVolume(this.volume) * 100)
+  }
+
+  // The system / "other audio" strip renders a speaker glyph instead of a
+  // bundle icon (matching the Pro reference).
+  private static readonly SYSTEM_BUNDLE_IDS = [
+    'system',
+    'other',
+    'com.apple.systemsounds',
+    'com.apple.audio.SystemSoundServer'
+  ]
+
+  get isSystem () {
+    const bundleId = ((this.app && this.app.bundleId) || '').toLowerCase()
+    return AppRowComponent.SYSTEM_BUNDLE_IDS.indexOf(bundleId) >= 0
+  }
+
+  // Height of the accent fill under the thumb. The fader travel region is
+  // the strip height minus 14px (2 x 2px slider host padding + 2 x 5px
+  // thumb radius); stop 5px short of the thumb center so the fill ends
+  // under the thumb edge. calc() clamps negative results to 0.
+  get fillHeight () {
+    return `calc((100% - 14px) * ${this.clampVolume(this.volume)} - 5px)`
   }
 
   ngOnChanges (changes: SimpleChanges) {

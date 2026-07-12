@@ -1,4 +1,10 @@
-<div class="audio-units" fxLayout="column" fxLayoutAlign="start stretch">
+<div class="card audio-units" fxLayout="column" fxLayoutAlign="start stretch">
+
+  <!-- Header: "Extra Effects" title (the Audio Units service has no
+       chain-wide bypass, so no master toggle here) -->
+  <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" [style.height.px]="headerHeight">
+    <eqm-label class="title" [fontSize]="11">{{ titleLabelKey | translate }}</eqm-label>
+  </div>
 
   <div *ngIf="synced && supported" class="chain-list" fxFlex>
     <div
@@ -8,13 +14,13 @@
       fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="6px"
       [style.height.px]="rowHeight"
     >
-      <eqm-checkbox
-        [checked]="unit.enabled"
+      <eqm-toggle
+        [state]="unit.enabled"
         [interactive]="unit.status === 'ready'"
-        (checkedChange)="setUnitEnabled(unit, $event)"
+        (stateChange)="setUnitEnabled(unit, $event)"
         [eqmTooltip]="'audioUnits.enableDisable' | translate"
         eqmTooltipPositionSide="bottom"
-      ></eqm-checkbox>
+      ></eqm-toggle>
 
       <eqm-label fxFlex class="unit-name" [fontSize]="11">
         {{ unitLabel(unit) }}
@@ -49,7 +55,7 @@
 
       <eqm-icon
         class="row-button"
-        name="cross" [size]="12"
+        name="minus" [size]="12"
         (click)="removeUnit(unit)"
         [eqmTooltip]="'common.remove' | translate"
         eqmTooltipPositionSide="bottom"
@@ -66,7 +72,7 @@
       fxFlex
       [items]="availableItems"
       labelParam="label"
-      [placeholder]="'audioUnits.add' | translate"
+      [placeholder]="addEffectLabelKey | translate"
       [noItemsPlaceholder]="'audioUnits.noneFound' | translate"
       [searchPlaceholder]="'audioUnits.search' | translate"
       [numberOfVisibleItems]="6"
@@ -75,7 +81,7 @@
     ></eqm-virtual-dropdown>
   </div>
 
-  <div *ngIf="synced && !supported" class="placeholder" fxLayout="row" fxLayoutAlign="center center">
+  <div *ngIf="synced && !supported" class="placeholder unsupported" fxFlex fxLayout="row" fxLayoutAlign="center center">
     <eqm-label [fontSize]="11">{{ 'audioUnits.requiresNewerVersion' | translate }}</eqm-label>
   </div>
 

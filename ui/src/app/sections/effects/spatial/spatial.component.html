@@ -1,7 +1,7 @@
-<div class="spatial" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
+<div class="card" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="6px">
 
-  <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="5px" fxFlex="60px">
-    <eqm-label>{{ 'spatial.title' | translate }}</eqm-label>
+  <!-- Header: enable toggle + "Spatial Audio" title -->
+  <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
     <eqm-checkbox
       [enabled]="available && app.enabled"
       [checked]="enabled"
@@ -9,57 +9,63 @@
       [eqmTooltip]="available ? ((enabled ? 'spatial.disable' : 'spatial.enable') | translate) : ('spatial.unavailable' | translate: { version: minNativeVersion })"
       eqmTooltipPositionSide="bottom"
     ></eqm-checkbox>
+    <eqm-label class="title" [fontSize]="11">{{ 'sections.spatial' | translate }}</eqm-label>
   </div>
 
-  <div fxFlex fxLayout="column" fxLayoutAlign="center stretch" fxLayoutGap="5px">
-    <eqm-label [fontSize]="10">{{ 'spatial.environment' | translate }}</eqm-label>
-    <eqm-dropdown
-      [items]="environments"
-      labelParam="name"
-      [searchable]="false"
-      [enabled]="available && enabled && app.enabled"
-      [placeholder]="'spatial.selectEnvironment' | translate"
-      [noItemsPlaceholder]="'spatial.noEnvironments' | translate"
-      [selectedItem]="selectedEnvironmentItem"
-      (itemSelected)="selectEnvironment($event)"
-    ></eqm-dropdown>
-  </div>
+  <!-- Content: Environment dropdown left, Dry/Wet Mix cluster right -->
+  <div class="content" fxFlex fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="12px">
 
-  <!-- Knob control -->
-  <div *ngIf="!replaceKnobsWithSliders" fxLayout="row" fxLayoutAlign="center center" class="knob-control">
-    <eqm-knob
-      [enabled]="available && enabled && app.enabled"
-      size="small"
-      [min]="0" [max]="100"
-      [(value)]="wetDryMix"
-      (userChangedValue)="setWetDryMix($event)"
-      [doubleClickToAnimateToMiddle]="false"
-      [stickToMiddle]="false"
-      [controlStyle]="ui.settings.knobControlStyle"
-    ></eqm-knob>
-    <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
-      <eqm-label>{{ 'spatial.mix' | translate }}</eqm-label>
-      <eqm-value-screen [enabled]="available && enabled && app.enabled">{{ wetDryMix | fixFloat:0:false }}%</eqm-value-screen>
-    </div>
-  </div>
-
-  <!-- Slider control -->
-  <div *ngIf="replaceKnobsWithSliders" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px" fxFlex="35" class="slider-control">
-    <div fxFlex>
-      <eqm-flat-slider
+    <div class="environment" fxFlex fxLayout="column" fxLayoutAlign="center stretch" fxLayoutGap="4px">
+      <eqm-label [fontSize]="10">{{ 'spatial.environment' | translate }}</eqm-label>
+      <eqm-dropdown
+        [items]="environments"
+        labelParam="name"
+        [searchable]="false"
         [enabled]="available && enabled && app.enabled"
+        [placeholder]="'spatial.selectEnvironment' | translate"
+        [noItemsPlaceholder]="'spatial.noEnvironments' | translate"
+        [selectedItem]="selectedEnvironmentItem"
+        (itemSelected)="selectEnvironment($event)"
+      ></eqm-dropdown>
+    </div>
+
+    <!-- Knob control -->
+    <div *ngIf="!replaceKnobsWithSliders" class="mix-cluster" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+      <div fxLayout="column" fxLayoutAlign="center center" fxFlex="64px">
+        <eqm-label [fontSize]="10">{{ dryWetMixLabelKey | translate }}</eqm-label>
+        <eqm-value-screen [enabled]="available && enabled && app.enabled">{{ wetDryMix | fixFloat:0:false }}%</eqm-value-screen>
+      </div>
+      <eqm-knob
+        [enabled]="available && enabled && app.enabled"
+        size="small"
         [min]="0" [max]="100"
         [(value)]="wetDryMix"
         (userChangedValue)="setWetDryMix($event)"
         [doubleClickToAnimateToMiddle]="false"
         [stickToMiddle]="false"
-        [thickness]="4" [thumbRadius]="5"
-      ></eqm-flat-slider>
+        [controlStyle]="ui.settings.knobControlStyle"
+      ></eqm-knob>
     </div>
-    <div fxLayout="column" fxLayoutAlign="center center" fxFlex="52px">
-      <eqm-label>{{ 'spatial.mix' | translate }}</eqm-label>
-      <eqm-value-screen [enabled]="available && enabled && app.enabled">{{ wetDryMix | fixFloat:0:false }}%</eqm-value-screen>
+
+    <!-- Slider control -->
+    <div *ngIf="replaceKnobsWithSliders" class="mix-cluster" fxFlex="45" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+      <div fxLayout="column" fxLayoutAlign="center center" fxFlex="64px">
+        <eqm-label [fontSize]="10">{{ dryWetMixLabelKey | translate }}</eqm-label>
+        <eqm-value-screen [enabled]="available && enabled && app.enabled">{{ wetDryMix | fixFloat:0:false }}%</eqm-value-screen>
+      </div>
+      <div fxFlex>
+        <eqm-flat-slider
+          [enabled]="available && enabled && app.enabled"
+          [min]="0" [max]="100"
+          [(value)]="wetDryMix"
+          (userChangedValue)="setWetDryMix($event)"
+          [doubleClickToAnimateToMiddle]="false"
+          [stickToMiddle]="false"
+          [thickness]="4" [thumbRadius]="5"
+        ></eqm-flat-slider>
+      </div>
     </div>
+
   </div>
 
 </div>

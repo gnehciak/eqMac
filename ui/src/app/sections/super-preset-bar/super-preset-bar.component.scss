@@ -1,0 +1,27 @@
+// Pro-reference "Super Preset" rail card: one compact row on a raised
+// card surface. All colors come from the shared theme tokens.
+:host {
+  display: block;
+  box-sizing: border-box;
+  padding: 6px 10px;
+}
+
+.card {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 8px 10px;
+  background: var(--eqm-card-surface, #26282b);
+  border: 1px solid var(--eqm-card-border, #34373b);
+  border-radius: 8px;
+
+  .title {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .button-container {
+    flex-shrink: 0;
+    width: 21px;
+    height: 21px;
+  }
+}

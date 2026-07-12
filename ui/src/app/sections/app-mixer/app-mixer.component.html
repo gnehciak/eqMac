@@ -1,10 +1,12 @@
 <div class="app-mixer" fxLayout="column" fxLayoutAlign="start stretch">
-  <div *ngIf="available && apps.length > 0" class="app-list">
+  <div *ngIf="available && apps.length > 0" class="strip-list" fxLayout="row" fxLayoutAlign="start start">
     <eqm-app-row
       *ngFor="let mixerApp of apps; trackBy: trackApp"
+      class="strip"
       [app]="mixerApp"
       [enabled]="app.enabled"
-      [style.height.px]="rowHeight"
+      [style.width.px]="stripWidth"
+      [style.height.px]="stripHeight"
     ></eqm-app-row>
   </div>
 

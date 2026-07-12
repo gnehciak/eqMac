@@ -1,12 +1,19 @@
+// NOTE: booster.component.scss and balance.component.scss @import this file,
+// so every selector below is compiled twice: once in this (parent) scope and
+// once inside each child scope. Rules meant for the child internals are
+// written as :host(.card)/:host(.slider-card) so they only activate on the
+// eqm-booster / eqm-balance host elements (which carry those classes from
+// this component's template) and stay inert here.
+
 :host {
   display: block;
   position: relative;
 }
 
-// .controls {
-//   overflow: hidden;
-//   height: 60px;
-// }
+.cards {
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
 
 .hide {
   height: 0;
@@ -14,4 +21,46 @@
 
 eqm-label {
   margin: 5px;
+}
+
+// ---------------------------------------------------------------------------
+// Pro-style surface cards (parent scope: these classes sit on the
+// eqm-booster / eqm-balance host elements)
+// ---------------------------------------------------------------------------
+
+.card {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 6px 12px 8px 12px;
+  border-radius: 8px;
+  background-color: var(--eqm-surface, #16191c);
+  border: 1px solid var(--eqm-gradient-end-lighten-3, #333336);
+  overflow: hidden;
+}
+
+.knob-card {
+  height: 88px;
+}
+
+.slider-card {
+  height: 80px;
+}
+
+// ---------------------------------------------------------------------------
+// Card internals (child scope only — activated via the child @imports)
+// ---------------------------------------------------------------------------
+
+// Card title: the first (section) label inside the booster/balance templates,
+// pinned to the top-left corner of the card like the Pro reference.
+:host(.card) > eqm-label {
+  align-items: flex-start;
+  text-align: left;
+  margin: 0 0 2px 0;
+}
+
+// The slider fallback rows pull themselves up with a negative top margin
+// (see child .slider-control rules) — give the title extra clearance.
+:host(.slider-card) > eqm-label {
+  margin-bottom: 8px;
 }

@@ -1,14 +1,16 @@
 .header {
-  background-color: #3E3E3E;
+  // Pro-style flat dark title bar (themeable surface token)
+  background-color: var(--eqm-surface, #16191c);
   padding: 2px 7px 0px 7px;
 }
 
 .menu-buttons {
   height: 100%;
 }
+
 .circle-button {
   border-radius: 25px;
-  background-color: #8E8E93;
+  background-color: var(--eqm-text-light, #c9cdd0);
   overflow: hidden;
 }
 
@@ -17,7 +19,46 @@
   height: 12px;
 }
 
+// macOS-style traffic lights (tokenized so themes recolor them)
+.left.close {
+  background-color: var(--eqm-warning, #eb3f42);
+}
+
+.left.minimize {
+  background-color: var(--eqm-caution, #FFD500);
+}
+
+.left.mode {
+  background-color: var(--eqm-accent-light, #4DAD82);
+}
+
 .right {
   width: 16px;
   height: 16px;
+}
+
+.title-area {
+  height: 100%;
+}
+
+.app-title ::ng-deep .label {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+// Fork equivalent of the official Pro badge: rounded 4px accent chip.
+// Text color uses the surface token: near-white on the accent chip in the
+// light theme, near-black (macOS traffic-light glyph style) in dark themes.
+.reborn-badge {
+  margin-left: 5px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background-color: var(--eqm-accent, #4f8d71);
+
+  ::ng-deep .label {
+    color: var(--eqm-surface, #16191c);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    line-height: 1;
+  }
 }

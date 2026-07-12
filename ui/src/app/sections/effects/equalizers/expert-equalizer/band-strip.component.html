@@ -1,0 +1,90 @@
+<div class="strips" *ngIf="bands && bands.length; else noBands">
+
+  <div class="strip"
+    *ngFor="let band of bands; let i = index; trackBy: trackById"
+    [class.selected]="band.id === selectedBandId"
+    [class.disabled]="!band.enabled"
+    (click)="select(band)">
+
+    <!-- Colored enable chip + filter-type glyph -->
+    <div class="strip-head" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="3px">
+      <eqm-checkbox
+        [enabled]="enabled"
+        [color]="color(i)"
+        [checked]="band.enabled"
+        (checkedChange)="setEnabled(band, $event)"
+        [eqmTooltip]="'expertEq.enableDisableBand' | translate" eqmTooltipPositionSide="top">
+      </eqm-checkbox>
+      <svg class="type-icon" viewBox="0 0 20 12"
+        [eqmTooltip]="typeName(band.type)" eqmTooltipPositionSide="top">
+        <path [attr.d]="typePath(band.type)"
+          fill="none"
+          [attr.stroke]="color(i)"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </div>
+
+    <eqm-label class="freq-label" [fontSize]="9">{{ frequencyLabel(band) }}</eqm-label>
+
+    <!-- Vertical gain slider over fine tick marks -->
+    <div class="gain-slider">
+      <div class="ticks"></div>
+      <eqm-flat-slider
+        orientation="vertical"
+        [enabled]="enabled"
+        [min]="minGain" [max]="maxGain"
+        [middle]="0"
+        [stickToMiddle]="true"
+        [scrollEnabled]="false"
+        [color]="color(i)"
+        [value]="band.gain"
+        (userChangedValue)="setGain(band, $event)">
+      </eqm-flat-slider>
+    </div>
+
+    <eqm-label class="gain-label" [fontSize]="9">{{ gainLabel(band) }}</eqm-label>
+
+    <!-- Q knob + value -->
+    <div class="q-knob">
+      <div class="q-knob-scale">
+        <eqm-knob
+          size="small"
+          [showScale]="false"
+          [enabled]="enabled"
+          [min]="minQ" [max]="maxQ"
+          [scrollEnabled]="false"
+          [doubleClickToAnimateToMiddle]="false"
+          [value]="band.q"
+          (userChangedValue)="setQ(band, $event)">
+        </eqm-knob>
+      </div>
+    </div>
+    <eqm-label class="q-label" [fontSize]="8">{{ qLabel(band) }}</eqm-label>
+
+    <!-- Edit + remove -->
+    <div class="strip-actions" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2px">
+      <eqm-button type="transparent" [height]="16" [width]="18"
+        [enabled]="enabled"
+        (pressed)="edit(band)"
+        [eqmTooltip]="'expertEq.editBand' | translate" eqmTooltipPositionSide="top">
+        <eqm-icon name="pencil" [width]="9" [height]="9"></eqm-icon>
+      </eqm-button>
+      <eqm-button type="transparent" [height]="16" [width]="18"
+        [enabled]="enabled"
+        (pressed)="remove(band)"
+        [eqmTooltip]="'expertEq.removeBand' | translate" eqmTooltipPositionSide="top">
+        <eqm-icon name="minus" [width]="9" [height]="9" [stroke]="2"></eqm-icon>
+      </eqm-button>
+    </div>
+
+  </div>
+
+</div>
+
+<ng-template #noBands>
+  <div class="no-bands" fxLayout="column" fxLayoutAlign="center center">
+    <eqm-label [fontSize]="10">{{ 'expertEq.noBands' | translate }}</eqm-label>
+  </div>
+</ng-template>

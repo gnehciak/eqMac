@@ -1,3 +1,5 @@
+@import "../../../../styles/colors";
+
 :host {
   display: block;
 }
@@ -29,7 +31,56 @@
   }
 }
 
-eqm-expert-band-inspector {
-  display: block;
+.strips-area {
+  position: relative;
   width: 100%;
+  min-height: 0;
+
+  eqm-expert-band-strips {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  // Band inspector popover anchored over the top of the strips row
+  .inspector-popover {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    z-index: 20;
+    background: $gradient-end;
+    border: 1px solid $dark;
+    border-radius: 4px;
+    box-shadow: 0 6px 18px rgba(black, .45);
+  }
+}
+
+.global-row {
+  width: 100%;
+  padding: 0 4px;
+  box-sizing: border-box;
+
+  .global-label {
+    white-space: nowrap;
+  }
+
+  .global-slider {
+    min-width: 40px;
+  }
+
+  .global-screen {
+    min-width: 56px;
+    text-align: center;
+  }
+}
+
+.add-band-bar {
+  width: 100%;
+
+  eqm-button {
+    display: block;
+    width: calc(100% - 2px);
+    margin: 1px;
+  }
 }

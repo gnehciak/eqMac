@@ -45,10 +45,13 @@ export class AudioUnitsComponent implements OnInit, OnDestroy {
   supported = false
   synced = false
 
+  readonly headerHeight = 22
   readonly rowHeight = 28
   readonly addRowHeight = 34
   readonly maxVisibleRows = 4
-  readonly verticalPadding = 16
+  // Card chrome: host gutter (6px * 2) + card border (1px * 2) + card
+  // padding (8px * 2) - keep in sync with audio-units.component.scss
+  readonly verticalPadding = 30
 
   // The eqm-virtual-dropdown instance — captured to reset its internal
   // selection back to the placeholder after a unit has been added
@@ -66,10 +69,21 @@ export class AudioUnitsComponent implements OnInit, OnDestroy {
   // changes — beyond maxVisibleRows the list scrolls internally.
   @HostBinding('style.height.px') get height () {
     if (!this.synced || !this.supported) {
-      return this.rowHeight + this.verticalPadding
+      return this.headerHeight + this.rowHeight + this.verticalPadding
     }
     const rows = Math.min(Math.max(this.chain.length, 1), this.maxVisibleRows)
-    return rows * this.rowHeight + this.addRowHeight + this.verticalPadding
+    return this.headerHeight + rows * this.rowHeight + this.addRowHeight + this.verticalPadding
+  }
+
+  // Pro-reference card title / add-row labels. The proposed keys fall back
+  // to existing catalog entries until the integration pass lands them in
+  // the i18n files, so no raw dot-keys ever hit the screen.
+  get titleLabelKey (): string {
+    return this.translate.has('audioUnits.extraEffects') ? 'audioUnits.extraEffects' : 'sections.audioUnits'
+  }
+
+  get addEffectLabelKey (): string {
+    return this.translate.has('audioUnits.addEffect') ? 'audioUnits.addEffect' : 'audioUnits.add'
   }
 
   private onLocaleChangedSubscription: any

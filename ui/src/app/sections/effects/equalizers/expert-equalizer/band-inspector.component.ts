@@ -22,9 +22,11 @@ export interface ExpertEqualizerFilterTypeItem {
 }
 
 /**
- * Per-selected-band parameter editor row rendered under the eq-graph:
- * filter type dropdown, frequency / gain / Q sliders with value screens,
- * L / R / Both channel toggle, enable checkbox, add + delete band buttons.
+ * Per-selected-band parameter editor: filter type dropdown, frequency /
+ * gain / Q sliders with value screens, L / R / Both channel toggle, enable
+ * checkbox, delete band button. Since the Pro-style restyle it renders as a
+ * popover over the band strips, opened via a strip's pencil button
+ * (showClose + closed wire the popover dismissal).
  *
  * Styles are inline (styles array) — this component deliberately ships
  * without its own .scss file.
@@ -72,12 +74,13 @@ export interface ExpertEqualizerFilterTypeItem {
 export class BandInspectorComponent implements OnInit, OnDestroy {
   @Input() band: ExpertEqualizerBand | null = null
   @Input() enabled = true
-  @Input() canAddBand = true
+  /** Shows the popover close button (the host toggles the popover) */
+  @Input() showClose = false
 
   /** Emitted after this component mutated the band object's parameters */
   @Output() bandChange = new EventEmitter<ExpertEqualizerBand>()
   @Output() bandRemove = new EventEmitter<ExpertEqualizerBand>()
-  @Output() addBand = new EventEmitter<void>()
+  @Output() closed = new EventEmitter<void>()
 
   // Labels come from the i18n catalog — retranslated in place on locale
   // change so the dropdown's selected item reference stays valid
