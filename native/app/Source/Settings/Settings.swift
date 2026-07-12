@@ -12,7 +12,6 @@ import ServiceManagement
 import LaunchAtLogin
 import SwiftyUserDefaults
 import ReSwift
-import Sentry
 
 enum IconMode: String, Codable {
   case dock = "dock"

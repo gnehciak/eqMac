@@ -125,7 +125,7 @@ class MIDIDataBus: DataBus {
         throw "Invalid 'enabled' parameter, must be a boolean"
       }
       Application.dispatchAction(MIDIAction.setEnabled(enabled))
-      return "MIDI has been " + (enabled ? "enabled" : "disabled")
+      return JSON("MIDI has been " + (enabled ? "enabled" : "disabled"))
     }
 
     mappingsChangedListener = MIDIManager.mappingsChanged.on { mappings in

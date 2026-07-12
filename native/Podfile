@@ -1,5 +1,6 @@
-source 'https://github.com/AudioKit/Specs.git'
-source 'https://github.com/CocoaPods/Specs.git'
+# The AudioKit specs source is gone and no pod here needs it; the CDN
+# replaces the old git-cloned CocoaPods/Specs mirror.
+source 'https://cdn.cocoapods.org/'
 
 # Uncomment the next line to define a global platform for your project
 platform :osx, '10.12'
@@ -9,8 +10,56 @@ use_frameworks!
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.12'
+      # Deployment floor: the AU hosting + reverb bypass paths use auAudioUnit
+      # APIs that require macOS 13, so the whole app targets 13.0.
+      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '13.0'
     end
+  end
+
+  # HTTPParserC's HTTP_STATUS_* enumerators collide with the macOS SDK's
+  # cups/http.h under Xcode 27's explicit module builds. Telegraph never
+  # references these constants, so prefix-rename them inside the pod.
+  # Idempotent: re-runs cleanly after every pod install.
+  cups_undefs = <<~PATCH
+    #define http_parser_h
+
+    /* eqMac fork: the macOS SDK's cups/http.h ships backward-compat macros
+     * (HTTP_GET -> HTTP_STATE_GET etc.) that rewrite this parser's method
+     * enumerators into CUPS enumerator names under Xcode 27's explicit module
+     * builds. Neutralize them before defining enum http_method. */
+    #undef HTTP_OPTIONS
+    #undef HTTP_GET
+    #undef HTTP_HEAD
+    #undef HTTP_POST
+    #undef HTTP_PUT
+    #undef HTTP_DELETE
+    #undef HTTP_TRACE
+  PATCH
+  # Xcode 27's explicit-module dependency scanner needs the app target to
+  # resolve the Zip pod's internal 'Minizip' clang module; expose its
+  # modulemap dir to consumers via the aggregate xcconfigs (quoted — the
+  # checkout path contains a space).
+  installer.aggregate_targets.each do |agg|
+    agg.user_build_configurations.each_key do |config_name|
+      xcpath = agg.xcconfig_path(config_name)
+      next unless File.exist?(xcpath)
+      txt = File.read(xcpath)
+      next if txt.include?('minizip/module')
+      File.write(xcpath, txt + "\nSWIFT_INCLUDE_PATHS = $(inherited) \"${PODS_ROOT}/Zip/Zip/minizip/module\"\n")
+    end
+  end
+
+  ['HTTPParserC/Sources/http_parser.h',
+   'HTTPParserC/Sources/http_parser.c'].each do |file|
+    path = File.join(installer.sandbox.root.to_s, file)
+    next unless File.exist?(path)
+    File.chmod(0644, path)
+    src = File.read(path)
+    patched = src.gsub(/(?<!EQM_)HTTP_STATUS_(MAP|##name)/, 'EQM_HTTP_STATUS_\1')
+    if file.end_with?('.h') && !patched.include?('#undef HTTP_GET')
+      patched = patched.sub("#define http_parser_h\n", cups_undefs)
+    end
+    File.write(path, patched) if patched != src
   end
 end
 
@@ -29,13 +78,15 @@ target 'eqMac' do
   pod 'SwiftHTTP', '~> 3.0'
   # HTTP + WebSocket server for the remote control API (SwiftHTTP is client only)
   pod 'Telegraph', '~> 0.30'
-  pod 'AMCoreAudio', :git => 'https://github.com/bitgapp/AMCoreAudio.git', :commit => 'b312d1509ef863dea3ca56cfa3f57451de4ff721'
+  # bitgapp/AMCoreAudio was deleted from GitHub; this is the exact pinned
+  # commit (b312d15) recovered from the rnine/AMCoreAudio fork network,
+  # vendored so the build no longer depends on a fetchable fork.
+  pod 'AMCoreAudio', :path => 'Vendor/AMCoreAudio'
   pod 'WebViewJavascriptBridge', '~> 6.0'
 #  pod 'ReachabilitySwift'
   pod 'ReSwift', '~> 6.1'
   pod 'SwiftLint'
   pod 'Sparkle', '~> 1.24'
-  pod 'Sentry', '~> 7.1.3'
   pod 'EmitterKit', '~> 5.2.2'
   pod 'SwiftyJSON', '~> 4.2'
   pod 'SwiftyUserDefaults', '4.0'

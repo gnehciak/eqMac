@@ -18,6 +18,7 @@ import Foundation
 import Cocoa
 import ReSwift
 import EmitterKit
+import AMCoreAudio
 
 class SuperPresets: StoreSubscriber {
   // MARK: - Integration wiring

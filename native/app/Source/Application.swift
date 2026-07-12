@@ -10,7 +10,6 @@ import Foundation
 import Cocoa
 import AMCoreAudio
 import Dispatch
-import Sentry
 import EmitterKit
 import AVFoundation
 import SwiftyUserDefaults
@@ -94,10 +93,6 @@ class Application {
   static var equalizersTypeChangedListener: EventListener<EqualizerType>?
 
   static public func start () {
-    if (!Constants.DEBUG) {
-      setupCrashReporting()
-    }
-    
     self.settings = Settings()
 
     createFeatureManagers()
@@ -239,19 +234,9 @@ class Application {
     }
   }
   
-  private static func setupCrashReporting () {
-    // Create a Sentry client and start crash handler
-    SentrySDK.start { options in
-      options.dsn = Constants.SENTRY_ENDPOINT
-      // Only send crash reports if user gave consent
-      options.beforeSend = { event in
-        if (store.state.settings.doCollectCrashReports) {
-          return event
-        }
-        return nil
-      }
-    }
-  }
+  // Crash reporting (Sentry) was removed in this fork: the pod no longer
+  // compiles on current toolchains and reports would go to the original
+  // vendor's private DSN anyway.
 
   private static var settingUpAudio = false
   private static func setupAudio () {
@@ -602,6 +587,14 @@ class Application {
         }
       case .advanced:
         if let preset = AdvancedEqualizer.getPreset(id: equalizersState.advanced.selectedPresetId) {
+          return preset.gains.global
+        }
+      case .expert:
+        if let preset = ExpertEqualizer.getPreset(id: equalizersState.expert.selectedPresetId) {
+          return preset.globalGain
+        }
+      case .graphic31:
+        if let preset = Graphic31Equalizer.getPreset(id: equalizersState.graphic31.selectedPresetId) {
           return preset.gains.global
         }
       }

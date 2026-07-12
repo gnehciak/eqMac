@@ -40,7 +40,7 @@ struct SuperPresetRule: Codable, Equatable {
   var revert: Bool = false
 }
 
-fileprivate struct SuperPresetRulesDefault: DefaultCodableStrategy {
+struct SuperPresetRulesDefault: DefaultCodableStrategy {
   static var defaultValue: [SuperPresetRule] = []
 }
 
@@ -54,7 +54,7 @@ struct SuperPresetsStateDefault: DefaultCodableStrategy {
 
 struct SuperPresetsState: State {
   @DefaultFalse var enabled = false
-  @DefaultCodable<SuperPresetRulesDefault> var rules: [SuperPresetRule] = SuperPresetRulesDefault.value
+  @DefaultCodable<SuperPresetRulesDefault> var rules: [SuperPresetRule] = SuperPresetRulesDefault.defaultValue
 }
 
 enum SuperPresetsAction: Action {
