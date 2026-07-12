@@ -23,6 +23,7 @@ class RoutingDataBus: DataBus {
 
   var enabledChangedListener: EventListener<Bool>?
   var modeChangedListener: EventListener<RoutingMode>?
+  var polarityChangedListener: EventListener<(Bool, Bool)>?
 
   required init (route: String, bridge: Bridge) {
     super.init(route: route, bridge: bridge)
@@ -55,12 +56,41 @@ class RoutingDataBus: DataBus {
       return "Routing mode has been set"
     }
 
+    self.on(.GET, "/polarity") { _, _ in
+      return [
+        "left": self.state.invertLeft,
+        "right": self.state.invertRight
+      ]
+    }
+
+    self.on(.POST, "/polarity") { data, _ in
+      let left = data["left"] as? Bool
+      let right = data["right"] as? Bool
+      guard left != nil || right != nil else {
+        throw "Invalid polarity payload, provide 'left' and/or 'right' booleans"
+      }
+      if let left = left {
+        Application.dispatchAction(RoutingAction.setInvertLeft(left))
+      }
+      if let right = right {
+        Application.dispatchAction(RoutingAction.setInvertRight(right))
+      }
+      return "Polarity inversion has been set"
+    }
+
     enabledChangedListener = Routing.enabledChanged.on { enabled in
       self.send(to: "/enabled", data: JSON([ "enabled": enabled ]))
     }
 
     modeChangedListener = Routing.modeChanged.on { mode in
       self.send(to: "/mode", data: JSON([ "mode": mode.rawValue ]))
+    }
+
+    polarityChangedListener = Routing.polarityChanged.on { invertLeft, invertRight in
+      self.send(to: "/polarity", data: JSON([
+        "left": invertLeft,
+        "right": invertRight
+      ]))
     }
   }
 }

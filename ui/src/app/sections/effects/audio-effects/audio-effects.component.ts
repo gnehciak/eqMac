@@ -31,7 +31,8 @@ import {
 import {
   RoutingService,
   RoutingMode,
-  RoutingModeChangedEventCallback
+  RoutingModeChangedEventCallback,
+  RoutingPolarityChangedEventCallback
 } from './routing.service'
 import {
   PreampService,
@@ -113,6 +114,10 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
   }
 
   selectedRoutingMode: RoutingModeItem = this.routingModes[0]
+
+  // Peace-style per-channel polarity (phase) inversion
+  invertLeft = false
+  invertRight = false
 
   private applyTranslations () {
     for (const item of this.routingModes) {
@@ -201,6 +206,7 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
       delaySettings,
       routingEnabled,
       routingMode,
+      routingPolarity,
       preampEnabled,
       preampGain,
       autoGain
@@ -211,6 +217,7 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
       this.delayService.getSettings(),
       this.routingService.getEnabled(),
       this.routingService.getMode(),
+      this.routingService.getPolarity(),
       this.preampService.getEnabled(),
       this.preampService.getGain(),
       this.preampService.getAutoGain()
@@ -223,6 +230,8 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
     this.delayRightMs = delaySettings.rightMs
     this.routingEnabled = !!routingEnabled
     this.setRoutingModeFromId(routingMode)
+    this.invertLeft = routingPolarity.left
+    this.invertRight = routingPolarity.right
     this.preampEnabled = !!preampEnabled
     this.preampGain = preampGain
     this.autoGain = autoGain
@@ -261,6 +270,7 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
   private onDelaySettingsChangedEventCallback: ChannelDelaySettingsChangedEventCallback
   private onRoutingEnabledChangedEventCallback: EffectEnabledChangedEventCallback
   private onRoutingModeChangedEventCallback: RoutingModeChangedEventCallback
+  private onRoutingPolarityChangedEventCallback: RoutingPolarityChangedEventCallback
   private onPreampEnabledChangedEventCallback: EffectEnabledChangedEventCallback
   private onPreampGainChangedEventCallback: PreampGainChangedEventCallback
   private onPreampAutoGainChangedEventCallback: PreampAutoGainChangedEventCallback
@@ -325,6 +335,13 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
     }
     this.routingService.onModeChanged(this.onRoutingModeChangedEventCallback)
 
+    this.onRoutingPolarityChangedEventCallback = ({ left, right }) => {
+      this.invertLeft = !!left
+      this.invertRight = !!right
+      this.detectChanges()
+    }
+    this.routingService.onPolarityChanged(this.onRoutingPolarityChangedEventCallback)
+
     this.onPreampEnabledChangedEventCallback = ({ enabled }) => {
       this.preampEnabled = enabled
       this.detectChanges()
@@ -366,6 +383,9 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
     }
     if (this.onRoutingModeChangedEventCallback) {
       this.routingService.offModeChanged(this.onRoutingModeChangedEventCallback)
+    }
+    if (this.onRoutingPolarityChangedEventCallback) {
+      this.routingService.offPolarityChanged(this.onRoutingPolarityChangedEventCallback)
     }
     if (this.onPreampEnabledChangedEventCallback) {
       this.preampService.offEnabledChanged(this.onPreampEnabledChangedEventCallback)
@@ -470,6 +490,16 @@ export class AudioEffectsComponent implements OnInit, OnDestroy {
     if (!item) return
     this.selectedRoutingMode = item
     this.routingService.setMode(item.id)
+  }
+
+  setInvertLeft (invert: boolean) {
+    this.invertLeft = invert
+    this.routingService.setPolarity({ left: invert })
+  }
+
+  setInvertRight (invert: boolean) {
+    this.invertRight = invert
+    this.routingService.setPolarity({ right: invert })
   }
 
   setPreampEnabled (enabled: boolean) {

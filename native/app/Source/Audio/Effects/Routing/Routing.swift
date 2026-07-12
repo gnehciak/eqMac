@@ -24,6 +24,8 @@ class Routing: StoreSubscriber {
   // presets).
   static let enabledChanged = EmitterKit.Event<Bool>()
   static let modeChanged = EmitterKit.Event<RoutingMode>()
+  /// (invertLeft, invertRight)
+  static let polarityChanged = EmitterKit.Event<(Bool, Bool)>()
 
   // MARK: - Properties
   let kernel = RoutingKernel()
@@ -40,6 +42,8 @@ class Routing: StoreSubscriber {
   // touch the kernel / emit events when something actually changed.
   private var appliedEnabled: Bool?
   private var appliedMode: RoutingMode?
+  private var appliedInvertLeft: Bool?
+  private var appliedInvertRight: Bool?
 
   // MARK: - Initialization
   init () {
@@ -71,10 +75,25 @@ class Routing: StoreSubscriber {
       Routing.enabledChanged.emit(state.enabled)
     }
 
-    if state.mode != appliedMode {
+    let modeChanged = state.mode != appliedMode
+    let polarityChanged = state.invertLeft != appliedInvertLeft ||
+      state.invertRight != appliedInvertRight
+
+    if modeChanged || polarityChanged {
       appliedMode = state.mode
-      kernel.setMode(state.mode)
-      Routing.modeChanged.emit(state.mode)
+      appliedInvertLeft = state.invertLeft
+      appliedInvertRight = state.invertRight
+      kernel.setParams(
+        mode: state.mode,
+        invertLeft: state.invertLeft,
+        invertRight: state.invertRight
+      )
+      if modeChanged {
+        Routing.modeChanged.emit(state.mode)
+      }
+      if polarityChanged {
+        Routing.polarityChanged.emit((state.invertLeft, state.invertRight))
+      }
     }
   }
 

@@ -21,18 +21,19 @@ class Window: NSWindow, NSWindowDelegate {
     self.titlebarAppearsTransparent = true
     self.isMovableByWindowBackground = true
     
+    // The web UI draws its own traffic lights - hide the native ones.
+    // (The old NSTitlebarContainerView subview walk silently stopped
+    // working on modern macOS; standardWindowButton is the supported way.)
+    hideNativeWindowButtons()
     Async.delay(1000, completion: {
-      for subview in self.contentView!.superview!.subviews {
-        if subview.isKind(of: NSClassFromString("NSTitlebarContainerView")!) {
-          let titleBarView = subview.subviews[0]
-          for button in titleBarView.subviews {
-            if button.isKind(of: NSButton.self) {
-              button.isHidden = true
-            }
-          }
-        }
-      }
+      self.hideNativeWindowButtons()
     })
+  }
+
+  private func hideNativeWindowButtons () {
+    for buttonType in [ NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton ] {
+      standardWindowButton(buttonType)?.isHidden = true
+    }
   }
   
   func windowDidChangeOcclusionState(_ notification: Notification) {
@@ -144,6 +145,8 @@ class Window: NSWindow, NSWindowDelegate {
   func show() {
     self.makeKeyAndOrderFront(nil)
     self.becomeFirstResponder()
+    // Style-mask churn can resurrect the native buttons - keep them hidden
+    hideNativeWindowButtons()
   }
   
   func hide() {

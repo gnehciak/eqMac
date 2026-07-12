@@ -25,11 +25,16 @@ struct RoutingStateDefault: DefaultCodableStrategy {
 struct RoutingState: State {
   @DefaultFalse var enabled = false
   @DefaultCodable<RoutingModeDefault> var mode = RoutingModeDefault.value
+  // Peace-style per-channel polarity (phase) inversion
+  @DefaultFalse var invertLeft = false
+  @DefaultFalse var invertRight = false
 }
 
 enum RoutingAction: Action {
   case setEnabled(Bool)
   case setMode(RoutingMode)
+  case setInvertLeft(Bool)
+  case setInvertRight(Bool)
 }
 
 func RoutingStateReducer (action: Action, state: RoutingState?) -> RoutingState {
@@ -40,6 +45,10 @@ func RoutingStateReducer (action: Action, state: RoutingState?) -> RoutingState 
     state.enabled = enabled
   case .setMode(let mode)?:
     state.mode = mode
+  case .setInvertLeft(let invert)?:
+    state.invertLeft = invert
+  case .setInvertRight(let invert)?:
+    state.invertRight = invert
   case .none:
     break
   }

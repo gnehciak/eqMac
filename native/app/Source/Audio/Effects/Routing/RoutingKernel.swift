@@ -25,9 +25,13 @@ enum RoutingMode: String, Codable, CaseIterable {
 /// AtomicSnapshot.
 final class RoutingKernelParams {
   let mode: RoutingMode
+  let invertLeft: Bool
+  let invertRight: Bool
 
-  init (mode: RoutingMode) {
+  init (mode: RoutingMode, invertLeft: Bool = false, invertRight: Bool = false) {
     self.mode = mode
+    self.invertLeft = invertLeft
+    self.invertRight = invertRight
   }
 }
 
@@ -68,9 +72,13 @@ class RoutingKernel: RawDSPKernel {
     scratch.deallocate()
   }
 
-  /// Publish a new routing mode. Any non-realtime thread.
-  func setMode (_ mode: RoutingMode) {
-    params.set(RoutingKernelParams(mode: mode))
+  /// Publish new routing parameters. Any non-realtime thread.
+  func setParams (mode: RoutingMode, invertLeft: Bool, invertRight: Bool) {
+    params.set(RoutingKernelParams(
+      mode: mode,
+      invertLeft: invertLeft,
+      invertRight: invertRight
+    ))
   }
 
   override func process (
@@ -80,7 +88,10 @@ class RoutingKernel: RawDSPKernel {
     sampleRate: Double
   ) {
     guard channelCount >= 2, frameCount > 0 else { return }
-    let mode = params.value?.mode ?? .stereo
+    let snapshot = params.value
+    let mode = snapshot?.mode ?? .stereo
+    let invertLeft = snapshot?.invertLeft ?? false
+    let invertRight = snapshot?.invertRight ?? false
 
     let left = channelBuffers[0]
     let right = channelBuffers[1]
@@ -88,7 +99,7 @@ class RoutingKernel: RawDSPKernel {
 
     switch mode {
     case .stereo:
-      return
+      break
 
     case .leftToBoth:
       memcpy(right, left, frameCount * floatSize)
@@ -124,6 +135,15 @@ class RoutingKernel: RawDSPKernel {
         memcpy(right + offset, scratch, bytes)
         offset += chunk
       }
+    }
+
+    // Peace-style polarity (phase) inversion - applied after the routing
+    // matrix so it always refers to what actually reaches each ear
+    if invertLeft {
+      vDSP_vneg(left, 1, left, 1, vDSP_Length(frameCount))
+    }
+    if invertRight {
+      vDSP_vneg(right, 1, right, 1, vDSP_Length(frameCount))
     }
   }
 }

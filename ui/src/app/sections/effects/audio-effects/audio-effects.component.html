@@ -144,6 +144,23 @@
       [searchable]="false" [numberOfVisibleItems]="5"
       [placeholder]="'effects.routing.selectMode' | translate" [noItemsPlaceholder]="'effects.routing.noModes' | translate"
     ></eqm-dropdown>
+
+    <!-- Peace-style per-channel polarity (phase) inversion -->
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+      [eqmTooltip]="'effects.routing.polarityTooltip' | translate"
+    >
+      <eqm-label [fontSize]="11">Ø</eqm-label>
+      <eqm-checkbox
+        [enabled]="routingControlsEnabled"
+        [checked]="invertLeft" (checkedChange)="setInvertLeft($event)"
+      ></eqm-checkbox>
+      <eqm-label [fontSize]="10">{{ 'effects.routing.polarityLeft' | translate }}</eqm-label>
+      <eqm-checkbox
+        [enabled]="routingControlsEnabled"
+        [checked]="invertRight" (checkedChange)="setInvertRight($event)"
+      ></eqm-checkbox>
+      <eqm-label [fontSize]="10">{{ 'effects.routing.polarityRight' | translate }}</eqm-label>
+    </div>
   </div>
 
   <!-- Preamp -->
